@@ -1,5 +1,5 @@
 # Contra
-Repository for the Contra project
+Repository for the fair embeddings project
 
 
 run:
