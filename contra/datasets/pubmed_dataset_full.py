@@ -36,6 +36,7 @@ class PubMedFullModule(pl.LightningDataModule):
     def prepare_data(self):
         # Holding all shards in memory is too much: 50 shards*600 MB (per file).
         # Instead, we remember which indexes belong to which file, and read that file only when we have to.
+        # TODO: for just one year, we can hold everything in memory (should be around 1.5 GB).
         # That's why we have to use Shuffle=False in all the dataloaders.
         current_index = 0
         for i in tqdm(range(PUBMED_SHARDS)):
