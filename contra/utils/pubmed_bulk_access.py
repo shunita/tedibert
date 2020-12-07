@@ -48,17 +48,22 @@ def extract_pubmed_date_from_xml(xml_object):
 
 def sanitize_abstract_text_for_csv(string, forbidden_chars=["\r", "\n", ",", ";"]):
     s = string
+    copyright_sign = '©'
     if s is None:
-        return ""
+        return ''
+    s = s.split(copyright_sign)[0]
+    if s.startswith('[This corrects') or s.strip(' ') == 'Copyright:':
+        return ''
     for c in forbidden_chars:
-        s = s.replace(c, " ")
+        s = s.replace(c, ' ')
     return s
 
 
 class BulkPubmedAccess:
 
-    def __init__(self, folder, xmlgz_fname_pattern="pubmed20n{:04}.xml.gz"):
-        self.gz_folder = folder
+    def __init__(self, gz_folder, output_folder, xmlgz_fname_pattern="pubmed20n{:04}.xml.gz"):
+        self.gz_folder = gz_folder
+        self.output_folder = output_folder
         self.fname_pattern = xmlgz_fname_pattern
 
     def download_pubmed(self):
@@ -66,7 +71,7 @@ class BulkPubmedAccess:
         ftp = ftplib.FTP(host, passwd="shunit.agmon@gmail.com")
         ftp.login()
         ftp.cwd("pubmed/baseline/")
-        for i in range(1, PUBMED_FILES):
+        for i in range(1, PUBMED_FILES+1):
             fname = self.fname_pattern.format(i)
             print("downloading file {}".format(fname))
             ftp.retrbinary('RETR {}'.format(fname), open(os.path.join(self.gz_folder, fname), "wb").write)
@@ -81,6 +86,16 @@ class BulkPubmedAccess:
             write_header = not os.path.exists(out)
             chunk.to_csv(os.path.join(self.gz_folder, 'pubmed_v2_shard_{}.csv'.format(i)), mode='a', header=write_header)
 
+    def split_df_by_years(self, df):
+        df = df.dropna(subset=['date'], axis=0)
+        df['year'] = pd.DatetimeIndex(df['date']).year
+        for year in df['year'].unique():
+            subset = df[df['year'] == year]
+            out = os.path.join(self.output_folder, 'pubmed_{}.csv'.format(year))
+            write_header = not os.path.exists(out)
+            subset.to_csv(os.path.join(self.output_folder, 'pubmed_{}.csv'.format(year)), mode='a', header=write_header)
+        
+
     def parse_pubmed_xml_to_dataframe(self, file_index):
         data = {}
         fname = os.path.join(self.gz_folder, self.fname_pattern.format(file_index))
@@ -93,12 +108,16 @@ class BulkPubmedAccess:
             abstract_texts = get_values_list(pubmed_article, "MedlineCitation/Article/Abstract")
             if not abstract_texts:  # Skip empty abstracts.
                 continue
-            if len(abstract_texts) > 1:
-                print("fname:{} pmid:{} has more than one abstracttexts".format(fname, pmid))
-            abstract_text_as_string = ";".join([sanitize_abstract_text_for_csv(item.text) for item in abstract_texts
-                                                if item is not None])
-            abstract_labels = ";".join([item.attrib.get('Label', "") for item in abstract_texts
-                                        if item is not None])
+            #if len(abstract_texts) > 1:
+            #    print("fname:{} pmid:{} has more than one abstracttexts".format(fname, pmid))
+            abstract_texts_sanitized = [sanitize_abstract_text_for_csv(item.text) for item in abstract_texts
+                                        if item is not None]
+            abstract_non_empty_indices = [i for i, item in enumerate(abstract_texts_sanitized) if item!='']
+            abstract_text_as_string = ";".join([abstract_texts_sanitized[i] for i in abstract_non_empty_indices])
+            if abstract_text_as_string.strip(' ;') == '':
+                continue
+            abstract_labels = ";".join([item.attrib.get('Label', "") for i,item in enumerate(abstract_texts)
+                                        if item is not None and i in abstract_non_empty_indices])
             title = get_first_element(pubmed_article, "MedlineCitation/Article/ArticleTitle")
             pub_types = ";".join([sanitize_abstract_text_for_csv(item.text) for item in
                                   pubmed_article.findall(".//PublicationType")
@@ -118,15 +137,18 @@ class BulkPubmedAccess:
             desc = pubmed_article.findall(".//MeshHeading/DescriptorName")
             mesh = ";".join([sanitize_abstract_text_for_csv(d.text) for d in desc])
             data[pmid] = {'title': title, 'abstract': abstract_text_as_string, 'labels': abstract_labels,
-                          'pub_types': pub_types, 'date': date, 'file': fname,
+                          'pub_types': pub_types, 'date': date, 'file': file_index,
                           'mesh_headings': mesh, 'keywords': kw_as_text}
         df = pd.DataFrame.from_dict(data, orient='index')
         return df
 
 
 if __name__ == "__main__":
-    PUBMED_FOLDER = 'pubmed_2019'
-    bpa = BulkPubmedAccess(PUBMED_FOLDER, 'pubmed20n{:04}.xml.gz')
-    bpa.download_pubmed()
+    PUBMED_FOLDER = os.path.expanduser('~/pubmed_2019')
+    OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2019_by_years')
+    bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed20n{:04}.xml.gz')
+    #bpa.download_pubmed()
     for i in range(1, PUBMED_FILES+1):
-        bpa.parse_pubmed_xml_to_dataframe()
+        df = bpa.parse_pubmed_xml_to_dataframe(i)
+        bpa.split_df_by_years(df)
+        #df.to_csv(os.path.join(PUBMED_FOLDER, 'pubmed20n1015.csv'))
