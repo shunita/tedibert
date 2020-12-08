@@ -87,6 +87,8 @@ class BulkPubmedAccess:
             chunk.to_csv(os.path.join(self.gz_folder, 'pubmed_v2_shard_{}.csv'.format(i)), mode='a', header=write_header)
 
     def split_df_by_years(self, df):
+        if len(df) == 0:
+            return
         df = df.dropna(subset=['date'], axis=0)
         df['year'] = pd.DatetimeIndex(df['date']).year
         for year in df['year'].unique():
@@ -143,13 +145,21 @@ class BulkPubmedAccess:
         df = pd.DataFrame.from_dict(data, orient='index')
         return df
 
+    def split_df_into_papers(self, df_path, target_dir):
+        df = pd.read_csv(df_path, index_col=0)
+        for i in range(len(df)):
+        #for i in range(10):
+            df.iloc[i:i+1].to_csv(os.path.join(target_dir, f'{df.iloc[i].name}.csv'))
+        
+
 
 if __name__ == "__main__":
     PUBMED_FOLDER = os.path.expanduser('~/pubmed_2019')
     OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2019_by_years')
     bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed20n{:04}.xml.gz')
     #bpa.download_pubmed()
-    for i in range(1, PUBMED_FILES+1):
-        df = bpa.parse_pubmed_xml_to_dataframe(i)
-        bpa.split_df_by_years(df)
-        #df.to_csv(os.path.join(PUBMED_FOLDER, 'pubmed20n1015.csv'))
+    #for i in range(654, PUBMED_FILES+1):
+    #    df = bpa.parse_pubmed_xml_to_dataframe(i)
+    #    bpa.split_df_by_years(df)
+    #    #df.to_csv(os.path.join(PUBMED_FOLDER, 'pubmed20n1015.csv'))
+    bpa.split_df_into_papers(os.path.join(OUTPUT_FOLDER, 'pubmed_2018.csv'), os.path.join(OUTPUT_FOLDER, '2018') )
