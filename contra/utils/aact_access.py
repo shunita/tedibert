@@ -47,16 +47,12 @@ def execute_query():
 if __name__ == "__main__":
     sex = execute_query()
     # keep nct_ids that have both male and female
-    sex = sex.pivot(index='nct_id', columns='cat', values='total_participants')
-    sex.dropna(axis=0, how='any', inplace=True)
-
-    # get male/female counts for each nct_id
-    nct_id_to_counts = {}
-    f = open("clinical_trial_to_participants_by_sex.csv", "w")
-    f.write("NCT,Male,Female\n")
-    for nct_id, counts in zip(sex.index, sex.values):
-        female_counts, male_counts = counts
-        counts_dict = {'males': male_counts, 'females': female_counts}
-        nct_id_to_counts[nct_id] = counts_dict
-        f.write("{},{},{}\n".format(nct_id, male_counts, female_counts))
-    f.close()
+    fields = ['nct_id', 'study_first_submitted_date', 'total_participants']
+    df = sex[sex['cat'] == 'female'][fields].merge(sex[sex['cat'] == 'male'][fields], on='nct_id',
+                                                   suffixes=['_f', '_m'])
+    df = df.drop(columns=['study_first_submitted_date_f'], axis=1)
+    df = df.rename({'total_participants_f': 'female',
+                    'total_participants_m': 'male',
+                    'study_first_submitted_date_m': 'first_submitted_date'}, axis=1)
+    df.dropna(axis=0, how='any', inplace=True)
+    df.to_csv('ncts_with_participants.csv', index=False)
