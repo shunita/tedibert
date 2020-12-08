@@ -158,8 +158,8 @@ if __name__ == "__main__":
     OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2019_by_years')
     bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed20n{:04}.xml.gz')
     #bpa.download_pubmed()
-    #for i in range(654, PUBMED_FILES+1):
-    #    df = bpa.parse_pubmed_xml_to_dataframe(i)
-    #    bpa.split_df_by_years(df)
-    #    #df.to_csv(os.path.join(PUBMED_FOLDER, 'pubmed20n1015.csv'))
-    bpa.split_df_into_papers(os.path.join(OUTPUT_FOLDER, 'pubmed_2018.csv'), os.path.join(OUTPUT_FOLDER, '2018') )
+    for i in range(1, PUBMED_FILES+1):
+        df = bpa.parse_pubmed_xml_to_dataframe(i)
+        bpa.split_df_by_years(df)
+
+    #bpa.split_df_into_papers(os.path.join(OUTPUT_FOLDER, 'pubmed_2018.csv'), os.path.join(OUTPUT_FOLDER, '2018') )
