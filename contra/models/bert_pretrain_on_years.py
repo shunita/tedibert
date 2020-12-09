@@ -28,8 +28,8 @@ class BertPretrainOnYears(pl.LightningModule):
         # TODO: max_length is not 50! 512 is supposedly the maximum in BERT.
         inputs = self.tokenizer(text, padding=True, truncation=True, max_length=512,
                                 add_special_tokens=True, return_tensors="pt")
-        # TODO: needed? for what?
-        # inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        # TODO: what does the next line do?
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         outputs = self.bert_model(**inputs)
         # TODO: like this??
         return outputs.loss

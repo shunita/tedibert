@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/shunita/fair_temporal/contra')
+sys.path.append('/home/shunita/fairemb/')
 
 from datetime import datetime
 import pytz
