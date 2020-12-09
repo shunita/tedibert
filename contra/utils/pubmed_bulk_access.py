@@ -138,7 +138,10 @@ class BulkPubmedAccess:
             kw_as_text = ";".join([sanitize_abstract_text_for_csv(word) for word in kw_list])
             desc = pubmed_article.findall(".//MeshHeading/DescriptorName")
             mesh = ";".join([sanitize_abstract_text_for_csv(d.text) for d in desc])
-            ncts = ";".join([item.text for item in get_values_list(pubmed_article, './/AccessionNumberList')])
+            ncts = ";".join([item.text for item in get_values_list(pubmed_article, './/AccessionNumberList') 
+                             if item is not None 
+                             and item.text is not None 
+                             and item.text.startswith("NCT")])
             data[pmid] = {'title': title, 'abstract': abstract_text_as_string, 'labels': abstract_labels,
                           'pub_types': pub_types, 'date': date, 'file': file_index,
                           'mesh_headings': mesh, 'keywords': kw_as_text, 'ncts': ncts}
