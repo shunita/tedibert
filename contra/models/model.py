@@ -88,8 +88,9 @@ class FairEmbedding(pl.LightningModule):
     def test_epoch_end(self, outputs) -> None:
         rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
         df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
-        pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).reset_index().index)
-        true_rank = list(df.sort_values(['true_similarity'], ascending=False).reset_index().index)
+        df = df.sort_values(['true_similarity'], ascending=False).reset_index()
+        true_rank = list(df.index)
+        pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).index)
 
         correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
         self.log('test/correlation', correlation)
