@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 
-from contra.constants import FULL_PUMBED_2019_PATH, PUBMED_YEARS
+from contra.constants import FULL_PUMBED_2019_PATH
 
 # helper function
 
@@ -22,8 +22,10 @@ def read_shard(path, start_date, end_date):
     return relevant
 
 
-def read_year(year):
-    path = os.path.join(FULL_PUMBED_2019_PATH, 'pubmed_{}.csv'.format(year))
+def read_year(path_or_year):
+    path = path_or_year
+    if type(path_or_year) == int: # it's a year
+        path = os.path.join(FULL_PUMBED_2019_PATH, f'pubmed_{path_or_year}.csv')
     if not os.path.exists(path):
         print(f"File not found: {path}")
         return None
@@ -36,41 +38,43 @@ class PubMedFullModule(pl.LightningDataModule):
 
     def __init__(self, start_year=2018, end_year=2018, test_size=0.2):
         super().__init__()
-        self.start_year = datetime(start_year, 1, 1)
-        self.end_year = datetime(end_year, 12, 31)
+        self.start_year = start_year
+        self.end_year = end_year
         self.test_size = test_size
         self.relevant_abstracts = None
         self.year_to_indexes = {}
+        self.year_to_pmids = {}
 
     def prepare_data(self):
-        # We remember which indexes belong to which file, and read that file only when we have to.
-        # That's why we have to use Shuffle=False in all the dataloaders.
+        # We remember which indexes belong to which year, so we know which folder contains them.
         current_index = 0
-        for year in range(start_year, end_year+1):
+        for year in range(self.start_year, self.end_year+1):
             relevant = read_year(year)
             self.year_to_indexes[year] = (current_index, current_index+len(relevant))
+            self.year_to_pmids[year] = relevant.index.tolist()
             current_index += len(relevant)
         self.relevant_abstracts = current_index
 
     def setup(self, stage=None):
         train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
-        self.train = PubMedFullDataset(sorted(train_indices), self.shard_to_indexes, self.start_year, self.end_year)
-        self.val = PubMedFullDataset(sorted(val_indices), self.shard_to_indexes, self.start_year, self.end_year)
+        self.train = PubMedFullDataset(train_indices, self.year_to_indexes, self.year_to_pmids, self.start_year, self.end_year)
+        self.val = PubMedFullDataset(val_indices, self.year_to_indexes, self.year_to_pmids, self.start_year, self.end_year)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.train, shuffle=False, batch_size=128, num_workers=3)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=3)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=3)
 
 
 class PubMedFullDataset(Dataset):
-    def __init__(self, indexes, year_to_indexes, start_year, end_year):
+    def __init__(self, indexes, year_to_indexes, year_to_pmids, start_year, end_year):
         self.indexes = indexes
         self.year_to_indexes = year_to_indexes
+        self.year_to_pmids = year_to_pmids
         self.start_year = start_year
         self.end_year = end_year
         self.df = None
@@ -79,7 +83,8 @@ class PubMedFullDataset(Dataset):
     def index_to_filename(self, index):
         for year, interval in self.year_to_indexes.items():
             if interval[0] <= index < interval[1]:
-                return interval[0], os.path.join(FULL_PUMBED_2019_PATH, f'pubmed_{year}.csv')
+                pmid = self.year_to_pmids[year][index-interval[0]]
+                return os.path.join(FULL_PUMBED_2019_PATH, str(year), f'{pmid}.csv')
         raise IndexError
 
     def __len__(self):
@@ -88,10 +93,8 @@ class PubMedFullDataset(Dataset):
     def __getitem__(self, index):
         if torch.is_tensor(index):
             index = index.tolist()
-        first_index_in_year, year_fname = self.index_to_filename(index)
-        if self.current_df_name is None or self.current_df_name != year_fname:
-            self.df = read_year(year_fname)
-            self.current_df_name = year_fname
-        row = self.df.iloc[index - first_index_in_shard]
+        fname = self.index_to_filename(index)
+        df = pd.read_csv(fname, index_col=0)
+        row = df.iloc[0]
         text = '; '.join([row['title'], row['abstract']])
         return {'text': text}
