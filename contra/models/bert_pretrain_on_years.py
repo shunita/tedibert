@@ -26,16 +26,14 @@ class BertPretrainOnYears(pl.LightningModule):
     def forward(self, batch):
         text = batch['text']
         # TODO: max_length is not 50! 512 is supposedly the maximum in BERT.
-        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=512,
+        x = self.tokenizer(text, padding=True, truncation=True, max_length=200,
                                 add_special_tokens=True, return_tensors="pt")
-        # TODO: what does the next line do?
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        outputs = self.bert_model(**inputs)
-        # TODO: like this??
-        return outputs.loss
+        x = {k: v.to(self.device) for k, v in x.items()}
+        x = self.bert_model(**x)
+        return x.loss
 
     def step(self, batch: dict, name='train') -> dict:
-        bert_loss = self.forward(batch)
+        bert_loss = self.forward(batch) # didn't give labels so we got no loss!! loss is None.
         self.log(f'bert_{name}_loss', bert_loss)
         return bert_loss
 
