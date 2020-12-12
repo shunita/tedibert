@@ -71,7 +71,7 @@ class FairEmbedding(pl.LightningModule):
 
     def training_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None) -> dict:
         loss = self.step(batch, optimizer_idx, name='train')
-        return loss
+        return {'loss': loss}
 
     def validation_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
         for i in range(len(self.optimizers())):

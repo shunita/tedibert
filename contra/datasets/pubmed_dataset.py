@@ -89,7 +89,7 @@ class CUIDataset(Dataset):
                             0 - take all - if selected, ignores `frac`
                             1 - random sample
                             2 - top similar
-                            3 - equal between all similarities
+                            3 - uniform distribution of similarities
         """
         self.top_percentile = top_percentile
         self.semtypes = semtypes
@@ -121,7 +121,7 @@ class CUIDataset(Dataset):
             self.similarity_df = self.similarity_df.sample(frac=self.frac)
         elif self.sample_type == 2:
             num_samples = int(self.frac*len(similarity))
-            self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[:num_samples]
+            self.similarity_df = self.similarity_df.nlargest(num_samples, 'similarity')
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
