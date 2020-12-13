@@ -62,13 +62,13 @@ class PubMedFullModule(pl.LightningDataModule):
         self.val = PubMedFullDataset(val_indices, self.year_to_indexes, self.year_to_pmids, self.start_year, self.end_year)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=32, num_workers=3)
+        return DataLoader(self.train, shuffle=False, batch_size=16, num_workers=3)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=16, num_workers=3)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=16, num_workers=3)
 
 
 class PubMedFullDataset(Dataset):

@@ -18,7 +18,7 @@ model = BertPretrainOnYears(hparams)
 logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                      version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                      project='Contra', config=hparams)
-trainer = pl.Trainer(gpus=hparams.gpus, max_epochs=hparams.max_epochs, logger=logger, log_every_n_steps=10)
+trainer = pl.Trainer(gpus=hparams.gpus, max_epochs=hparams.max_epochs, logger=logger, log_every_n_steps=10, accumulate_grad_batches=16, precision=16)
 
 trainer.fit(model, datamodule=dm)
 trainer.test(datamodule=dm)

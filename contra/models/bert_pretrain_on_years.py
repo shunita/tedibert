@@ -29,7 +29,7 @@ class BertPretrainOnYears(pl.LightningModule):
 
     def forward(self, batch):
         text = batch['text']
-        tokenized_as_list = self.tokenizer(text)
+        tokenized_as_list = self.tokenizer(text,padding=True, truncation=True, max_length=200, add_special_tokens=True)
         # Collator output is a dict, and it will have 'input_ids' and 'labels'
         collated = self.data_collator(tokenized_as_list['input_ids'])
         # TODO: max_length is not 200! 512 is supposedly the maximum in BERT.
@@ -38,11 +38,13 @@ class BertPretrainOnYears(pl.LightningModule):
         inputs['labels'] = collated['labels']
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         # At this point, inputs has the 'labels' key for LM and so the loss will not be None.
+        #print(f"shape of input_ids: {inputs['input_ids'].shape}, shape of labels: {inputs['labels'].shape}")
+        
         x = self.bert_model(**inputs)
         return x.loss
 
     def step(self, batch: dict, name='train') -> dict:
-        bert_loss = self.forward(batch) # didn't give labels so we got no loss!! loss is None.
+        bert_loss = self.forward(batch)
         self.log(f'bert_{name}_loss', bert_loss)
         return bert_loss
 
