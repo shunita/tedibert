@@ -4,11 +4,11 @@ Repository for the fair embeddings project
 
 run:
 ```
-sudo docker build -t contra:1.0 .
+sudo docker build -t fairemb:1.0 .
 ```
 to build the  docker images. Then run:
 ```
-sudo docker run -it -v /home/urielsinger/contra:/root/contra -v /home/urielsinger/common:/root/common -p 1234:22 -p 8000-8020:8000-8020 --gpus all --name contra contra:1.0
+sudo docker run -it -v /home/urielsinger/fairemb:/root/fairemb -v /home/urielsinger/common:/root/common -p 1234:22 -p 8000-8020:8000-8020 --gpus all --name fairemb fairemb:1.0
 ```
 to get a container for the project.
 

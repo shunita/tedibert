@@ -32,9 +32,7 @@ RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN echo 'root:Aa123456' | chpasswd
 
 # Init environment
-#RUN source activate lightning
-RUN pip install pandas ipython jupyter pytorch-lightning optuna flask bokeh panel pathos tensorboard tensorflow datetime wandb transformers sklearn
-
+RUN pip install pandas ipython jupyter pytorch-lightning optuna flask bokeh panel pathos tensorboard tensorflow datetime wandb sentencepiece==0.1.91 transformers scikit-learn
 
 ENTRYPOINT ["/bin/bash"]
 CMD []
