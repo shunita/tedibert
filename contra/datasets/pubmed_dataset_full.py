@@ -36,7 +36,7 @@ def read_year(path_or_year):
 
 class PubMedFullModule(pl.LightningDataModule):
 
-    def __init__(self, start_year=2018, end_year=2018, test_size=0.2):
+    def __init__(self, start_year=2018, end_year=2018, test_size=0.2, by_sentence=True):
         super().__init__()
         self.start_year = start_year
         self.end_year = end_year
@@ -44,6 +44,7 @@ class PubMedFullModule(pl.LightningDataModule):
         self.relevant_abstracts = None
         self.year_to_indexes = {}
         self.year_to_pmids = {}
+        self.by_sentence = by_sentence
 
     def prepare_data(self):
         # We remember which indexes belong to which year, so we know which folder contains them.
@@ -61,13 +62,13 @@ class PubMedFullModule(pl.LightningDataModule):
         self.val = PubMedFullDataset(val_indices, self.year_to_indexes, self.year_to_pmids, self.start_year, self.end_year)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=128, num_workers=3)
+        return DataLoader(self.train, shuffle=False, batch_size=32, num_workers=3)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=3)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=3)
 
 
 class PubMedFullDataset(Dataset):
@@ -96,5 +97,5 @@ class PubMedFullDataset(Dataset):
         fname = self.index_to_filename(index)
         df = pd.read_csv(fname, index_col=0)
         row = df.iloc[0]
-        text = '; '.join([row['title'], row['abstract']])
+        text = '; '.join([str(row['title']), str(row['abstract'])])
         return {'text': text}

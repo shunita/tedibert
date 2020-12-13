@@ -33,13 +33,8 @@ order by b.nct_id;
 
 
 def execute_query():
-    params = {
-        'dbname': 'aact',
-        'host': 'aact-db.ctti-clinicaltrials.org',
-        'port': 5432
-    }
-    params['user'] = input("AACT username:")
-    params['password'] = input("AACT password:")
+    params = {'dbname': 'aact', 'host': 'aact-db.ctti-clinicaltrials.org', 'port': 5432,
+              'user': input("AACT username:"), 'password': input("AACT password:")}
     conn = psycopg2.connect(**params)
     return pd.read_sql_query(sex_query, conn)
 

@@ -5,7 +5,8 @@ from itertools import chain
 import pytorch_lightning as pl
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModel, BertForPreTraining
+from transformers import AutoTokenizer, AutoModel, BertForPreTraining, BertForMaskedLM
+from transformers import DataCollatorForLanguageModeling
 from contra.constants import SAVE_PATH
 
 
@@ -18,18 +19,26 @@ class BertPretrainOnYears(pl.LightningModule):
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
 
-        # We use biobert tokenizer because it matches the bert tokenization plus word pieces.
+        # We use biobert tokenizer because it matches the bert tokenization, but also has word pieces.
         self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
-        self.bert_model = BertForPreTraining.from_pretrained('bert-base-cased')
+
+        self.bert_model = BertForMaskedLM.from_pretrained('bert-base-cased')
+        #self.bert_model = BertForPreTraining.from_pretrained('bert-base-cased')
+        self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
 
 
     def forward(self, batch):
         text = batch['text']
-        # TODO: max_length is not 50! 512 is supposedly the maximum in BERT.
-        x = self.tokenizer(text, padding=True, truncation=True, max_length=200,
+        tokenized_as_list = self.tokenizer(text)
+        # Collator output is a dict, and it will have 'input_ids' and 'labels'
+        collated = self.data_collator(tokenized_as_list['input_ids'])
+        # TODO: max_length is not 200! 512 is supposedly the maximum in BERT.
+        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=200,
                                 add_special_tokens=True, return_tensors="pt")
-        x = {k: v.to(self.device) for k, v in x.items()}
-        x = self.bert_model(**x)
+        inputs['labels'] = collated['labels']
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        # At this point, inputs has the 'labels' key for LM and so the loss will not be None.
+        x = self.bert_model(**inputs)
         return x.loss
 
     def step(self, batch: dict, name='train') -> dict:
