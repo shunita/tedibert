@@ -6,6 +6,7 @@ import torch
 import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
+import pickle
 
 from contra.constants import FULL_PUMBED_2019_PATH
 import nltk.data
@@ -57,9 +58,41 @@ class PubMedFullModule(pl.LightningDataModule):
             sentences.extend(self.sent_tokenizer.tokenize(part))
         return sentences
 
+
     def prepare_data(self):
-        # We remember which indexes belong to which year, so we know which folder contains them.
-        if not self.by_sentence:
+        # happens only on one GPU
+        if self.by_sentence:
+            sentences = []
+            for year in range(self.start_year, self.end_year + 1):
+                year_sentences_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences.pickle')
+                if os.path.exists(year_sentences_path):
+                    continue
+                relevant = read_year(year)
+                relevant['sentences'] = relevant['abstract'].apply(self.split_abstract_to_sentences)
+                print(f'splitting {year} to sentences:')
+                for pmid, r in tqdm(relevant.iterrows(), total=len(relevant)):
+                    title = r['title']
+                    if not pd.isnull(title):        
+                        sentences.append(r['title'])
+                    sentences.extend(r['sentences'])
+                pickle.dump(sentences, open(year_sentences_path, 'wb'))
+                print(f'saved {len(sentences)} from {year} to pickle file')
+
+    def setup(self, stage=None):
+        # happens on all GPUs
+        if self.by_sentence:
+            self.sentences = []
+            for year in range(self.start_year, self.end_year + 1):
+                year_sentences_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences.pickle')
+                sentences = pickle.load(open(year_sentences_path, 'rb'))
+                self.sentences.extend(sentences)
+            print(f'len(sentences) = {len(self.sentences)}')
+            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size)
+            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year,
+                                           by_sentence=True)
+            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year,
+                                         by_sentence=True)
+        else:
             current_index = 0
             for year in range(self.start_year, self.end_year+1):
                 relevant = read_year(year)
@@ -67,24 +100,6 @@ class PubMedFullModule(pl.LightningDataModule):
                 self.year_to_pmids[year] = relevant.index.tolist()
                 current_index += len(relevant)
             self.relevant_abstracts = current_index
-
-        if self.by_sentence:
-            self.sentences = []
-            for year in range(self.start_year, self.end_year + 1):
-                relevant = read_year(year)
-                relevant['sentences'] = relevant['abstract'].apply(self.split_abstract_to_sentences)
-                for pmid, r in relevant.iterrows():
-                    self.sentence.append(r['title'])
-                    self.sentences.extend(r['sentences'])
-
-    def setup(self, stage=None):
-        if self.by_sentence:
-            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size)
-            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year,
-                                           by_sentence=True)
-            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year,
-                                         by_sentence=True)
-        else:
             train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
             self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year,
                                            year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
@@ -92,20 +107,20 @@ class PubMedFullModule(pl.LightningDataModule):
                                          year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=16, num_workers=3)
+        return DataLoader(self.train, shuffle=False, batch_size=150, num_workers=8)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=16, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=150, num_workers=8)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=16, num_workers=3)
+        return DataLoader(self.val, shuffle=False, batch_size=150, num_workers=8)
 
 
 class PubMedFullDataset(Dataset):
     def __init__(self, indexes_or_sentences, start_year, end_year,
                  year_to_indexes=None, year_to_pmids=None,
                  by_sentence=False):
-        if self.by_sentence:
+        if by_sentence:
             self.sentences = indexes_or_sentences
         else:
             self.indexes = indexes_or_sentences
@@ -131,7 +146,7 @@ class PubMedFullDataset(Dataset):
         if torch.is_tensor(index):
             index = index.tolist()
         if self.by_sentence:
-            return self.sentences[index]
+            return {'text': self.sentences[index]}
         # Not by_sentence:
         fname = self.index_to_filename(index)
         df = pd.read_csv(fname, index_col=0)
