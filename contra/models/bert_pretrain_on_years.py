@@ -5,7 +5,7 @@ from itertools import chain
 import pytorch_lightning as pl
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModel, BertForPreTraining, BertForMaskedLM
+from transformers import AutoTokenizer, AutoModel, BertForPreTraining, BertForMaskedLM, AlbertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
 from contra.constants import SAVE_PATH
 
@@ -22,18 +22,22 @@ class BertPretrainOnYears(pl.LightningModule):
         # We use biobert tokenizer because it matches the bert tokenization, but also has word pieces.
         self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
 
+        # self.bert_model = AlbertForMaskedLM.from_pretrained('albert-base-v2')
         self.bert_model = BertForMaskedLM.from_pretrained('bert-base-cased')
-        #self.bert_model = BertForPreTraining.from_pretrained('bert-base-cased')
+        
         self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
+        self.by_sentence = hparams.by_sentence
+        self.max_len = 50 if self.by_sentence else 200
+        print(f'initialized BertPretrainOnYears with {self.by_sentence}, with max len: {self.max_len}')
 
 
     def forward(self, batch):
         text = batch['text']
-        tokenized_as_list = self.tokenizer(text,padding=True, truncation=True, max_length=200, add_special_tokens=True)
+        #print(f"batch text: {text}")
+        tokenized_as_list = self.tokenizer(text, padding=True, truncation=True, max_length=self.max_len, add_special_tokens=True)
         # Collator output is a dict, and it will have 'input_ids' and 'labels'
         collated = self.data_collator(tokenized_as_list['input_ids'])
-        # TODO: max_length is not 200! 512 is supposedly the maximum in BERT.
-        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=200,
+        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=self.max_len,
                                 add_special_tokens=True, return_tensors="pt")
         inputs['labels'] = collated['labels']
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
@@ -53,13 +57,13 @@ class BertPretrainOnYears(pl.LightningModule):
         return loss
 
     def validation_step(self, batch: dict, batch_idx: int):
+        path = os.path.join(SAVE_PATH, f'bert_base_cased_{self.start_year}_{self.end_year}_epoch{self.current_epoch}')
+        if self.current_epoch > 0 and not os.path.exists(path):
+            self.bert_model.save_pretrained(path)
         loss = self.step(batch, name='val')
         return loss
 
     def test_step(self, batch: dict, batch_idx: int):
-        # TODO: is this the right place to save the model?
-        # This is called when we call .test()
-        self.bert_model.save_pretrained(os.path.join(SAVE_PATH, f'bert_base_cased_{self.start_year}_{self.end_year}'))
         loss = self.step(batch, name='test')
         return loss
 
