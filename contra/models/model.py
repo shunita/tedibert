@@ -1,3 +1,5 @@
+import sys
+import os
 import numpy as np
 from datetime import datetime
 from itertools import chain
@@ -5,6 +7,10 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
+from contra.models.w2v_on_years import PretrainedW2V, PretrainedOldNewW2V 
+from contra.utils.text_utils import TextUtils
+
+from contra.constants import SAVE_PATH, DATA_PATH
 
 
 class FairEmbedding(pl.LightningModule):
@@ -12,43 +18,72 @@ class FairEmbedding(pl.LightningModule):
         super(FairEmbedding, self).__init__()
         self.hparams = hparams
 
-        self.bert_embedding_size = 768
+        self.initial_emb_algorithm = hparams.emb_algorithm
+        self.initial_embedding_size = hparams.initial_emb_size
         self.embedding_size = hparams.embedding_size
+        
+        if self.initial_emb_algorithm == 'bert':
+            self.tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
+            self.bert_model = AutoModel.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
+        elif self.initial_emb_algorithm == 'w2v':
+            self.tokenizer = TextUtils()
+            old_w2v = self.read_w2v_model(hparams.first_start_year, hparams.first_end_year)
+            new_w2v = self.read_w2v_model(hparams.second_start_year, hparams.second_end_year)
+            self.w2v = PretrainedOldNewW2V(old_w2v, new_w2v)
+        else:
+            print("unsupported initial embedding algorithm. Should be 'bert' or 'w2v'.")
+            sys.exit()
 
-        self.tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
-        self.bert_model = AutoModel.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
-
-        self.autoencoder = Autoencoder(self.bert_embedding_size, self.embedding_size)
+        self.autoencoder = Autoencoder(in_dim=self.initial_embedding_size, hid_dim=self.embedding_size)
         self.ratio_reconstuction = Classifier(self.embedding_size, int(self.embedding_size / 2), 1)
         self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1)
         self.L1Loss = torch.nn.L1Loss()
         self.BCELoss = torch.nn.BCELoss()
+        
+    def read_w2v_model(self, year1, year2):
+        '''Read the pretrained embeddings of a year range.'''
+        year_to_ndocs = pd.read_csv(os.path.join(DATA_PATH, 'year_to_ndocs.csv'), index_col=0, 
+                                    dtype={'year': int, 'ndocs': int}).to_dict(orient='dict')['ndocs']
+        vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}.wordvectors")
+        idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
+        num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
+        w2v = PretrainedW2V(idf_path, vectors_path, ndocs=docs)
+        return w2v
 
     def forward(self, batch):
         text = batch['text']
-        inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=50,
-                                                  add_special_tokens=True, return_tensors="pt")
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        _, bert_sentence_embedding = self.bert_model(**inputs)
+        if self.initial_emb_algorithm == 'bert':
+            # TODO: this will use the same bert model for all abstracts, regardless of year (it shouldn't).
+            inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=50,
+                                                      add_special_tokens=True, return_tensors="pt")
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            _, sentence_embedding = self.bert_model(**inputs)
+        elif self.initial_emb_algorithm == 'w2v':
+            # tokenization is the same for old and new (simple word_tokenize)
+            tokenized_texts = [self.tokenizer.word_tokenize_abstract(t) for t in text]
+            is_new = batch['is_new']
+            sentence_embedding = self.w2v.embed_batch(tokenized_texts, is_new, self.device)
 
-        decoded, latent = self.autoencoder(bert_sentence_embedding)
+        decoded, latent = self.autoencoder(sentence_embedding)
 
-        return bert_sentence_embedding, latent, decoded
+        return sentence_embedding, latent, decoded
 
     def step(self, batch: dict, optimizer_idx: int = None, name='train') -> dict:
         if optimizer_idx == 0:
             self.ratio_true = batch['female_ratio']
             self.is_new = batch['is_new']
             # generate
-            bert_embedding, self.fair_embedding, bert_reconstruction = self.forward(batch)
-            g_loss = self.L1Loss(bert_embedding, bert_reconstruction)
+            initial_embedding, self.fair_embedding, reconstruction = self.forward(batch)
+            g_loss = self.L1Loss(initial_embedding, reconstruction)
 
             self.ratio_pred = self.ratio_reconstuction(self.fair_embedding)
             ratio_loss = self.BCELoss(self.ratio_pred.squeeze()[self.is_new].float(), self.ratio_true[self.is_new].float())
 
             # discriminate
             isnew_pred = self.discriminator(torch.cat([self.fair_embedding, self.ratio_pred], dim=1))
-            isnew_loss = self.BCELoss(isnew_pred.squeeze()[~self.is_new], torch.ones(isnew_pred.squeeze()[~self.is_new].shape[0]))
+            only_old = isnew_pred.squeeze()[~self.is_new]
+            # TODO: why do we take old rows and a label as if they were new??
+            isnew_loss = self.BCELoss(only_old, torch.ones(only_old.shape[0], device=self.device))
 
             # final loss
             loss = g_loss + self.hparams.lmb_ratio * ratio_loss + self.hparams.lmb_isnew * isnew_loss
