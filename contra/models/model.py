@@ -1,18 +1,18 @@
 import pandas as pd
-from itertools import chain
 import sys
 import os
 import numpy as np
 from datetime import datetime
+from itertools import chain
 import pytorch_lightning as pl
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
-from scipy import stats
 from contra.models.w2v_on_years import PretrainedW2V, PretrainedOldNewW2V
 from contra.utils.text_utils import TextUtils
 from contra.common.utils import mean_pooling
 from contra.constants import SAVE_PATH, DATA_PATH
+
 
 class FairEmbedding(pl.LightningModule):
     def __init__(self, hparams):
@@ -50,7 +50,7 @@ class FairEmbedding(pl.LightningModule):
         vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}.wordvectors")
         idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
         num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
-        w2v = PretrainedW2V(idf_path, vectors_path, ndocs=docs)
+        w2v = PretrainedW2V(idf_path, vectors_path, ndocs=num_docs_in_range)
         return w2v
 
     def forward(self, batch):
@@ -131,7 +131,6 @@ class FairEmbedding(pl.LightningModule):
         correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
         self.log('test/correlation', correlation)
         self.log('test/pvalue', pvalue)
-
 
     def configure_optimizers(self):
         optimizer_1 = torch.optim.Adam(chain(self.autoencoder.parameters(), self.ratio_reconstuction.parameters()),

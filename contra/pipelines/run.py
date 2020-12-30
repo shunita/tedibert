@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/home/shunita/fairemb')
+
 from datetime import datetime
 import pytz
 import pytorch_lightning as pl
