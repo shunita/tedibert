@@ -6,34 +6,11 @@ import torch
 import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
+from contra.utils import text_utils as tu
+from contra.utils.pubmed_utils import read_year 
 import pickle
 
 from contra.constants import FULL_PUMBED_2019_PATH
-import nltk.data
-# helper function
-
-
-def read_shard(path, start_date, end_date):
-    # fields: 'title', 'abstract', 'labels', 'pub_types', 'date', 'file', 'mesh_headings', 'keywords'
-    print(f'reading pubmed shard: {path}')
-    df = pd.read_csv(path, index_col=0)
-    df = df.dropna(subset=['date'], axis=0)
-    df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
-    relevant = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
-    print(f'finished reading shard. found {len(relevant)} records with matching dates.')
-    return relevant
-
-
-def read_year(path_or_year):
-    path = path_or_year
-    if type(path_or_year) == int:  # it's a year
-        path = os.path.join(FULL_PUMBED_2019_PATH, f'pubmed_{path_or_year}.csv')
-    if not os.path.exists(path):
-        print(f"File not found: {path}")
-        return None
-    df = pd.read_csv(path, index_col=0)
-    df = df.dropna(subset=['date'], axis=0)
-    return df
 
 
 class PubMedFullModule(pl.LightningDataModule):
@@ -48,19 +25,11 @@ class PubMedFullModule(pl.LightningDataModule):
         self.year_to_pmids = {}
         self.by_sentence = by_sentence
         if self.by_sentence:
-            self.sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+            self.text_utils = tu.TextUtils()
             self.sentences = {}
 
-    def split_abstract_to_sentences(self, abstract):
-        parts = abstract.split(';')
-        sentences = []
-        for part in parts:
-            sentences.extend(self.sent_tokenizer.tokenize(part))
-        return sentences
-
-
     def prepare_data(self):
-        # happens only on one GPU
+        '''happens only on one GPU'''
         if self.by_sentence:
             sentences = []
             for year in range(self.start_year, self.end_year + 1):
@@ -68,18 +37,15 @@ class PubMedFullModule(pl.LightningDataModule):
                 if os.path.exists(year_sentences_path):
                     continue
                 relevant = read_year(year)
-                relevant['sentences'] = relevant['abstract'].apply(self.split_abstract_to_sentences)
+                relevant['sentences'] = relevant['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
                 print(f'splitting {year} to sentences:')
                 for pmid, r in tqdm(relevant.iterrows(), total=len(relevant)):
-                    title = r['title']
-                    if not pd.isnull(title):        
-                        sentences.append(r['title'])
                     sentences.extend(r['sentences'])
                 pickle.dump(sentences, open(year_sentences_path, 'wb'))
                 print(f'saved {len(sentences)} from {year} to pickle file')
 
     def setup(self, stage=None):
-        # happens on all GPUs
+        '''happens on all GPUs'''
         if self.by_sentence:
             self.sentences = []
             for year in range(self.start_year, self.end_year + 1):
@@ -107,7 +73,7 @@ class PubMedFullModule(pl.LightningDataModule):
                                          year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=150, num_workers=8)
+        return DataLoader(self.train, shuffle=True, batch_size=150, num_workers=8)
 
     def val_dataloader(self):
         return DataLoader(self.val, shuffle=False, batch_size=150, num_workers=8)
@@ -147,7 +113,7 @@ class PubMedFullDataset(Dataset):
             index = index.tolist()
         if self.by_sentence:
             return {'text': self.sentences[index]}
-        # Not by_sentence:
+        # Not by_sentence: (based on every abstract being in a different file)
         fname = self.index_to_filename(index)
         df = pd.read_csv(fname, index_col=0)
         row = df.iloc[0]

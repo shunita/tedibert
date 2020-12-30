@@ -12,10 +12,11 @@ from contra import config
 from contra.models import BertPretrainOnYears
 
 hparams = config.parser.parse_args(['--name', 'BertYears', 
-                                    '--start_year', '2018',
-                                    '--end_year', '2018',
+                                    '--start_year', '2010',
+                                    '--end_year', '2013',
                                     '--by_sentence',
-                                    '--max_epochs', '40'])
+                                    '--max_epochs', '40',
+                                    '--lr', '5e-5'])
 hparams.gpus = [0,1]
 #hparams.gpus = 1
 

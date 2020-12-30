@@ -10,8 +10,17 @@ from contra.constants import SAVE_PATH, LOG_PATH
 parser = argparse.ArgumentParser(add_help=False)
 
 date_type = lambda dt: datetime.strptime(dt, '%Y/%m/%d')
-parser.add_argument('--pivot_datetime', default="2016/01/01", type=date_type,
-                    help='pivot year for new/old split')
+
+parser.add_argument('--first_start_year', default=2010, type=int,
+                    help='first year of the first range')
+parser.add_argument('--first_end_year', default=2013, type=int,
+                    help='last year of the first range')
+parser.add_argument('--second_start_year', default=2018, type=int,
+                    help='first year of the second range')
+parser.add_argument('--second_end_year', default=2018, type=int,
+                    help='last year of the second range')
+
+
 parser.add_argument('--start_year', default=2018, type=int,
                     help='start year for BERT pretraining')
 parser.add_argument('--end_year', default=2018, type=int,
@@ -27,6 +36,10 @@ parser.add_argument('--name', type=str, help='a special name for the current mod
 parser.add_argument('--save_path', metavar='DIR', default=SAVE_PATH, type=str, help='path to save model')
 parser.add_argument('--log_path', default=LOG_PATH, type=str, help='tensorboard log path')
 parser.add_argument('--gpus', default='0', nargs='+', help='gpus parameter used for pytorch_lightning')
+parser.add_argument('--emb_algorithm', default='bert', type=str, 
+                    help='inital embedding algorithm - either "bert", "w2v" or "doc2vec"(not yet fully supported).')
+parser.add_argument('--initial_emb_size', default=768, type=int, 
+                    help='initial embedding size. 768 for bert, or 300 for w2v, or other'.)
 
 parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
                     metavar='LR', help='initial learning rate', dest='learning_rate')
