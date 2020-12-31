@@ -57,7 +57,7 @@ class PubMedModule(pl.LightningDataModule):
         return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=32)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=32)
+        return DataLoader(self.test, shuffle=True, batch_size=32, num_workers=32)
 
 
 class PubMedDataset(Dataset):
