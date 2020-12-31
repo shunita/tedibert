@@ -12,6 +12,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from contra.common.utils import get_bert_model, mean_pooling
 from contra.constants import DATA_PATH
 from transformers import AutoTokenizer, AutoModel
+from contra.models.w2v_on_years import read_w2v_model
+from contra.utils.text_utils import TextUtils
 
 
 class PubMedModule(pl.LightningDataModule):
@@ -22,6 +24,8 @@ class PubMedModule(pl.LightningDataModule):
         self.first_time_range = (datetime(first_year_range[0], 1, 1), datetime(first_year_range[1], 12, 31))
         self.second_time_range = (datetime(second_year_range[0], 1, 1), datetime(second_year_range[1], 12, 31))
         self.train_test_split = train_test_split
+        self.df = None
+        self.train, self.test, self.val = None
 
     def prepare_data(self):
         self.df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2019_abstracts_with_participants.csv'), index_col=0)
@@ -44,7 +48,7 @@ class PubMedModule(pl.LightningDataModule):
         self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
         self.test = CUIDataset(frac=0.001, sample_type=1)
-        print("Loaded {} train samples and {} validation samples".format(len(train_df), len(val_df)))
+        print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples')
 
     def train_dataloader(self):
         return DataLoader(self.train, shuffle=True, batch_size=32, num_workers=32)
@@ -77,12 +81,15 @@ class PubMedDataset(Dataset):
 
         return {'text': text, 'is_new': is_new, 'female_ratio': female_ratio}
 
+
 class CUIDataset(Dataset):
-    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", top_percentile=0.01, semtypes=None, frac=1., sample_type=0):
+    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), top_percentile=0.01, semtypes=None, frac=1.,
+                 sample_type=0):
         """
         This Dataset handles the CUI pairs and their similarity
         Args:
-            bert: the bert path to use
+            bert: the bert path to use. If None, will use w2v.
+            w2v_years: (start_year, end_year) - the range of years on which a w2v model was trained.
             top_percentile: from what percentile of apperance to filter
             semtypes: str or List[str] representing the wanted semtypes. If None then uses all
             frac: a number in the range [0,1], representing the fraction of pairs to sample.
@@ -96,9 +103,15 @@ class CUIDataset(Dataset):
         self.semtypes = semtypes
         self.frac = frac
         self.sample_type = sample_type
-
-        self.tokenizer = AutoTokenizer.from_pretrained(bert)
-        self.bert_model = AutoModel.from_pretrained(bert)
+        if bert is not None:
+            self.tokenizer = AutoTokenizer.from_pretrained(bert)
+            self.bert_model = AutoModel.from_pretrained(bert)
+        elif w2v_years is not None:
+            self.tokenizer = TextUtils()
+            self.w2v_model = read_w2v_model(*w2v_years)
+        else:
+            print("CUIDataset got no model to work with: both bert and w2v_years are None.")
+            sys.exit()
 
         df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
         if self.semtypes is not None:
@@ -108,9 +121,14 @@ class CUIDataset(Dataset):
         df = df[df['abstracts'] >= df['abstracts'].quantile(1 - self.top_percentile)]
 
         CUI_names = df['name'].tolist()
-        inputs = self.tokenizer(CUI_names, padding=True, return_tensors="pt")
-        outputs = self.bert_model(**inputs)
-        CUI_embeddings = mean_pooling(outputs, inputs['attention_mask']).detach().numpy()
+        if bert is not None:
+            inputs = self.tokenizer(CUI_names, padding=True, return_tensors="pt")
+            outputs = self.bert_model(**inputs)
+            CUI_embeddings = mean_pooling(outputs, inputs['attention_mask']).detach().numpy()
+        else:  # w2v_years is not None
+            tokenized_names = [self.tokenizer.word_tokenize_abstract(name) for name in CUI_names]
+            CUI_embeddings = self.w2v_model.embed_batch(tokenized_names)
+
         similarity = cosine_similarity(CUI_embeddings, CUI_embeddings).flatten()
         pairs = list(product(CUI_names, CUI_names))
 

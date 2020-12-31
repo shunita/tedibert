@@ -29,7 +29,7 @@ class PubMedFullModule(pl.LightningDataModule):
             self.sentences = {}
 
     def prepare_data(self):
-        '''happens only on one GPU'''
+        """happens only on one GPU."""
         if self.by_sentence:
             sentences = []
             for year in range(self.start_year, self.end_year + 1):
@@ -45,7 +45,7 @@ class PubMedFullModule(pl.LightningDataModule):
                 print(f'saved {len(sentences)} from {year} to pickle file')
 
     def setup(self, stage=None):
-        '''happens on all GPUs'''
+        """happens on all GPUs."""
         if self.by_sentence:
             self.sentences = []
             for year in range(self.start_year, self.end_year + 1):

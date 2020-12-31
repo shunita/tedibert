@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
-from contra.models.w2v_on_years import PretrainedW2V, PretrainedOldNewW2V
+from contra.models.w2v_on_years import PretrainedOldNewW2V, read_w2v_model
 from contra.utils.text_utils import TextUtils
 from contra.common.utils import mean_pooling
 from contra.constants import SAVE_PATH, DATA_PATH
@@ -30,8 +30,8 @@ class FairEmbedding(pl.LightningModule):
 
         elif self.initial_emb_algorithm == 'w2v':
             self.tokenizer = TextUtils()
-            old_w2v = self.read_w2v_model(hparams.first_start_year, hparams.first_end_year)
-            new_w2v = self.read_w2v_model(hparams.second_start_year, hparams.second_end_year)
+            old_w2v = read_w2v_model(hparams.first_start_year, hparams.first_end_year)
+            new_w2v = read_w2v_model(hparams.second_start_year, hparams.second_end_year)
             self.w2v = PretrainedOldNewW2V(old_w2v, new_w2v)
         else:
             print("unsupported initial embedding algorithm. Should be 'bert' or 'w2v'.")
@@ -42,16 +42,6 @@ class FairEmbedding(pl.LightningModule):
         self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1)
         self.L1Loss = torch.nn.L1Loss()
         self.BCELoss = torch.nn.BCELoss()
-
-    def read_w2v_model(self, year1, year2):
-        '''Read the pretrained embeddings of a year range.'''
-        year_to_ndocs = pd.read_csv(os.path.join(DATA_PATH, 'year_to_ndocs.csv'), index_col=0,
-                                    dtype={'year': int, 'ndocs': int}).to_dict(orient='dict')['ndocs']
-        vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}.wordvectors")
-        idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
-        num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
-        w2v = PretrainedW2V(idf_path, vectors_path, ndocs=num_docs_in_range)
-        return w2v
 
     def forward(self, batch):
         text = batch['text']

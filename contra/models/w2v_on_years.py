@@ -149,8 +149,7 @@ class PretrainedW2V:
             self.wv = KeyedVectors.load(vectors_path, mmap='r')
         #if self.model_name == 'doc2vec':
         #    self.model = Doc2Vec.load(path)
-            
-    
+
     def embed(self, tokenized_text):
         tf = defaultdict(int)
         for word in tokenized_text:
@@ -161,23 +160,23 @@ class PretrainedW2V:
             if word in self.wv:
                 idf = self.idf_map[word]
                 if idf == 0:
-                    # this word did not appear in any documents so we know nothing about it - we don't add it to the averaged vector
+                    # This word did not appear in any documents, so we know nothing about it - we don't add it to the
+                    # averaged vector
                     continue
                 vectors.append(self.wv.get_vector(word))
                 weights.append(tf[word]*np.log(self.ndocs/self.idf_map[word]))
-        #print(f'vectors: {np.stack(vectors).shape}, weights: {np.array(weights).shape}')
         return np.average(np.stack(vectors), axis=0, weights=np.array(weights))
     
-    def embed_multiple_texts(texts):
-        return torch.as_tensor(np.stack([self.embed(text) for text in texts]))
-  
+    def embed_batch(self, texts, device=None):
+        return torch.as_tensor(np.stack([self.embed(text) for text in texts]), dtype=torch.float32, device=device)
+
+
 class PretrainedOldNewW2V:
     def __init__(self, old_w2v, new_w2v):
         self.old_w2v = old_w2v
         self.new_w2v = new_w2v
         
     def embed_batch(self, tokenized_texts, is_news, device=None):
-        # TODO: there is probably a faster way.
         vectors = []
         for text, is_new in zip(tokenized_texts, is_news):
             if is_new:
@@ -186,6 +185,17 @@ class PretrainedOldNewW2V:
                 vector = self.old_w2v.embed(text)
             vectors.append(vector)
         return torch.as_tensor(np.stack(vectors), dtype=torch.float32, device=device)
+
+
+def read_w2v_model(year1: int, year2: int) -> PretrainedW2V:
+    '''Read the pretrained embeddings of a year range.'''
+    year_to_ndocs = pd.read_csv(os.path.join(DATA_PATH, 'year_to_ndocs.csv'), index_col=0,
+                                dtype={'year': int, 'ndocs': int}).to_dict(orient='dict')['ndocs']
+    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}.wordvectors")
+    idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
+    num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
+    w2v = PretrainedW2V(idf_path, vectors_path, ndocs=num_docs_in_range)
+    return w2v
 
 
 if __name__ == '__main__':
