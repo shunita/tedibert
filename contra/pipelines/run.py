@@ -16,7 +16,8 @@ hparams = config.parser.parse_args(['--name', 'GAN',
                                     '--second_start_year', '2018',
                                     '--second_end_year', '2018',
                                     '--emb_algorithm', 'w2v',
-                                    '--initial_emb_size', '300'
+                                    '--initial_emb_size', '300',
+                                    '--max_epochs', '50',
                                     ])
 
 dm = PubMedModule(min_num_participants=hparams.min_num_participants,
@@ -29,6 +30,5 @@ logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                      version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                      project='FairEmbedding', config=hparams)
 trainer = pl.Trainer(gpus=hparams.gpus, max_epochs=hparams.max_epochs, logger=logger, log_every_n_steps=10)
-
 trainer.fit(model, datamodule=dm)
 trainer.test(datamodule=dm)

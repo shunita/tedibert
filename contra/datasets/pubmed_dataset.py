@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import cosine_similarity
 
 from contra.common.utils import get_bert_model, mean_pooling
-from contra.constants import DATA_PATH
+from contra.constants import DATA_PATH, SAVE_PATH
 from transformers import AutoTokenizer, AutoModel
 from contra.models.w2v_on_years import read_w2v_model
 from contra.utils.text_utils import TextUtils
@@ -25,7 +25,7 @@ class PubMedModule(pl.LightningDataModule):
         self.second_time_range = (datetime(second_year_range[0], 1, 1), datetime(second_year_range[1], 12, 31))
         self.train_test_split = train_test_split
         self.df = None
-        self.train, self.test, self.val = None
+        self.train, self.test, self.val = None, None, None
 
     def prepare_data(self):
         self.df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2019_abstracts_with_participants.csv'), index_col=0)
@@ -47,8 +47,9 @@ class PubMedModule(pl.LightningDataModule):
 
         self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
-        self.test = CUIDataset(frac=0.001, sample_type=1)
-        print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples')
+        self.test = CUIDataset(bert=None, w2v_years=(2018, 2018), frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
+                               read_from_file=os.path.join(SAVE_PATH, 'test_similarities_CUI_names.csv'))
+        print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples.\nLoaded {len(self.test)} cui pairs for test.')
 
     def train_dataloader(self):
         return DataLoader(self.train, shuffle=True, batch_size=32, num_workers=32)
@@ -57,7 +58,7 @@ class PubMedModule(pl.LightningDataModule):
         return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=32)
 
     def test_dataloader(self):
-        return DataLoader(self.test, shuffle=True, batch_size=32, num_workers=32)
+        return DataLoader(self.test, shuffle=False, batch_size=32, num_workers=32)
 
 
 class PubMedDataset(Dataset):
@@ -84,7 +85,7 @@ class PubMedDataset(Dataset):
 
 class CUIDataset(Dataset):
     def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), top_percentile=0.01, semtypes=None, frac=1.,
-                 sample_type=0):
+                 sample_type=0, read_from_file=None):
         """
         This Dataset handles the CUI pairs and their similarity
         Args:
@@ -99,6 +100,10 @@ class CUIDataset(Dataset):
                             2 - top similar
                             3 - uniform distribution of similarities
         """
+        if read_from_file is not None:
+            self.similarity_df = pd.read_csv(read_from_file, index_col=0)
+            print(f"read {len(self.similarity_df)} CUI pairs from {read_from_file}.")
+            return
         self.top_percentile = top_percentile
         self.semtypes = semtypes
         self.frac = frac
@@ -114,11 +119,15 @@ class CUIDataset(Dataset):
             sys.exit()
 
         df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
+        all_cuis = len(df)
         if self.semtypes is not None:
             if not isinstance(self.semtypes, list):
                 self.semtypes = [self.semtypes]
             df = df[df['semtypes'].map(lambda sems: np.any([sem in self.semtypes for sem in eval(sems)]))]
+        semtype_match = len(df)
         df = df[df['abstracts'] >= df['abstracts'].quantile(1 - self.top_percentile)]
+        percentile_match = len(df)
+        print(f"read {all_cuis} CUIs.\nFiltered to {semtype_match} by semptypes: {self.semtypes}.\nKept {self.top_percentile} with the most abstract appearances: {percentile_match} CUIs.")
 
         CUI_names = df['name'].tolist()
         if bert is not None:
@@ -128,6 +137,12 @@ class CUIDataset(Dataset):
         else:  # w2v_years is not None
             tokenized_names = [self.tokenizer.word_tokenize_abstract(name) for name in CUI_names]
             CUI_embeddings = self.w2v_model.embed_batch(tokenized_names)
+            got_embedding = torch.count_nonzero(CUI_embeddings, dim=1) > 0
+            CUI_embeddings = CUI_embeddings[got_embedding]
+            before = len(CUI_names)
+            CUI_names = [name for i, name in enumerate(CUI_names) if got_embedding[i]]
+            after = len(CUI_names)
+            print(f"{after}/{before} CUIs have embedding.")
 
         similarity = cosine_similarity(CUI_embeddings, CUI_embeddings).flatten()
         pairs = list(product(CUI_names, CUI_names))
@@ -144,10 +159,11 @@ class CUIDataset(Dataset):
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
+        self.similarity_df.to_csv(os.path.join(SAVE_PATH, "test_similarities_CUI_names.csv"))
 
     def __len__(self):
         return len(self.similarity_df)
 
     def __getitem__(self, index):
         row = self.similarity_df.iloc[index]
-        return {'CUI1': row['CUI1'], 'CUI2': row['CUI1'], 'true_similarity': row['similarity']}
+        return {'CUI1': row['CUI1'], 'CUI2': row['CUI2'], 'true_similarity': row['similarity']}

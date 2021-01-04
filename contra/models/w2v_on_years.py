@@ -16,7 +16,7 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
-from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH
+from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, DATA_PATH
 from contra.utils.pubmed_utils import read_year 
 from contra import config
 import wandb
@@ -147,6 +147,7 @@ class PretrainedW2V:
         self.idf_map = pickle.load(open(idf_path, 'rb'))
         if self.model_name == 'w2v':
             self.wv = KeyedVectors.load(vectors_path, mmap='r')
+            self.emb_size = 300
         #if self.model_name == 'doc2vec':
         #    self.model = Doc2Vec.load(path)
 
@@ -159,12 +160,21 @@ class PretrainedW2V:
         for word in tf:
             if word in self.wv:
                 idf = self.idf_map[word]
-                if idf == 0:
-                    # This word did not appear in any documents, so we know nothing about it - we don't add it to the
-                    # averaged vector
-                    continue
-                vectors.append(self.wv.get_vector(word))
-                weights.append(tf[word]*np.log(self.ndocs/self.idf_map[word]))
+                if idf > 0:
+                    vec = self.wv.get_vector(word)
+                else: # idf == 0
+                    # try to find the word in lowercase
+                    idf = self.idf_map[word.lower()]
+                    if idf > 0:
+                        vec = self.wv.get_vector(word.lower())
+                    else:
+                        # This word did not appear in any documents, even in lowercase. 
+                        # We know nothing about it - so we don't add it to the averaged vector.
+                        continue
+                vectors.append(vec)
+                weights.append(tf[word]*np.log(self.ndocs/idf))
+        if len(vectors) == 0:
+            return np.zeros(self.emb_size)
         return np.average(np.stack(vectors), axis=0, weights=np.array(weights))
     
     def embed_batch(self, texts, device=None):
@@ -195,6 +205,7 @@ def read_w2v_model(year1: int, year2: int) -> PretrainedW2V:
     idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
     num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
     w2v = PretrainedW2V(idf_path, vectors_path, ndocs=num_docs_in_range)
+    print(f"read w2v vectors from {vectors_path} and idf map from {idf_path}.")
     return w2v
 
 

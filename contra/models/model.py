@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
+from scipy import stats
 from contra.models.w2v_on_years import PretrainedOldNewW2V, read_w2v_model
 from contra.utils.text_utils import TextUtils
 from contra.common.utils import mean_pooling
@@ -75,7 +76,8 @@ class FairEmbedding(pl.LightningModule):
             # discriminate
             isnew_pred = self.discriminator(torch.cat([self.fair_embedding, self.ratio_pred], dim=1))
             only_old = isnew_pred.squeeze()[~self.is_new]
-            # TODO: why do we take old rows and a label as if they were new??
+            # we take old samples and label them as new, because the generator is training now.
+            # TODO: how to make sure the discriminator weights do not change while we train the generator?
             isnew_loss = self.BCELoss(only_old, torch.ones(only_old.shape[0], device=self.device))
 
             # final loss
@@ -101,19 +103,25 @@ class FairEmbedding(pl.LightningModule):
 
     def validation_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
         for i in range(len(self.optimizers())):
-            self.step(batch, i, name='val')
+            loss = self.step(batch, i, name='val')
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
-        _, CUI1_embedding, _ = self.forward(batch['CUI1'])
-        _, CUI2_embedding, _ = self.forward(batch['CUI2'])
+        _, CUI1_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI1']))
+        _, CUI2_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI2']))
         pred_similarity = nn.CosineSimilarity()(CUI1_embedding, CUI2_embedding)
         true_similarity = batch['true_similarity']
-
         return pred_similarity, true_similarity
+        
+    def wrap_text_to_batch(self, texts):
+        batch1 = {'text': texts, 
+                  'is_new': torch.as_tensor([False for i in range(len(texts))], device=self.device)
+                  }
+        return batch1
 
     def test_epoch_end(self, outputs) -> None:
         rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
         df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
+        df.to_csv(os.path.join(SAVE_PATH, 'test_similarities.csv'))
         df = df.sort_values(['true_similarity'], ascending=False).reset_index()
         true_rank = list(df.index)
         pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).index)
