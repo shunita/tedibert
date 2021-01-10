@@ -84,8 +84,8 @@ class PubMedDataset(Dataset):
 
 
 class CUIDataset(Dataset):
-    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), top_percentile=0.01, semtypes=None, frac=1.,
-                 sample_type=0, read_from_file=None):
+    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), top_percentile=0.01,
+                 semtypes=None, frac=1., sample_type=0, read_from_file=None, save_to_file=None):
         """
         This Dataset handles the CUI pairs and their similarity
         Args:
@@ -159,7 +159,9 @@ class CUIDataset(Dataset):
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
-        self.similarity_df.to_csv(os.path.join(SAVE_PATH, "test_similarities_CUI_names.csv"))
+        if save_to_file is not None:
+            #"test_similarities_CUI_names.csv"
+            self.similarity_df.to_csv(os.path.join(SAVE_PATH, save_to_file))
 
     def __len__(self):
         return len(self.similarity_df)
