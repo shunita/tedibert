@@ -18,11 +18,18 @@ from contra.utils.text_utils import TextUtils
 
 class PubMedModule(pl.LightningDataModule):
 
-    def __init__(self, min_num_participants=1, first_year_range=(2010,2013), second_year_range=(2018,2018), train_test_split=0.8):
+    def __init__(self, min_num_participants=1,
+                 first_year_range=(2010,2013),
+                 second_year_range=(2018,2018),
+                 train_test_split=0.8,
+                 test_year_range=None,
+                 test_fname=None):
         super().__init__()
         self.min_num_participants = min_num_participants
         self.first_time_range = (datetime(first_year_range[0], 1, 1), datetime(first_year_range[1], 12, 31))
         self.second_time_range = (datetime(second_year_range[0], 1, 1), datetime(second_year_range[1], 12, 31))
+        self.test_year_range = test_year_range
+        self.test_fname = test_fname
         self.train_test_split = train_test_split
         self.df = None
         self.train, self.test, self.val = None, None, None
@@ -47,8 +54,17 @@ class PubMedModule(pl.LightningDataModule):
 
         self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
-        self.test = CUIDataset(bert=None, w2v_years=(2018, 2018), frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
-                               read_from_file=os.path.join(SAVE_PATH, 'test_similarities_CUI_names.csv'))
+        
+        if self.test_fname is not None:
+            fname = os.path.join(SAVE_PATH, self.test_fname)
+        elif self.test_year_range is not None and self.test_year_range[0] is not None:
+            testyear0, testyear1 = self.test_year_range
+            fname = os.path.join(SAVE_PATH, 'test_similarities_CUI_names_{testyear0}_{testyear1}.csv')
+        else:
+            print("both test year and test file name were not provided.")
+            sys.exit()
+        self.test = CUIDataset(bert=None, w2v_years=self.test_year_range, frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
+                               read_from_file=fname)
         print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples.\nLoaded {len(self.test)} cui pairs for test.')
 
     def train_dataloader(self):
@@ -84,8 +100,10 @@ class PubMedDataset(Dataset):
 
 
 class CUIDataset(Dataset):
-    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), top_percentile=0.01,
-                 semtypes=None, frac=1., sample_type=0, read_from_file=None, save_to_file=None):
+    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), read_w2v_params={},
+                 top_percentile=0.01, semtypes=None, frac=1., sample_type=0, 
+                 filter_by_models=[],
+                 read_from_file=None):
         """
         This Dataset handles the CUI pairs and their similarity
         Args:
@@ -104,6 +122,7 @@ class CUIDataset(Dataset):
             self.similarity_df = pd.read_csv(read_from_file, index_col=0)
             print(f"read {len(self.similarity_df)} CUI pairs from {read_from_file}.")
             return
+        
         self.top_percentile = top_percentile
         self.semtypes = semtypes
         self.frac = frac
@@ -113,7 +132,7 @@ class CUIDataset(Dataset):
             self.bert_model = AutoModel.from_pretrained(bert)
         elif w2v_years is not None:
             self.tokenizer = TextUtils()
-            self.w2v_model = read_w2v_model(*w2v_years)
+            self.w2v_model = read_w2v_model(w2v_years[0], w2v_years[1], **read_w2v_params)
         else:
             print("CUIDataset got no model to work with: both bert and w2v_years are None.")
             sys.exit()
@@ -136,13 +155,24 @@ class CUIDataset(Dataset):
             CUI_embeddings = mean_pooling(outputs, inputs['attention_mask']).detach().numpy()
         else:  # w2v_years is not None
             tokenized_names = [self.tokenizer.word_tokenize_abstract(name) for name in CUI_names]
-            CUI_embeddings = self.w2v_model.embed_batch(tokenized_names)
+            # Filter the CUIs according to the models we want to compare.
+            # CUIs in the final test set should have embeddings in all compared models.
+            for (first_year, last_year) in filter_by_models:
+                print(f"Filtering CUIs by {first_year}_{last_year} model")
+                w2v_model = read_w2v_model(first_year, last_year)
+                embs = w2v_model.embed_batch(tokenized_names)
+                got_emb = torch.count_nonzero(embs, dim=1) > 0
+                before = len(CUI_names)
+                CUI_names = [name for i, name in enumerate(CUI_names) if got_emb[i]]
+                print(f"Keeping {len(CUI_names)}/{before} CUIs.")
+            
+            print(f"Filtering CUIs by main model: {first_year}_{last_year} model")
+            CUI_embeddings = self.w2v_model.embed_batch(tokenized_names) 
             got_embedding = torch.count_nonzero(CUI_embeddings, dim=1) > 0
             CUI_embeddings = CUI_embeddings[got_embedding]
             before = len(CUI_names)
             CUI_names = [name for i, name in enumerate(CUI_names) if got_embedding[i]]
-            after = len(CUI_names)
-            print(f"{after}/{before} CUIs have embedding.")
+            print(f"Keeping {len(CUI_names)}/{before} CUIs.")
 
         similarity = cosine_similarity(CUI_embeddings, CUI_embeddings).flatten()
         pairs = list(product(CUI_names, CUI_names))
@@ -159,9 +189,7 @@ class CUIDataset(Dataset):
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
-        if save_to_file is not None:
-            #"test_similarities_CUI_names.csv"
-            self.similarity_df.to_csv(os.path.join(SAVE_PATH, save_to_file))
+        self.similarity_df.to_csv(os.path.join(SAVE_PATH, f"test_similarities_CUI_names_{w2v_years[0]}_{w2v_years[1]}.csv"))
 
     def __len__(self):
         return len(self.similarity_df)
