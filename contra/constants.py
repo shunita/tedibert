@@ -12,3 +12,4 @@ FULL_PUMBED_2018_PATH = os.path.join(os.path.expanduser('~'), 'pubmed_2018')
 PUBMED_SHARDS = 50
 
 FULL_PUMBED_2019_PATH = os.path.join(os.path.expanduser('~'), 'pubmed_2019_by_years')
+FULL_PUMBED_2020_PATH = os.path.join(os.path.expanduser('~'), 'pubmed_2020_by_years')
