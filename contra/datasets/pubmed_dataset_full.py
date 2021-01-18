@@ -10,12 +10,12 @@ from contra.utils import text_utils as tu
 from contra.utils.pubmed_utils import read_year 
 import pickle
 
-from contra.constants import FULL_PUMBED_2019_PATH
+from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH
 
 
 class PubMedFullModule(pl.LightningDataModule):
 
-    def __init__(self, start_year=2018, end_year=2018, test_size=0.2, by_sentence=True):
+    def __init__(self, start_year=2018, end_year=2018, test_size=0.2, by_sentence=True, abstract_weighting_mode='normal', pubmed_version=2019):
         super().__init__()
         self.start_year = start_year
         self.end_year = end_year
@@ -27,29 +27,41 @@ class PubMedFullModule(pl.LightningDataModule):
         if self.by_sentence:
             self.text_utils = tu.TextUtils()
             self.sentences = {}
+        self.abstract_weighting_mode = abstract_weighting_mode
+        self.pubmed_version = pubmed_version
+        self.pubmed_folder = {2019: FULL_PUMBED_2019_PATH,
+                              2020: FULL_PUMBED_2020_PATH}[self.pubmed_version]
+        if self.abstract_weighting_mode == 'normal':
+            self.desc = ''
+        if self.abstract_weighting_mode == 'subsample':
+            self.desc='sample'
+        else:
+            print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
+            sys.exit()
 
     def prepare_data(self):
         """happens only on one GPU."""
         if self.by_sentence:
             sentences = []
             for year in range(self.start_year, self.end_year + 1):
-                year_sentences_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences.pickle')
+                year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
                 if os.path.exists(year_sentences_path):
                     continue
-                relevant = read_year(year)
+                relevant = read_year(year, version=self.pubmed_version, subsample=(self.abstract_weighting_mode=='subsample'))
+                print(f'splitting {year} abstracts to sentences...')
                 relevant['sentences'] = relevant['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
-                print(f'splitting {year} to sentences:')
+                print(f'saving sentence list...')
                 for pmid, r in tqdm(relevant.iterrows(), total=len(relevant)):
                     sentences.extend(r['sentences'])
                 pickle.dump(sentences, open(year_sentences_path, 'wb'))
-                print(f'saved {len(sentences)} from {year} to pickle file')
+                print(f'saved {len(sentences)} sentences from {year} to pickle file {year_sentences_path}.')
 
     def setup(self, stage=None):
         """happens on all GPUs."""
         if self.by_sentence:
             self.sentences = []
             for year in range(self.start_year, self.end_year + 1):
-                year_sentences_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences.pickle')
+                year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
                 sentences = pickle.load(open(year_sentences_path, 'rb'))
                 self.sentences.extend(sentences)
             print(f'len(sentences) = {len(self.sentences)}')

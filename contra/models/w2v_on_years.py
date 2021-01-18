@@ -16,8 +16,10 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
-from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, DATA_PATH
-from contra.utils.pubmed_utils import read_year 
+from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs
+from contra.datasets.pubmed_dataset_full import PubMedFullModule
+from contra.utils import text_utils as tu
 from contra import config
 import wandb
 
@@ -45,6 +47,13 @@ class EpochLogger(CallbackAny2Vec):
                    'time per epoch': (time.time()-self.start)/self.epoch, 
                    'loss': loss_delta})
 
+def params_to_description(abstract_weighting_mode, only_aact_data):
+    desc = ''
+    if abstract_weighting_mode == 'subsample':
+        desc='sample'
+    if only_aact_data:
+        desc+='_aact'
+    return desc
 
 class EmbeddingOnYears:
     def __init__(self, hparams):
@@ -57,12 +66,33 @@ class EmbeddingOnYears:
         self.min_count = 1
         self.iterations = hparams.max_epochs
         
+        self.abstract_weighting_mode = hparams.abstract_weighting_mode
+        self.pubmed_version = hparams.pubmed_version
+        self.pubmed_folder = {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[self.pubmed_version]
+        
         self.model_name = hparams.emb_algorithm
         self.data = []
         self.model = None
         monitor_loss = (self.model_name == 'w2v')
         self.epoch_logger = EpochLogger(monitor_loss)
+
+        if self.abstract_weighting_mode not in ('normal', 'subsample'):
+            sys.exit()
+        
+        self.only_aact_data = hparams.only_aact_data
+        self.desc = params_to_description(self.abstract_weighting_mode, self.only_aact_data)
+
         self.idf = defaultdict(int)
+        self.idf_filename = f'idf_dict{self.start_year}_{self.end_year}{self.desc}.pickle'
+        self.text_utils = tu.TextUtils()
+
+    def load_aact_data(self):
+        df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2019_abstracts_with_participants.csv'), index_col=0)
+        df['title'] = df['title'].fillna('')
+        df['title'] = df['title'].apply(lambda x: x.strip('[]'))
+        df['title_and_abstract'] = df['title'] + df['abstract']
+        df = df[(df['year'] >= self.start_year) & (df['year'] <= self.end_year)]
+        return df
 
     def count_words_in_abstract(self, abstract):
         tokenized = word_tokenize(abstract)
@@ -70,46 +100,61 @@ class EmbeddingOnYears:
             self.idf[word] += 1
 
     def populate_idf_dict(self):
-        for year in range(self.start_year, self.end_year + 1):
-            df = read_year(year)
+        output_path = os.path.join(self.pubmed_folder, self.idf_filename)
+        if os.path.exists(output_path):
+            print(f"IDF path already exists: {output_path}")
+            return
+        print("Generating idf dict")
+        if self.only_aact_data:
+            df = self.load_aact_data()
             df['title_and_abstract'].apply(self.count_words_in_abstract)
-        output_path = os.path.join(FULL_PUMBED_2019_PATH, f'idf_dict{self.start_year}_{self.end_year}.pickle')
+        else:
+            for year in range(self.start_year, self.end_year + 1):
+                df = read_year(year, version=self.pubmed_version, subsample=(self.abstract_weighting_mode=='subsample'))
+                df['title_and_abstract'].apply(self.count_words_in_abstract)
+        print(f"Saving IDF dict to path: {output_path}")
         pickle.dump(self.idf, open(output_path, 'wb'))
 
     def load_data_for_w2v(self):
-        for year in range(self.start_year, self.end_year + 1):
-            year_sentences_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences.pickle')
-            year_sentences_tokenized_path = os.path.join(FULL_PUMBED_2019_PATH, f'{year}_sentences_tokenized.pickle')
-            if os.path.exists(year_sentences_tokenized_path):
-                sentences1 = pickle.load(open(year_sentences_tokenized_path, 'rb'))
-            else:
-                sentences = pickle.load(open(year_sentences_path, 'rb'))
-                sentences1 = []
-                print(f'word-tokenizing {year} sentences')
-                for sent in tqdm(sentences):
+        if self.only_aact_data:
+            df = self.load_aact_data()
+            print("Separating abstracts to sentences...")
+            abstracts_as_sent_list = df['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
+            sentences1 = []
+            print("Separating sentences to words...")
+            for abstract in tqdm(abstracts_as_sent_list):
+                for sent in abstract:
                     sentences1.append(word_tokenize(sent))
-                pickle.dump(sentences1, open(year_sentences_tokenized_path, 'wb'))
-            self.data.extend(sentences1)
+            self.data = sentences1
+        else:
+            for year in range(self.start_year, self.end_year + 1):
+                year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
+                year_sentences_tokenized_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
+                if os.path.exists(year_sentences_tokenized_path):
+                    print(f"Reading tokenized sentences for year {year}")
+                    sentences1 = pickle.load(open(year_sentences_tokenized_path, 'rb'))
+                else:
+                    if os.path.exists(year_sentences_path):
+                        sentences = pickle.load(open(year_sentences_path, 'rb'))
+                    else:
+                        print(f"need to split year to sentences, mode: {self.abstract_weighting_mode}")
+                        pmfull = PubMedFullModule(year, year, 
+                                                  abstract_weighting_mode=self.abstract_weighting_mode,
+                                                  pubmed_version=self.pubmed_version)
+                        pmfull.prepare_data()
+                        sentences = pickle.load(open(year_sentences_path, 'rb'))
+                    print(f"need to tokenize sentences of {year}, mode: {self.abstract_weighting_mode}")
+                    sentences1 = []
+                    for sent in tqdm(sentences):
+                        sentences1.append(word_tokenize(sent))
+                    pickle.dump(sentences1, open(year_sentences_tokenized_path, 'wb'))
+                self.data.extend(sentences1)
         print(f'loaded {len(self.data)} sentences.')
-        
-    def load_data_for_doc2vec(self):
-        for year in range(self.start_year, self.end_year + 1):
-            year_path = os.path.join(FULL_PUMBED_2019_PATH, f'pubmed_{year}.csv')
-            year_tokenized_path = os.path.join(FULL_PUMBED_2019_PATH, f'pubmed_{year}_tokenized_abstracts.pickle')
-            if os.path.exists(year_tokenized_path):
-                abstracts = pickle.load(open(year_tokenized_path, 'rb'))
-            else:
-                df = read_year(year)
-                abstracts = df['title_and_abstract'].progress_apply(word_tokenize)
-                pickle.dump(abstracts, open(year_tokenized_path, 'wb'))
-            docs = [TaggedDocument(doc, [i]) for i, doc in abstracts.iteritems()]    
-            self.data.extend(docs)
+
         
     def load_data(self):
         if self.model_name=='w2v':
             self.load_data_for_w2v()
-        elif self.model_name == 'doc2vec':
-            self.load_data_for_doc2vec()
         else:
             print(f"unsupported model name {self.model_name}")
             sys.exit()
@@ -120,22 +165,14 @@ class EmbeddingOnYears:
         if self.model_name=='w2v':
             self.model = Word2Vec(self.data, min_count=self.min_count, size=self.embedding_size,
                                   compute_loss=True, window=self.window, sg=0, iter=self.iterations, 
-                                  workers=3, callbacks=[self.epoch_logger]) 
-        elif self.model_name == 'doc2vec':
-            self.model = Doc2Vec(self.data, min_count=self.min_count, vector_size=self.embedding_size,
-                                 window=self.window, epochs=self.iterations,
-                                 workers=3, callbacks=[self.epoch_logger])
+                                  workers=3, callbacks=[self.epoch_logger])
         else:
             print(f"unsupported model name {self.model_name}")
             sys.exit()
 
     def save(self):
         if self.model_name == 'w2v':
-            self.model.wv.save(os.path.join(SAVE_PATH, f"word2vec_{self.start_year}_{self.end_year}.wordvectors"))
-        elif self.model_name == 'doc2vec':
-            self.model.delete_temporary_training_data(keep_doctags_vectors=False, keep_inference=True)
-            self.model.save(os.path.join(SAVE_PATH, f"doc2vec_{self.start_year}_{self.end_year}.vectors"))
-
+            self.model.wv.save(os.path.join(SAVE_PATH, f"word2vec_{self.start_year}_{self.end_year}{self.desc}.wordvectors"))
     
             
 
@@ -148,8 +185,6 @@ class PretrainedW2V:
         if self.model_name == 'w2v':
             self.wv = KeyedVectors.load(vectors_path, mmap='r')
             self.emb_size = 300
-        #if self.model_name == 'doc2vec':
-        #    self.model = Doc2Vec.load(path)
 
     def embed(self, tokenized_text):
         tf = defaultdict(int)
@@ -197,28 +232,31 @@ class PretrainedOldNewW2V:
         return torch.as_tensor(np.stack(vectors), dtype=torch.float32, device=device)
 
 
-def read_w2v_model(year1: int, year2: int) -> PretrainedW2V:
+def read_w2v_model(year1: int, year2: int, abstract_weighting_mode='normal', pubmed_version=2019, only_aact_data=True) -> PretrainedW2V:
     '''Read the pretrained embeddings of a year range.'''
-    year_to_ndocs = pd.read_csv(os.path.join(DATA_PATH, 'year_to_ndocs.csv'), index_col=0,
-                                dtype={'year': int, 'ndocs': int}).to_dict(orient='dict')['ndocs']
-    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}.wordvectors")
-    idf_path = os.path.join(SAVE_PATH, f'idf_dict{year1}_{year2}.pickle')
+    year_to_ndocs = read_year_to_ndocs(version=pubmed_version)
+    desc = params_to_description(abstract_weighting_mode, only_aact_data)
+    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}{desc}.wordvectors")
+    idf_path = os.path.join(FULL_PUMBED_2019_PATH, f'idf_dict{year1}_{year2}{desc}.pickle')
     num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
     w2v = PretrainedW2V(idf_path, vectors_path, ndocs=num_docs_in_range)
-    print(f"read w2v vectors from {vectors_path} and idf map from {idf_path}.")
+    print(f"Read w2v vectors from {vectors_path} and idf map from {idf_path}.")
     return w2v
 
 
 if __name__ == '__main__':
-    hparams = config.parser.parse_args(['--name', 'W2VYearsIDF',
-                                        '--emb_algorithm', 'doc2vec',
+    hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2013',
+                                        '--emb_algorithm', 'w2v',
+                                        '--abstract_weighting_mode', 'normal', #subsample
                                         '--start_year', '2010',
                                         '--end_year', '2013',
-                                        '--max_epochs', '15'])
+                                        '--pubmed_version', '2019',
+                                        '--max_epochs', '45',
+                                        '--only_aact_data'])
     wandb.init(project="Contra")
-    wandb.run.name = f'{hparams.name}_{hparams.start_year}_{hparams.end_year}'
+    wandb.run.name = f'{hparams.name}'
     wandb.config.update(hparams)
     wv = EmbeddingOnYears(hparams)
     wv.populate_idf_dict()
-    #wv.fit()
-    #wv.save()
+    wv.fit()
+    wv.save()
