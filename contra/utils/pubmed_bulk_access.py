@@ -8,8 +8,8 @@ import pickle
 import os
 import time
 
-PUBMED_FILES = 1015
-
+PUBMED_FILES_2019 = 1015
+PUBMED_FILES=1062 # 2020
 
 # Pubmed XML utilities
 def get_first_element(xml_object, xpath):
@@ -101,7 +101,7 @@ class BulkPubmedAccess:
     def parse_pubmed_xml_to_dataframe(self, file_index):
         data = {}
         fname = os.path.join(self.gz_folder, self.fname_pattern.format(file_index))
-        print("working on file: {}".format(fname))
+        print("Parsing file: {}".format(fname))
         with gzip.open(fname, "rb") as g:
             content = g.read()
             root = ET.fromstring(content)
@@ -157,10 +157,10 @@ class BulkPubmedAccess:
 
 
 if __name__ == "__main__":
-    PUBMED_FOLDER = os.path.expanduser('~/pubmed_2019')
-    OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2019_by_years')
-    bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed20n{:04}.xml.gz')
-    #bpa.download_pubmed()
+    PUBMED_FOLDER = os.path.expanduser('~/pubmed_2020')
+    OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2020_by_years')
+    bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed21n{:04}.xml.gz')
+    bpa.download_pubmed()
     for i in range(1, PUBMED_FILES+1):
         df = bpa.parse_pubmed_xml_to_dataframe(i)
         bpa.split_df_by_years(df)
