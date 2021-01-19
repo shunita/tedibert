@@ -7,10 +7,8 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from contra.utils import text_utils as tu
-from contra.utils.pubmed_utils import read_year 
+from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder
 import pickle
-
-from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH
 
 
 class PubMedFullModule(pl.LightningDataModule):
@@ -29,8 +27,7 @@ class PubMedFullModule(pl.LightningDataModule):
             self.sentences = {}
         self.abstract_weighting_mode = abstract_weighting_mode
         self.pubmed_version = pubmed_version
-        self.pubmed_folder = {2019: FULL_PUMBED_2019_PATH,
-                              2020: FULL_PUMBED_2020_PATH}[self.pubmed_version]
+        self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
         if self.abstract_weighting_mode == 'normal':
             self.desc = ''
         if self.abstract_weighting_mode == 'subsample':
@@ -42,19 +39,8 @@ class PubMedFullModule(pl.LightningDataModule):
     def prepare_data(self):
         """happens only on one GPU."""
         if self.by_sentence:
-            sentences = []
-            for year in range(self.start_year, self.end_year + 1):
-                year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
-                if os.path.exists(year_sentences_path):
-                    continue
-                relevant = read_year(year, version=self.pubmed_version, subsample=(self.abstract_weighting_mode=='subsample'))
-                print(f'splitting {year} abstracts to sentences...')
-                relevant['sentences'] = relevant['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
-                print(f'saving sentence list...')
-                for pmid, r in tqdm(relevant.iterrows(), total=len(relevant)):
-                    sentences.extend(r['sentences'])
-                pickle.dump(sentences, open(year_sentences_path, 'wb'))
-                print(f'saved {len(sentences)} sentences from {year} to pickle file {year_sentences_path}.')
+            process_year_range_into_sentences(self.start_year, self.end_year, self.pubmed_version, self.abstract_weighting_mode)
+
 
     def setup(self, stage=None):
         """happens on all GPUs."""
@@ -79,9 +65,9 @@ class PubMedFullModule(pl.LightningDataModule):
                 current_index += len(relevant)
             self.relevant_abstracts = current_index
             train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
-            self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year,
+            self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year, self.pubmed_version,
                                            year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
-            self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year,
+            self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year, self.pubmed_version,
                                          year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
@@ -95,7 +81,7 @@ class PubMedFullModule(pl.LightningDataModule):
 
 
 class PubMedFullDataset(Dataset):
-    def __init__(self, indexes_or_sentences, start_year, end_year,
+    def __init__(self, indexes_or_sentences, start_year, end_year, pubmed_version,
                  year_to_indexes=None, year_to_pmids=None,
                  by_sentence=False):
         if by_sentence:
@@ -107,12 +93,13 @@ class PubMedFullDataset(Dataset):
         self.start_year = start_year
         self.end_year = end_year
         self.by_sentence = by_sentence
+        self.pubmed_folder = pubmed_version_to_folder(pubmed_version)
 
     def index_to_filename(self, index):
         for year, interval in self.year_to_indexes.items():
             if interval[0] <= index < interval[1]:
                 pmid = self.year_to_pmids[year][index-interval[0]]
-                return os.path.join(FULL_PUMBED_2019_PATH, str(year), f'{pmid}.csv')
+                return os.path.join(self.pubmed_folder, str(year), f'{pmid}.csv')
         raise IndexError
 
     def __len__(self):

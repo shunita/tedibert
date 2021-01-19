@@ -4,8 +4,11 @@ import pickle
 
 import sys
 sys.path.append('/home/shunita/fairemb')
-from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
-DEFAULT_PUBMED_VERSION=2019
+from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
+from contra.utils import text_utils as tu
+
+def pubmed_version_to_folder(version=DEFAULT_PUBMED_VERSION):
+    return {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[version] 
 
 def read_year(path_or_year, version=DEFAULT_PUBMED_VERSION, subsample=False):
     path = path_or_year
@@ -40,6 +43,23 @@ def read_year(path_or_year, version=DEFAULT_PUBMED_VERSION, subsample=False):
         print(f"sample index path: {index_path} not found.")
     return df
 
+def process_year_range_into_sentences(start_year, end_year, pubmed_version, abstract_weighting_mode):
+    sentences = []
+    text_utils = tu.TextUtils()
+    pubmed_folder = pubmed_version_to_folder(version)
+    for year in range(start_year, end_year + 1):
+        year_sentences_path = os.path.join(pubmed_folder, f'{year}{self.desc}_sentences.pickle')
+        if os.path.exists(year_sentences_path):
+            continue
+        relevant = read_year(year, version=pubmed_version, subsample=(abstract_weighting_mode=='subsample'))
+        print(f'splitting {year} abstracts to sentences...')
+        relevant['sentences'] = relevant['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+        print(f'saving sentence list...')
+        for pmid, r in tqdm(relevant.iterrows(), total=len(relevant)):
+            sentences.extend(r['sentences'])
+        pickle.dump(sentences, open(year_sentences_path, 'wb'))
+        print(f'saved {len(sentences)} sentences from {year} to pickle file {year_sentences_path}.')
+
 
 def read_year_to_ndocs(version=DEFAULT_PUBMED_VERSION):
     year_to_ndocs = pd.read_csv(os.path.join(DATA_PATH, 'year_to_ndocs.csv'),
@@ -49,7 +69,7 @@ def read_year_to_ndocs(version=DEFAULT_PUBMED_VERSION):
 
 
 def subsample_by_minimum_year(years_list, version=DEFAULT_PUBMED_VERSION):
-    folder = {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[version]
+    folder = pubmed_version_to_folder(version)
     year_to_ndocs = read_year_to_ndocs()
     num_samples = min([year_to_ndocs[year] for year in years_list])
     print(f"num_samples: {num_samples}")
@@ -61,7 +81,7 @@ def subsample_by_minimum_year(years_list, version=DEFAULT_PUBMED_VERSION):
             pickle.dump(sample, out)
 
 def read_subsample(year, version=DEFAULT_PUBMED_VERSION):
-    folder = {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[version]
+    folder = pubmed_version_to_folder(version)
     df = read_year(year, version)
     sample_index = pickle.load(open(os.path.join(folder, f'pubmed_{year}_sample_index.pickle'), 'rb'))
     return df.loc[sample_index]

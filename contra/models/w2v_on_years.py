@@ -16,9 +16,8 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
-from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs
-from contra.datasets.pubmed_dataset_full import PubMedFullModule
+from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -138,15 +137,12 @@ class EmbeddingOnYears:
                     print(f"Reading tokenized sentences for year {year}")
                     sentences1 = pickle.load(open(year_sentences_tokenized_path, 'rb'))
                 else:
-                    if os.path.exists(year_sentences_path):
-                        sentences = pickle.load(open(year_sentences_path, 'rb'))
-                    else:
+                    if not os.path.exists(year_sentences_path):
                         print(f"need to split year to sentences, mode: {self.abstract_weighting_mode}")
-                        pmfull = PubMedFullModule(year, year, 
-                                                  abstract_weighting_mode=self.abstract_weighting_mode,
-                                                  pubmed_version=self.pubmed_version)
-                        pmfull.prepare_data()
-                        sentences = pickle.load(open(year_sentences_path, 'rb'))
+                        process_year_range_into_sentences(year, year,
+                                                          abstract_weighting_mode=self.abstract_weighting_mode,
+                                                          pubmed_version=self.pubmed_version)
+                    sentences = pickle.load(open(year_sentences_path, 'rb'))
                     print(f"need to tokenize sentences of {year}, mode: {self.abstract_weighting_mode}")
                     sentences1 = []
                     for sent in tqdm(sentences):

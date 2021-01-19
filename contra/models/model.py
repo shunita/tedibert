@@ -164,7 +164,7 @@ class FairEmbedding(pl.LightningModule):
     def configure_optimizers(self):
         optimizer_1 = torch.optim.Adam(chain(self.autoencoder.parameters(), self.ratio_reconstruction.parameters()),
                                        lr=self.hparams.learning_rate)
-        optimizer_2 = torch.optim.Adam(self.discriminator.parameters(), lr=self.hparams.learning_rate. weight_decay=self.hparams.regularize)
+        optimizer_2 = torch.optim.Adam(self.discriminator.parameters(), lr=self.hparams.learning_rate, weight_decay=self.hparams.regularize)
         return [optimizer_1, optimizer_2]
 
 
