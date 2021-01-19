@@ -238,3 +238,29 @@ class Classifier(nn.Module):
 
     def forward(self, input: torch.Tensor):
         return self.model(input)
+
+
+class Attention(nn.Module):
+    def __init__(self, input_dim: int, output_dim: int):
+        super().__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        # TODO: is this just initialization to random weights?
+        self.W = torch.nn.Parameter(torch.FloatTensor(self.output_dim, self.input_dim).uniform_(-0.1, 0.1))
+
+    def forward(self,
+                # TODO: why is the query of size output_dim?
+                # TODO: how are batches handled??
+                query: torch.Tensor,  # [output_dim]
+                values: torch.Tensor,  # [seq_length, input_dim]
+                ):
+        weights = self._get_weights(query, values)  # [seq_length]
+        weights = torch.nn.functional.softmax(weights, dim=0)
+        return weights @ values  # [encoder_dim]
+
+    def _get_weights(self,
+                     query: torch.Tensor,  # [output_dim]
+                     values: torch.Tensor,  # [seq_length, input_dim]
+                     ):
+        weights = query @ self.W @ values.T  # [seq_length]
+        return weights / np.sqrt(self.output_dim)  # [seq_length]

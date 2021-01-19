@@ -16,7 +16,7 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
-from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
+from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
 from contra.utils.pubmed_utils import read_year, read_year_to_ndocs
 from contra.datasets.pubmed_dataset_full import PubMedFullModule
 from contra.utils import text_utils as tu
@@ -47,13 +47,17 @@ class EpochLogger(CallbackAny2Vec):
                    'time per epoch': (time.time()-self.start)/self.epoch, 
                    'loss': loss_delta})
 
-def params_to_description(abstract_weighting_mode, only_aact_data):
+
+def params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version=DEFAULT_PUBMED_VERSION):
     desc = ''
     if abstract_weighting_mode == 'subsample':
-        desc='sample'
+        desc = 'sample'
     if only_aact_data:
-        desc+='_aact'
+        desc += '_aact'
+    if pubmed_version != 2019:
+        desc += 'v2020'
     return desc
+
 
 class EmbeddingOnYears:
     def __init__(self, hparams):
@@ -197,7 +201,7 @@ class PretrainedW2V:
                 idf = self.idf_map[word]
                 if idf > 0:
                     vec = self.wv.get_vector(word)
-                else: # idf == 0
+                else:  # idf == 0
                     # try to find the word in lowercase
                     idf = self.idf_map[word.lower()]
                     if idf > 0:
@@ -232,10 +236,13 @@ class PretrainedOldNewW2V:
         return torch.as_tensor(np.stack(vectors), dtype=torch.float32, device=device)
 
 
-def read_w2v_model(year1: int, year2: int, abstract_weighting_mode='normal', pubmed_version=2019, only_aact_data=True) -> PretrainedW2V:
+def read_w2v_model(year1: int, year2: int,
+                   abstract_weighting_mode='normal',
+                   pubmed_version=DEFAULT_PUBMED_VERSION,
+                   only_aact_data=True) -> PretrainedW2V:
     '''Read the pretrained embeddings of a year range.'''
     year_to_ndocs = read_year_to_ndocs(version=pubmed_version)
-    desc = params_to_description(abstract_weighting_mode, only_aact_data)
+    desc = params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version)
     vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}{desc}.wordvectors")
     idf_path = os.path.join(FULL_PUMBED_2019_PATH, f'idf_dict{year1}_{year2}{desc}.pickle')
     num_docs_in_range = sum([year_to_ndocs[year] for year in range(year1, year2+1)])
@@ -243,6 +250,18 @@ def read_w2v_model(year1: int, year2: int, abstract_weighting_mode='normal', pub
     print(f"Read w2v vectors from {vectors_path} and idf map from {idf_path}.")
     return w2v
 
+
+def read_w2v_model_to_matrix(year1: int, year2: int,
+                             abstract_weighting_mode='normal',
+                             pubmed_version=DEFAULT_PUBMED_VERSION,
+                             only_aact_data=True):
+    desc = params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version)
+    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}{desc}.wordvectors")
+    wv = KeyedVectors.load(vectors_path, mmap='r')
+    matrix = wv.vectors
+    index_to_word = wv.index2word
+    word_to_index = {w: i for i, w in enumerate(index_to_word)}
+    return matrix, index_to_word, word_to_index
 
 if __name__ == '__main__':
     hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2013',
