@@ -17,8 +17,7 @@ from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
 from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs
-from contra.datasets.pubmed_dataset_full import PubMedFullModule
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -134,15 +133,12 @@ class EmbeddingOnYears:
                     print(f"Reading tokenized sentences for year {year}")
                     sentences1 = pickle.load(open(year_sentences_tokenized_path, 'rb'))
                 else:
-                    if os.path.exists(year_sentences_path):
-                        sentences = pickle.load(open(year_sentences_path, 'rb'))
-                    else:
+                    if not os.path.exists(year_sentences_path):
                         print(f"need to split year to sentences, mode: {self.abstract_weighting_mode}")
-                        pmfull = PubMedFullModule(year, year, 
-                                                  abstract_weighting_mode=self.abstract_weighting_mode,
-                                                  pubmed_version=self.pubmed_version)
-                        pmfull.prepare_data()
-                        sentences = pickle.load(open(year_sentences_path, 'rb'))
+                        process_year_range_into_sentences(year, year, 
+                                                          abstract_weighting_mode=self.abstract_weighting_mode,
+                                                          pubmed_version=self.pubmed_version)
+                    sentences = pickle.load(open(year_sentences_path, 'rb'))
                     print(f"need to tokenize sentences of {year}, mode: {self.abstract_weighting_mode}")
                     sentences1 = []
                     for sent in tqdm(sentences):
@@ -232,7 +228,10 @@ class PretrainedOldNewW2V:
         return torch.as_tensor(np.stack(vectors), dtype=torch.float32, device=device)
 
 
-def read_w2v_model(year1: int, year2: int, abstract_weighting_mode='normal', pubmed_version=2019, only_aact_data=True) -> PretrainedW2V:
+def read_w2v_model(year1: int, year2: int,
+                   abstract_weighting_mode='normal',
+                   pubmed_version=DEFAULT_PUBMED_VERSION,
+                   only_aact_data=True) -> PretrainedW2V:
     '''Read the pretrained embeddings of a year range.'''
     year_to_ndocs = read_year_to_ndocs(version=pubmed_version)
     desc = params_to_description(abstract_weighting_mode, only_aact_data)
@@ -243,6 +242,18 @@ def read_w2v_model(year1: int, year2: int, abstract_weighting_mode='normal', pub
     print(f"Read w2v vectors from {vectors_path} and idf map from {idf_path}.")
     return w2v
 
+
+def read_w2v_model_to_matrix(year1: int, year2: int, 
+                             abstract_weighting_mode='normal',
+                             pubmed_version=DEFAULT_PUBMED_VERSION,
+                             only_aact_data=True):
+    desc = params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version)
+    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}{desc}.wordvectors")
+    wv = KeyedVectors.load(vectors_path, mmap='r')
+    matrix = wv.vectors
+    index_to_word = wv.index2word
+    word_to_index = {w: i for i, w in enumerate(index_to_word)}
+    return matrix, index_to_word, word_to_index
 
 if __name__ == '__main__':
     hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2013',
