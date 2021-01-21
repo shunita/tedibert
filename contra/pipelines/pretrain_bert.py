@@ -16,11 +16,17 @@ hparams = config.parser.parse_args(['--name', 'BertYears',
                                     '--end_year', '2013',
                                     '--by_sentence',
                                     '--max_epochs', '40',
-                                    '--lr', '5e-5'])
+                                    '--lr', '5e-5',
+                                    '--abstract_weighting_mode', 'normal', #subsample
+                                    '--pubmed_version', '2020',
+                                    ])
 hparams.gpus = [0,1]
 #hparams.gpus = 1
 
-dm = PubMedFullModule(start_year=hparams.start_year, end_year=hparams.end_year, test_size=0.2, by_sentence=hparams.by_sentence)
+dm = PubMedFullModule(start_year=hparams.start_year, end_year=hparams.end_year, test_size=0.2, 
+                      by_sentence=hparams.by_sentence, 
+                      abstract_weighting_mode=hparams.abstract_weighting_mode,
+                      pubmed_version=hparams.pubmed_version)
 model = BertPretrainOnYears(hparams)
 
 logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,

@@ -16,8 +16,8 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
-from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences
+from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -47,16 +47,6 @@ class EpochLogger(CallbackAny2Vec):
                    'loss': loss_delta})
 
 
-def params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version=DEFAULT_PUBMED_VERSION):
-    desc = ''
-    if abstract_weighting_mode == 'subsample':
-        desc = 'sample'
-    if only_aact_data:
-        desc += '_aact'
-    if pubmed_version != 2019:
-        desc += 'v2020'
-    return desc
-
 
 class EmbeddingOnYears:
     def __init__(self, hparams):
@@ -83,7 +73,7 @@ class EmbeddingOnYears:
             sys.exit()
         
         self.only_aact_data = hparams.only_aact_data
-        self.desc = params_to_description(self.abstract_weighting_mode, self.only_aact_data)
+        self.desc = params_to_description(self.abstract_weighting_mode, self.only_aact_data, self.pubmed_version)
 
         self.idf = defaultdict(int)
         self.idf_filename = f'idf_dict{self.start_year}_{self.end_year}{self.desc}.pickle'

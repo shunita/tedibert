@@ -4,11 +4,25 @@ import pickle
 
 import sys
 sys.path.append('/home/shunita/fairemb')
+from tqdm import tqdm
 from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
 from contra.utils import text_utils as tu
 
+
 def pubmed_version_to_folder(version=DEFAULT_PUBMED_VERSION):
     return {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[version] 
+
+
+def params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version=DEFAULT_PUBMED_VERSION):
+    desc = ''
+    if abstract_weighting_mode == 'subsample':
+        desc = 'sample'
+    if only_aact_data:
+        desc += '_aact'
+    if pubmed_version != 2019:
+        desc += 'v2020'
+    return desc
+
 
 def read_year(path_or_year, version=DEFAULT_PUBMED_VERSION, subsample=False):
     path = path_or_year
@@ -43,12 +57,14 @@ def read_year(path_or_year, version=DEFAULT_PUBMED_VERSION, subsample=False):
         print(f"sample index path: {index_path} not found.")
     return df
 
+
 def process_year_range_into_sentences(start_year, end_year, pubmed_version, abstract_weighting_mode):
     sentences = []
     text_utils = tu.TextUtils()
-    pubmed_folder = pubmed_version_to_folder(version)
+    pubmed_folder = pubmed_version_to_folder(pubmed_version)
+    desc = params_to_description(abstract_weighting_mode, only_aact_data=False, pubmed_version=pubmed_version)
     for year in range(start_year, end_year + 1):
-        year_sentences_path = os.path.join(pubmed_folder, f'{year}{self.desc}_sentences.pickle')
+        year_sentences_path = os.path.join(pubmed_folder, f'{year}{desc}_sentences.pickle')
         if os.path.exists(year_sentences_path):
             continue
         relevant = read_year(year, version=pubmed_version, subsample=(abstract_weighting_mode=='subsample'))
