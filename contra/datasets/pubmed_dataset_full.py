@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from contra.utils import text_utils as tu
-from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder
+from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder, params_to_description
 import pickle
 
 
@@ -29,11 +29,8 @@ class PubMedFullModule(pl.LightningDataModule):
         self.abstract_weighting_mode = abstract_weighting_mode
         self.pubmed_version = pubmed_version
         self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
-        if self.abstract_weighting_mode == 'normal':
-            self.desc = ''
-        elif self.abstract_weighting_mode == 'subsample':
-            self.desc='sample'
-        else:
+        self.desc = params_to_description(self.abstract_weighting_mode, only_aact_data=False, pubmed_version=self.pubmed_version)
+        if self.abstract_weighting_mode not in ('normal', 'subsample'):
             print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
             sys.exit()
 
@@ -53,9 +50,9 @@ class PubMedFullModule(pl.LightningDataModule):
                 self.sentences.extend(sentences)
             print(f'len(sentences) = {len(self.sentences)}')
             train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size)
-            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year,
+            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year, self.pubmed_version,
                                            by_sentence=True)
-            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year,
+            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year, self.pubmed_version,
                                          by_sentence=True)
         else:
             current_index = 0
