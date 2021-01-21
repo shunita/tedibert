@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 from datetime import datetime
 from tqdm import tqdm
@@ -30,7 +31,7 @@ class PubMedFullModule(pl.LightningDataModule):
         self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
         if self.abstract_weighting_mode == 'normal':
             self.desc = ''
-        if self.abstract_weighting_mode == 'subsample':
+        elif self.abstract_weighting_mode == 'subsample':
             self.desc='sample'
         else:
             print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
