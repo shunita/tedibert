@@ -5,7 +5,7 @@ from itertools import chain
 import pytorch_lightning as pl
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModel, BertForPreTraining, BertForMaskedLM, AlbertForMaskedLM
+from transformers import AutoTokenizer, BertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
 from contra.constants import SAVE_PATH
 
@@ -23,8 +23,13 @@ class BertPretrainOnYears(pl.LightningModule):
         # We use biobert tokenizer because it matches the bert tokenization, but also has word pieces.
         self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
 
-        # self.bert_model = AlbertForMaskedLM.from_pretrained('albert-base-v2')
         self.bert_model = BertForMaskedLM.from_pretrained('bert-base-cased')
+        self.num_frozen_layers = hparams.num_frozen_layers
+        if self.num_frozen_layers > 0:
+            modules = [self.bert_model.bert.embeddings, *self.bert_model.bert.encoder.layer[:self.num_frozen_layers]]
+            for module in modules:
+                for param in module.parameters():
+                    param.requires_grad = False
         
         self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
         self.by_sentence = hparams.by_sentence
@@ -55,6 +60,10 @@ class BertPretrainOnYears(pl.LightningModule):
 
     def training_step(self, batch: dict, batch_idx: int) -> dict:
         loss = self.step(batch, name='train')
+        if loss > 0.02:
+            print(batch_idx)
+            #for sample in batch['text']:
+            #    print(sample.encode('utf-8'))
         return loss
 
     def validation_step(self, batch: dict, batch_idx: int):
