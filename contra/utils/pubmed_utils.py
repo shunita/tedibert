@@ -59,11 +59,11 @@ def read_year(path_or_year, version=DEFAULT_PUBMED_VERSION, subsample=False):
 
 
 def process_year_range_into_sentences(start_year, end_year, pubmed_version, abstract_weighting_mode):
-    sentences = []
     text_utils = tu.TextUtils()
     pubmed_folder = pubmed_version_to_folder(pubmed_version)
     desc = params_to_description(abstract_weighting_mode, only_aact_data=False, pubmed_version=pubmed_version)
     for year in range(start_year, end_year + 1):
+        sentences = []
         year_sentences_path = os.path.join(pubmed_folder, f'{year}{desc}_sentences.pickle')
         if os.path.exists(year_sentences_path):
             continue

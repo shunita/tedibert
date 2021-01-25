@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from contra.utils import text_utils as tu
-from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder
+from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder, params_to_description
 import pickle
 
 
@@ -29,11 +29,8 @@ class PubMedFullModule(pl.LightningDataModule):
         self.abstract_weighting_mode = abstract_weighting_mode
         self.pubmed_version = pubmed_version
         self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
-        if self.abstract_weighting_mode == 'normal':
-            self.desc = ''
-        elif self.abstract_weighting_mode == 'subsample':
-            self.desc='sample'
-        else:
+        self.desc = params_to_description(self.abstract_weighting_mode, only_aact_data=False, pubmed_version=self.pubmed_version)
+        if self.abstract_weighting_mode not in ('normal', 'subsample'):
             print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
             sys.exit()
 
@@ -52,10 +49,10 @@ class PubMedFullModule(pl.LightningDataModule):
                 sentences = pickle.load(open(year_sentences_path, 'rb'))
                 self.sentences.extend(sentences)
             print(f'len(sentences) = {len(self.sentences)}')
-            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size)
-            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year,
+            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size, random_state=1)
+            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year, self.pubmed_version,
                                            by_sentence=True)
-            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year,
+            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year, self.pubmed_version,
                                          by_sentence=True)
         else:
             current_index = 0
@@ -65,14 +62,14 @@ class PubMedFullModule(pl.LightningDataModule):
                 self.year_to_pmids[year] = relevant.index.tolist()
                 current_index += len(relevant)
             self.relevant_abstracts = current_index
-            train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
+            train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size, random_state=1)
             self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year, self.pubmed_version,
                                            year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
             self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year, self.pubmed_version,
                                          year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=True, batch_size=150, num_workers=8)
+        return DataLoader(self.train, shuffle=False, batch_size=150, num_workers=8)
 
     def val_dataloader(self):
         return DataLoader(self.val, shuffle=False, batch_size=150, num_workers=8)
