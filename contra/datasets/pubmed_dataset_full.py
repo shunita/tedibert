@@ -49,7 +49,7 @@ class PubMedFullModule(pl.LightningDataModule):
                 sentences = pickle.load(open(year_sentences_path, 'rb'))
                 self.sentences.extend(sentences)
             print(f'len(sentences) = {len(self.sentences)}')
-            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size)
+            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size, random_state=1)
             self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year, self.pubmed_version,
                                            by_sentence=True)
             self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year, self.pubmed_version,
@@ -62,14 +62,14 @@ class PubMedFullModule(pl.LightningDataModule):
                 self.year_to_pmids[year] = relevant.index.tolist()
                 current_index += len(relevant)
             self.relevant_abstracts = current_index
-            train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
+            train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size, random_state=1)
             self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year, self.pubmed_version,
                                            year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
             self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year, self.pubmed_version,
                                          year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=True, batch_size=150, num_workers=8)
+        return DataLoader(self.train, shuffle=False, batch_size=150, num_workers=8)
 
     def val_dataloader(self):
         return DataLoader(self.val, shuffle=False, batch_size=150, num_workers=8)

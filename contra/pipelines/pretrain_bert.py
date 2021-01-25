@@ -11,14 +11,22 @@ from contra.datasets import PubMedFullModule
 from contra import config
 from contra.models import BertPretrainOnYears
 
-hparams = config.parser.parse_args(['--name', 'BertYears', 
+# For debug purposes: disable randomness
+import numpy as np
+import torch
+np.random.seed(1)
+torch.manual_seed(1)
+
+
+hparams = config.parser.parse_args(['--name', 'BertYears10-13', 
                                     '--start_year', '2010',
                                     '--end_year', '2013',
                                     '--by_sentence',
-                                    '--max_epochs', '40',
+                                    '--max_epochs', '1',  #  '40',
                                     '--lr', '5e-5',
                                     '--abstract_weighting_mode', 'normal', #subsample
                                     '--pubmed_version', '2020',
+                                    #'--num_frozen_layers', '10',
                                     ])
 hparams.gpus = [0,1]
 #hparams.gpus = 1
