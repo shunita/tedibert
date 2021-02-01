@@ -7,7 +7,8 @@ from itertools import chain
 import pytorch_lightning as pl
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, BertForMaskedLM
+from transformers import DataCollatorForLanguageModeling
 from scipy import stats
 from contra.models.w2v_on_years import PretrainedOldNewW2V, read_w2v_model
 from contra.utils.text_utils import TextUtils
@@ -21,6 +22,7 @@ class FairEmbedding(pl.LightningModule):
         self.hparams = hparams
         self.bn = hparams.bn
         self.activation=hparams.activation
+        self.do_ratio_prediction = (hparams.lmb_ratio > 0)
 
         self.initial_emb_algorithm = hparams.emb_algorithm
         self.initial_embedding_size = hparams.initial_emb_size
@@ -28,8 +30,9 @@ class FairEmbedding(pl.LightningModule):
 
         if self.initial_emb_algorithm == 'bert':
             self.tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
-            self.bert_model = AutoModel.from_pretrained("google/bert_uncased_L-2_H-128_A-2")
+            self.bert_model = BertForMaskedLM.from_pretrained('bert-base-cased')
             self.initial_embedding_size = self.bert_model.get_input_embeddings().embedding_dim
+            self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
 
         elif self.initial_emb_algorithm == 'w2v':
             self.tokenizer = TextUtils()
@@ -43,30 +46,44 @@ class FairEmbedding(pl.LightningModule):
             print("unsupported initial embedding algorithm. Should be 'bert' or 'w2v'.")
             sys.exit()
 
-        self.autoencoder = Autoencoder(in_dim=self.initial_embedding_size, hid_dim=self.embedding_size)
-        self.ratio_reconstruction = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0)
-        self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=2,
+        if self.do_ratio_prediction:
+            self.ratio_reconstruction = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0)
+            self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1, hid_layers=2,
                                         bn=self.bn, activation=self.activation)
+        else:
+            self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=2,
+                                            bn=self.bn, activation=self.activation)
         self.L1Loss = torch.nn.L1Loss()
         self.BCELoss = torch.nn.BCELoss()
 
     def forward(self, batch):
         text = batch['text']
         if self.initial_emb_algorithm == 'bert':
-            # TODO: this will use the same bert model for all abstracts, regardless of year (it shouldn't).
+            # We use the same bert model for all abstracts, regardless of year.
             inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=50,
                                                       add_special_tokens=True, return_tensors="pt")
-            inputs = {k: v.to(self.device) for k, v in inputs.items()}
-            outputs = self.bert_model(**inputs)
-            sentence_embedding = mean_pooling(outputs, inputs['attention_mask'])
+            collated = self.data_collator(inputs['input_ids'].tolist())
+            inputs_for_emb = {k: v.to(self.device) for k, v in inputs.items()}
+
+            inputs_for_lm = inputs
+            inputs_for_lm['input_ids'] = collated['input_ids']
+            inputs_for_lm['labels'] = collated['labels']
+            inputs_for_lm = {k: v.to(self.device) for k, v in inputs_for_lm.items()}
+
+            outputs = self.bert_model(**inputs_for_emb, output_hidden_states=True)
+            loss = self.bert_model(**inputs_for_lm).loss
+            # TODO: inputs['attention_mask'] is just a tensor of ones so mean_pooling is a simple average
+            sentence_embedding = mean_pooling(outputs['hidden_states'][-1], inputs_for_emb['attention_mask'])
+
         elif self.initial_emb_algorithm == 'w2v':
             # tokenization is the same for old and new (we use word_tokenize for both).
+            # embedding is done by a different model for "old" or "new" samples.
             tokenized_texts = [self.tokenizer.word_tokenize_abstract(t) for t in text]
             is_new = batch['is_new']
             sentence_embedding = self.w2v.embed_batch(tokenized_texts, is_new, self.device)
+            loss = None
 
-        decoded, latent = self.autoencoder(sentence_embedding)
-        return sentence_embedding, latent, decoded
+        return sentence_embedding, loss
         
 
     def step(self, batch: dict, optimizer_idx: int = None, name='train') -> dict:
@@ -74,22 +91,23 @@ class FairEmbedding(pl.LightningModule):
             self.ratio_true = batch['female_ratio']
             self.is_new = batch['is_new']
             # generate
-            initial_embedding, self.fair_embedding, reconstruction = self.forward(batch)
-            g_loss = self.L1Loss(initial_embedding, reconstruction)
+            self.fair_embedding, g_loss = self.forward(batch)
             
-            self.ratio_pred = self.ratio_reconstruction(self.fair_embedding)
-            ratio_loss = self.BCELoss(self.ratio_pred.squeeze()[self.is_new].float(), self.ratio_true[self.is_new].float())
-
-            # discriminate
-            #isnew_pred = self.discriminator(torch.cat([self.fair_embedding, self.ratio_pred], dim=1))
-            isnew_pred = self.discriminator(self.fair_embedding)
+            if self.do_ratio_prediction:
+                self.ratio_pred = self.ratio_reconstruction(self.fair_embedding)
+                ratio_loss = self.BCELoss(self.ratio_pred.squeeze()[self.is_new].float(), self.ratio_true[self.is_new].float())
+                isnew_pred = self.discriminator(torch.cat([self.fair_embedding, self.ratio_pred], dim=1))
+            else:
+                isnew_pred = self.discriminator(self.fair_embedding)
             only_old_predicted = isnew_pred.squeeze()[~self.is_new]
             # we take samples that "look old" to the discriminator and label them as new, to train the generator.
             # Discriminator weights do not change while we train the generator because of the different optimizer_idx's.
             isnew_loss = self.BCELoss(only_old_predicted, torch.ones(only_old_predicted.shape[0], device=self.device))
 
             # final loss
-            loss = g_loss + self.hparams.lmb_ratio * ratio_loss + self.hparams.lmb_isnew * isnew_loss
+            loss = g_loss + self.hparams.lmb_isnew * isnew_loss
+            if self.do_ratio_prediction:
+                loss += self.hparams.lmb_ratio * ratio_loss
             self.log(f'generator/{name}_reconstruction_loss', g_loss)
             self.log(f'generator/{name}_ratio_loss', ratio_loss)
             self.log(f'generator/{name}_discriminator_loss', isnew_loss)
@@ -98,16 +116,21 @@ class FairEmbedding(pl.LightningModule):
         if optimizer_idx == 1:
             # discriminate
             emb = self.fair_embedding.detach()
-            # TODO: temporarily commented out the ratio prediction
-            #ratio = self.ratio_pred.detach()
             
-            only_new = emb[self.is_new] #, ratio[self.is_new]
-            only_old = emb[~self.is_new] #, ratio[~self.is_new]
+            if self.do_ratio_prediction:
+                ratio = self.ratio_pred.detach()
+                only_new = emb[self.is_new], ratio[self.is_new]
+                only_old = emb[~self.is_new], ratio[~self.is_new]
+            else:
+                only_new = emb[self.is_new]
+                only_old = emb[~self.is_new]
             loss = None
             if any(self.is_new):
                 if not self.bn or only_new.shape[0] > 1:
-                    #isnew_pred_only_new = self.discriminator(torch.cat(only_new, dim=1))
-                    isnew_pred_only_new = self.discriminator(only_new)
+                    if self.do_ratio_prediction:
+                        isnew_pred_only_new = self.discriminator(torch.cat(only_new, dim=1))
+                    else:
+                        isnew_pred_only_new = self.discriminator(only_new)
                     isnew_loss_only_new = self.BCELoss(isnew_pred_only_new.squeeze(), 
                                                        torch.ones(isnew_pred_only_new.shape[0], device=self.device).squeeze())
                     loss = isnew_loss_only_new
@@ -115,8 +138,10 @@ class FairEmbedding(pl.LightningModule):
             
             if not all(self.is_new):
                 if not self.bn or only_old.shape[0] > 1:
-                    #isnew_pred_only_old = self.discriminator(torch.cat(only_old, dim=1))
-                    isnew_pred_only_old = self.discriminator(only_old)
+                    if self.do_ratio_prediction:
+                        isnew_pred_only_old = self.discriminator(torch.cat(only_old, dim=1))
+                    else:
+                        isnew_pred_only_old = self.discriminator(only_old)
                     isnew_loss_only_old = self.BCELoss(isnew_pred_only_old.squeeze(), 
                                                        torch.zeros(isnew_pred_only_old.shape[0], device=self.device).squeeze())
                     self.log(f'discriminator/{name}_old_loss', isnew_loss_only_old)
@@ -137,8 +162,8 @@ class FairEmbedding(pl.LightningModule):
             loss = self.step(batch, i, name='val')
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
-        _, CUI1_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI1']))
-        _, CUI2_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI2']))
+        CUI1_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI1']))
+        CUI2_embedding, _ = self.forward(self.wrap_text_to_batch(batch['CUI2']))
         pred_similarity = nn.CosineSimilarity()(CUI1_embedding, CUI2_embedding)
         true_similarity = batch['true_similarity']
         return pred_similarity, true_similarity
@@ -162,9 +187,13 @@ class FairEmbedding(pl.LightningModule):
         self.log('test/pvalue', pvalue)
 
     def configure_optimizers(self):
-        optimizer_1 = torch.optim.Adam(chain(self.autoencoder.parameters(), self.ratio_reconstruction.parameters()),
-                                       lr=self.hparams.learning_rate)
-        optimizer_2 = torch.optim.Adam(self.discriminator.parameters(), lr=self.hparams.learning_rate, weight_decay=self.hparams.regularize)
+        opt1_params = self.bert_model.parameters()
+        if self.do_ratio_prediction:
+            opt1_params = chain(opt1_params, self.ratio_reconstruction.parameters())
+        optimizer_1 = torch.optim.Adam(opt1_params, lr=self.hparams.learning_rate)
+        optimizer_2 = torch.optim.Adam(self.discriminator.parameters(), 
+                                       lr=self.hparams.learning_rate,
+                                       weight_decay=self.hparams.regularize)
         return [optimizer_1, optimizer_2]
 
 
