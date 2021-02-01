@@ -17,7 +17,7 @@ from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
 from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description, load_aact_data
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -79,14 +79,6 @@ class EmbeddingOnYears:
         self.idf_filename = f'idf_dict{self.start_year}_{self.end_year}{self.desc}.pickle'
         self.text_utils = tu.TextUtils()
 
-    def load_aact_data(self):
-        df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2019_abstracts_with_participants.csv'), index_col=0)
-        df['title'] = df['title'].fillna('')
-        df['title'] = df['title'].apply(lambda x: x.strip('[]'))
-        df['title_and_abstract'] = df['title'] + df['abstract']
-        df = df[(df['year'] >= self.start_year) & (df['year'] <= self.end_year)]
-        return df
-
     def count_words_in_abstract(self, abstract):
         tokenized = word_tokenize(abstract)
         for word in set(tokenized):
@@ -99,7 +91,7 @@ class EmbeddingOnYears:
             return
         print("Generating idf dict")
         if self.only_aact_data:
-            df = self.load_aact_data()
+            df = load_aact_data(self.pubmed_version, (self.start_year, self.end_year))
             df['title_and_abstract'].apply(self.count_words_in_abstract)
         else:
             for year in range(self.start_year, self.end_year + 1):
@@ -110,7 +102,7 @@ class EmbeddingOnYears:
 
     def load_data_for_w2v(self):
         if self.only_aact_data:
-            df = self.load_aact_data()
+            df = load_aact_data(self.pubmed_version, (self.start_year, self.end_year))
             print("Separating abstracts to sentences...")
             abstracts_as_sent_list = df['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
             sentences1 = []

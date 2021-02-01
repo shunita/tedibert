@@ -18,23 +18,21 @@ np.random.seed(1)
 torch.manual_seed(1)
 
 
-hparams = config.parser.parse_args(['--name', 'BertYears10-13', 
-                                    '--start_year', '2010',
+hparams = config.parser.parse_args(['--name', 'BertYears11-13', 
+                                    '--start_year', '2011',
                                     '--end_year', '2013',
                                     '--by_sentence',
-                                    '--max_epochs', '1',  #  '40',
+                                    '--max_epochs', '40',
                                     '--lr', '5e-5',
                                     '--abstract_weighting_mode', 'normal', #subsample
                                     '--pubmed_version', '2020',
                                     #'--num_frozen_layers', '10',
+                                    '--only_aact_data',
                                     ])
-hparams.gpus = [0,1]
-#hparams.gpus = 1
+#hparams.gpus = [0,1]
+hparams.gpus = 1
 
-dm = PubMedFullModule(start_year=hparams.start_year, end_year=hparams.end_year, test_size=0.2, 
-                      by_sentence=hparams.by_sentence, 
-                      abstract_weighting_mode=hparams.abstract_weighting_mode,
-                      pubmed_version=hparams.pubmed_version)
+dm = PubMedFullModule(hparams)
 model = BertPretrainOnYears(hparams)
 
 logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,

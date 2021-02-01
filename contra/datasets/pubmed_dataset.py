@@ -14,57 +14,63 @@ from contra.constants import DATA_PATH, SAVE_PATH
 from transformers import AutoTokenizer, AutoModel
 from contra.models.w2v_on_years import read_w2v_model
 from contra.utils.text_utils import TextUtils
+from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data
 
 
 class PubMedModule(pl.LightningDataModule):
 
-    def __init__(self, min_num_participants=1,
-                 first_year_range=(2010,2013),
-                 second_year_range=(2018,2018),
-                 train_test_split=0.8,
-                 test_year_range=None,
-                 test_fname=None):
+    def __init__(self, hparams):
         super().__init__()
-        self.min_num_participants = min_num_participants
-        self.first_time_range = (datetime(first_year_range[0], 1, 1), datetime(first_year_range[1], 12, 31))
-        self.second_time_range = (datetime(second_year_range[0], 1, 1), datetime(second_year_range[1], 12, 31))
-        self.test_year_range = test_year_range
-        self.test_fname = test_fname
-        self.train_test_split = train_test_split
+        self.min_num_participants = hparams.min_num_participants
+        self.first_time_range = (datetime(hparams.first_start_year, 1, 1), datetime(hparams.first_end_year, 12, 31))
+        self.second_time_range = (datetime(hparams.second_start_year, 1, 1), datetime(hparams.second_end_year, 12, 31))
+        self.test_year_range = (hparams.test_start_year, hparams.test_end_year)
+        self.test_fname = hparams.test_pairs_file
+        if self.test_fname is not None:
+            self.test_fname = os.path.join(SAVE_PATH, self.test_fname)
+        self.train_test_split = hparams.train_test_split
+        self.pubmed_version = hparams.pubmed_version
+        self.emb_algorithm = hparams.emb_algorithm
         self.df = None
         self.train, self.test, self.val = None, None, None
 
     def prepare_data(self):
-        self.df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2019_abstracts_with_participants.csv'), index_col=0)
-        self.df = self.df.dropna(subset=['date', 'male', 'female'], axis=0)
-        self.df['title'] = self.df['title'].fillna('')
-        self.df['title'] = self.df['title'].apply(lambda x: x.strip('[]'))
-        self.df['date'] = self.df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
-        self.df['num_participants'] = self.df['female'] + self.df['male']
-        self.df = self.df[self.df['num_participants'] >= self.min_num_participants]
+        # This is a df containing a row for each abstract.
+        df = load_aact_data(self.pubmed_version, year_range=None)
+        df = df.dropna(subset=['date', 'male', 'female'], axis=0)
+        df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
+        df['num_participants'] = df['female'] + df['male']
+        df = df[df['num_participants'] >= self.min_num_participants]
+        self.df = df
 
     def setup(self, stage=None):
         old_df = self.df[(self.df['date'] >= self.first_time_range[0]) & (self.df['date'] <= self.first_time_range[1])]
         new_df = self.df[(self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
 
+        # We split to train and test while we still have the whole abstract.
         old_train_df, old_val_df = train_test_split(old_df, test_size=0.2)
         new_train_df, new_val_df = train_test_split(new_df, test_size=0.2)
         train_df = pd.concat([new_train_df, old_train_df])
         val_df = pd.concat([new_val_df, old_val_df])
+        # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
+        keep_fields = ['date', 'year', 'female', 'male', 'num_participants']
+        train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
+        val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
 
         self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
-        
-        if self.test_fname is not None:
-            fname = os.path.join(SAVE_PATH, self.test_fname)
-        elif self.test_year_range is not None and self.test_year_range[0] is not None:
-            testyear0, testyear1 = self.test_year_range
-            fname = os.path.join(SAVE_PATH, 'test_similarities_CUI_names_{testyear0}_{testyear1}.csv')
+
+        if self.emb_algorithm == 'w2v':
+            self.test = CUIDataset(bert=None, test_years=self.test_year_range, frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
+                                   read_from_file=self.test_fname)
+        elif self.emb_algorithm == 'bert':
+            bert_path = f'bert_base_cased_{self.test_year_range[0]}_{self.test_year_range[1]}_v{self.pubmed_version}_epoch39'
+            self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path), 
+                                   test_years=self.test_year_range, 
+                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
+                                   read_from_file=self.test_fname)
         else:
-            print("both test year and test file name were not provided.")
-            sys.exit()
-        self.test = CUIDataset(bert=None, w2v_years=self.test_year_range, frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
-                               read_from_file=fname)
+            print(f'Unsupported emb_algorithm: {self.emb_algorithm}')
         print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples.\nLoaded {len(self.test)} cui pairs for test.')
 
     def train_dataloader(self):
@@ -91,8 +97,8 @@ class PubMedDataset(Dataset):
             index = index.tolist()
 
         row = self.df.iloc[index]
-        text = '; '.join([row['title'], row['abstract']])
-        # at this point we don't have abstracts from outside the two ranges.
+        text = row['text']
+        # at this point we don't have data from outside the two ranges.
         is_new = torch.as_tensor(row['date'] >= self.second_range[0])
         female_ratio = torch.as_tensor(row['female'] / row['num_participants'])
 
@@ -100,7 +106,7 @@ class PubMedDataset(Dataset):
 
 
 class CUIDataset(Dataset):
-    def __init__(self, bert="google/bert_uncased_L-2_H-128_A-2", w2v_years=(2018, 2018), read_w2v_params={},
+    def __init__(self, bert='google/bert_uncased_L-2_H-128_A-2', test_years=(2018, 2018), read_w2v_params={},
                  top_percentile=0.01, semtypes=None, frac=1., sample_type=0, 
                  filter_by_models=[],
                  read_from_file=None):
@@ -108,7 +114,7 @@ class CUIDataset(Dataset):
         This Dataset handles the CUI pairs and their similarity
         Args:
             bert: the bert path to use. If None, will use w2v.
-            w2v_years: (start_year, end_year) - the range of years on which a w2v model was trained.
+            test_years: (start_year, end_year) - the range of years on which the w2v or bert model was trained.
             top_percentile: from what percentile of apperance to filter
             semtypes: str or List[str] representing the wanted semtypes. If None then uses all
             frac: a number in the range [0,1], representing the fraction of pairs to sample.
@@ -128,16 +134,20 @@ class CUIDataset(Dataset):
         self.frac = frac
         self.sample_type = sample_type
         if bert is not None:
-            self.tokenizer = AutoTokenizer.from_pretrained(bert)
+            self.emb_algorithm = 'bert'
+            self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
             self.bert_model = AutoModel.from_pretrained(bert)
-        elif w2v_years is not None:
+        elif test_years is not None:
+            self.emb_algorithm = 'w2v'
             self.tokenizer = TextUtils()
-            self.w2v_model = read_w2v_model(w2v_years[0], w2v_years[1], **read_w2v_params)
+            self.w2v_model = read_w2v_model(test_years[0], test_years[1], **read_w2v_params)
         else:
             print("CUIDataset got no model to work with: both bert and w2v_years are None.")
             sys.exit()
 
+        # TODO: this table was generated based on pubmed 2018. There could be new CUIs in 2020 version.
         df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
+        
         all_cuis = len(df)
         if self.semtypes is not None:
             if not isinstance(self.semtypes, list):
@@ -152,8 +162,8 @@ class CUIDataset(Dataset):
         if bert is not None:
             inputs = self.tokenizer(CUI_names, padding=True, return_tensors="pt")
             outputs = self.bert_model(**inputs)
-            CUI_embeddings = mean_pooling(outputs, inputs['attention_mask']).detach().numpy()
-        else:  # w2v_years is not None
+            CUI_embeddings = mean_pooling(outputs.last_hidden_state, inputs['attention_mask']).detach().numpy()
+        else:  # test_years is not None
             tokenized_names = [self.tokenizer.word_tokenize_abstract(name) for name in CUI_names]
             # Filter the CUIs according to the models we want to compare.
             # CUIs in the final test set should have embeddings in all compared models.
@@ -189,7 +199,9 @@ class CUIDataset(Dataset):
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
-        self.similarity_df.to_csv(os.path.join(SAVE_PATH, f"test_similarities_CUI_names_{w2v_years[0]}_{w2v_years[1]}.csv"))
+        
+        self.similarity_df.to_csv(os.path.join(SAVE_PATH, 
+            f'test_similarities_CUI_names_{self.emb_algorithm}_{test_years[0]}_{test_years[1]}.csv'))
 
     def __len__(self):
         return len(self.similarity_df)
