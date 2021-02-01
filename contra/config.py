@@ -46,6 +46,7 @@ parser.add_argument('--by_sentence', dest='by_sentence', action='store_true')
 
 # Bert
 parser.add_argument('--num_frozen_layers', type=int, default=0, help='how many layers to freeze in the bert model')
+parser.add_argument('--bert_pretrained_path', type=str, help='path to a saved checkpoint to start bert training from') 
 
 # Model parameters
 parser.add_argument('--min_num_participants', default=1, type=int, help='minimum number of total participants')
@@ -65,7 +66,7 @@ parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
 parser.add_argument('--max_epochs', default=100, type=int, metavar='N', help='number of total epochs to run')
 
 # Model Architecture
-parser.add_argument('--bn', dest='use_bn', action='store_true', help='Should batch normalization be used in the discriminator/ ratio prediction')
+parser.add_argument('--bn', action='store_true', help='Should batch normalization be used in the discriminator/ ratio prediction')
 parser.add_argument('--activation', default='relu', 
                     help='Activation function to use in the discriminator/ ratio prediction. Supported: "relu" or "swish".')
 parser.add_argument('--regularize', default=0, type=float, help='weight decay parameter for the discriminator/ratio prediction.')                    
