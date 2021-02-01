@@ -102,6 +102,50 @@ def read_subsample(year, version=DEFAULT_PUBMED_VERSION):
     sample_index = pickle.load(open(os.path.join(folder, f'pubmed_{year}_sample_index.pickle'), 'rb'))
     return df.loc[sample_index]
     
+def load_aact_data(version, year_range=None):
+    '''
+    @param version: 2019 or 2020
+    @param year_range: a tuple of (start_year, end_year). If given, will be used to filter the abstracts to these years.
+    '''
+    file_path = os.path.join(DATA_PATH, f'pubmed{version}_abstracts_with_participants.csv')
+    print(f"reading: {file_path}")
+    df = pd.read_csv(file_path, index_col=0)
+    df['title'] = df['title'].fillna('')
+    df['title'] = df['title'].apply(lambda x: x.strip('[]'))
+    df['title_and_abstract'] = df['title'] + df['abstract']
+    if year_range is not None:
+        start_year, end_year = year_range
+        df = df[(df['year'] >= start_year) & (df['year'] <= end_year)]
+    return df
+
+def process_aact_year_range_to_sentences(version, year_range):
+    '''
+    @param version: 2019 or 2020
+    @param year_range: a tuple of (start_year, end_year). Used to filter the abstracts to these years.
+    '''
+    df = load_aact_data(version, year_range)
+    text_utils = tu.TextUtils()
+    df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+
+    sentences_flat = []
+    for abstract in df['sentences'].values:
+        sentences_flat.extend(abstract)
+    return sentences_flat
+
+
+def split_abstracts_to_sentences_df(df_of_abstracts, text_field='title_and_abstract', keep=['date', 'year', 'female', 'male']):
+    text_utils = tu.TextUtils()
+    df_of_abstracts['sentences'] = df_of_abstracts['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    sentences = []
+    for pmid,r in df_of_abstracts.iterrows():
+        d = {field: r[field] for field in keep}
+        # TODO: add ncts? title? pmid?
+        for sent in r['sentences']:
+            new_row = d.copy()
+            new_row['text'] = sent   
+            sentences.append(new_row)
+    return pd.DataFrame.from_records(sentences)
+
 
 if __name__ == "__main__":
     compare_versions(2010, 2020)
