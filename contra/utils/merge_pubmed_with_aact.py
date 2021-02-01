@@ -42,7 +42,7 @@ def merge_pmids_with_ncts(pubmed_folder='pubmed_2020_by_years',
 
 if __name__ == '__main__':
     merge_pmids_with_ncts(pubmed_folder='pubmed_2020_by_years',
-                          nct_file='ncts_with_participants20200126.csv',
-                          output_csv='pubmed2020_abstracts_with_participants20200126.csv')
+                          nct_file='ncts_with_participants.csv',
+                          output_csv='pubmed2020_abstracts_with_participants.csv')
 
                                                                     
