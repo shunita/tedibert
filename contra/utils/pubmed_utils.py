@@ -1,10 +1,9 @@
 import os
 import pandas as pd
 import pickle
-
+from tqdm import tqdm
 import sys
 sys.path.append('/home/shunita/fairemb')
-from tqdm import tqdm
 from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
 from contra.utils import text_utils as tu
 
@@ -96,12 +95,14 @@ def subsample_by_minimum_year(years_list, version=DEFAULT_PUBMED_VERSION):
         with open(os.path.join(folder, f'pubmed_{year}_sample_index.pickle'), 'wb') as out:
             pickle.dump(sample, out)
 
+
 def read_subsample(year, version=DEFAULT_PUBMED_VERSION):
     folder = pubmed_version_to_folder(version)
     df = read_year(year, version)
     sample_index = pickle.load(open(os.path.join(folder, f'pubmed_{year}_sample_index.pickle'), 'rb'))
     return df.loc[sample_index]
-    
+
+
 def load_aact_data(version, year_range=None):
     '''
     @param version: 2019 or 2020
@@ -117,6 +118,7 @@ def load_aact_data(version, year_range=None):
         start_year, end_year = year_range
         df = df[(df['year'] >= start_year) & (df['year'] <= end_year)]
     return df
+
 
 def process_aact_year_range_to_sentences(version, year_range):
     '''

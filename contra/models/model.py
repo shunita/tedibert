@@ -1,19 +1,17 @@
-import pandas as pd
-import sys
 import os
-import numpy as np
-from datetime import datetime
+import sys
+from scipy import stats
+import pandas as pd
 from itertools import chain
-import pytorch_lightning as pl
 import torch
 from torch import nn
+import pytorch_lightning as pl
 from transformers import AutoTokenizer, BertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
-from scipy import stats
 from contra.models.w2v_on_years import PretrainedOldNewW2V, read_w2v_model
 from contra.utils.text_utils import TextUtils
 from contra.common.utils import mean_pooling
-from contra.constants import SAVE_PATH, DATA_PATH
+from contra.constants import SAVE_PATH
 
 
 class FairEmbedding(pl.LightningModule):
@@ -49,7 +47,7 @@ class FairEmbedding(pl.LightningModule):
         if self.do_ratio_prediction:
             self.ratio_reconstruction = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0)
             self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1, hid_layers=2,
-                                        bn=self.bn, activation=self.activation)
+                                            bn=self.bn, activation=self.activation)
         else:
             self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=2,
                                             bn=self.bn, activation=self.activation)
@@ -58,6 +56,7 @@ class FairEmbedding(pl.LightningModule):
 
     def forward(self, batch):
         text = batch['text']
+        loss = None
         if self.initial_emb_algorithm == 'bert':
             # We use the same bert model for all abstracts, regardless of year.
             inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=50,
@@ -76,15 +75,13 @@ class FairEmbedding(pl.LightningModule):
             sentence_embedding = mean_pooling(outputs['hidden_states'][-1], inputs_for_emb['attention_mask'])
 
         elif self.initial_emb_algorithm == 'w2v':
-            # tokenization is the same for old and new (we use word_tokenize for both).
+            # Tokenization is the same for old and new (we use word_tokenize for both).
             # embedding is done by a different model for "old" or "new" samples.
             tokenized_texts = [self.tokenizer.word_tokenize_abstract(t) for t in text]
             is_new = batch['is_new']
             sentence_embedding = self.w2v.embed_batch(tokenized_texts, is_new, self.device)
-            loss = None
 
         return sentence_embedding, loss
-        
 
     def step(self, batch: dict, optimizer_idx: int = None, name='train') -> dict:
         if optimizer_idx == 0:
@@ -96,7 +93,7 @@ class FairEmbedding(pl.LightningModule):
             if self.do_ratio_prediction:
                 self.ratio_pred = self.ratio_reconstruction(self.fair_embedding)
                 ratio_loss = self.BCELoss(self.ratio_pred.squeeze()[self.is_new].float(), self.ratio_true[self.is_new].float())
-                isnew_pred = self.discriminator(torch.cat([self.fair_embedding, self.ratio_pred], dim=1))
+                isnew_pred = self.discriminator(torch.cat((self.fair_embedding, self.ratio_pred), dim=1))
             else:
                 isnew_pred = self.discriminator(self.fair_embedding)
             only_old_predicted = isnew_pred.squeeze()[~self.is_new]
@@ -108,8 +105,8 @@ class FairEmbedding(pl.LightningModule):
             loss = g_loss + self.hparams.lmb_isnew * isnew_loss
             if self.do_ratio_prediction:
                 loss += self.hparams.lmb_ratio * ratio_loss
+                self.log(f'generator/{name}_ratio_loss', ratio_loss)
             self.log(f'generator/{name}_reconstruction_loss', g_loss)
-            self.log(f'generator/{name}_ratio_loss', ratio_loss)
             self.log(f'generator/{name}_discriminator_loss', isnew_loss)
             self.log(f'generator/{name}_loss', loss)
 
@@ -175,13 +172,12 @@ class FairEmbedding(pl.LightningModule):
         return batch1
 
     def test_epoch_end(self, outputs) -> None:
-        rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
+        rows = torch.cat((torch.stack(output) for output in outputs)).T.cpu().numpy()
         df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
         df.to_csv(os.path.join(SAVE_PATH, 'test_similarities.csv'))
         df = df.sort_values(['true_similarity'], ascending=False).reset_index()
         true_rank = list(df.index)
         pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).index)
-
         correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
         self.log('test/correlation', correlation)
         self.log('test/pvalue', pvalue)
@@ -219,7 +215,6 @@ class Autoencoder(nn.Module):
         return output, z
 
 
-
 class Swish(nn.Module):
     '''
     Applies the Sigmoid Linear Unit (SiLU) function element-wise:
@@ -231,16 +226,13 @@ class Swish(nn.Module):
     References:
         -  Related paper:
         https://arxiv.org/pdf/1606.08415.pdf
-    Examples:
-        >>> m = silu()
-        >>> input = torch.randn(2)
-        >>> output = m(input)
     '''
     def __init__(self):
         super().__init__()
 
     def forward(self, x):
         return x * torch.sigmoid(x)
+
 
 class Classifier(nn.Module):
     def __init__(self, in_dim, hid_dim, out_dim, hid_layers=0, bn=False, activation='relu'):
@@ -267,29 +259,3 @@ class Classifier(nn.Module):
 
     def forward(self, input: torch.Tensor):
         return self.model(input)
-
-
-class Attention(nn.Module):
-    def __init__(self, input_dim: int, output_dim: int):
-        super().__init__()
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        # TODO: is this just initialization to random weights?
-        self.W = torch.nn.Parameter(torch.FloatTensor(self.output_dim, self.input_dim).uniform_(-0.1, 0.1))
-
-    def forward(self,
-                # TODO: why is the query of size output_dim?
-                # TODO: how are batches handled??
-                query: torch.Tensor,  # [output_dim]
-                values: torch.Tensor,  # [seq_length, input_dim]
-                ):
-        weights = self._get_weights(query, values)  # [seq_length]
-        weights = torch.nn.functional.softmax(weights, dim=0)
-        return weights @ values  # [encoder_dim]
-
-    def _get_weights(self,
-                     query: torch.Tensor,  # [output_dim]
-                     values: torch.Tensor,  # [seq_length, input_dim]
-                     ):
-        weights = query @ self.W @ values.T  # [seq_length]
-        return weights / np.sqrt(self.output_dim)  # [seq_length]

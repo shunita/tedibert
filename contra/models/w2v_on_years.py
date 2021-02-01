@@ -5,15 +5,11 @@ import sys
 sys.path.append('/home/shunita/fairemb/')
 
 from collections import defaultdict
-from datetime import datetime
-import pytz
-import pandas as pd
 import numpy as np
 from tqdm import tqdm
 tqdm.pandas(desc="pandas")
 import torch
 from gensim.models import Word2Vec, KeyedVectors
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
 from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
@@ -21,6 +17,7 @@ from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_yea
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
+
 
 class EpochLogger(CallbackAny2Vec):
     '''Callback to log information about training'''
@@ -45,7 +42,6 @@ class EpochLogger(CallbackAny2Vec):
         wandb.log({'epoch': self.epoch, 
                    'time per epoch': (time.time()-self.start)/self.epoch, 
                    'loss': loss_delta})
-
 
 
 class EmbeddingOnYears:
@@ -133,7 +129,6 @@ class EmbeddingOnYears:
                 self.data.extend(sentences1)
         print(f'loaded {len(self.data)} sentences.')
 
-        
     def load_data(self):
         if self.model_name=='w2v':
             self.load_data_for_w2v()
@@ -144,7 +139,7 @@ class EmbeddingOnYears:
     def fit(self):
         if len(self.data) == 0:
             self.load_data()
-        if self.model_name=='w2v':
+        if self.model_name == 'w2v':
             self.model = Word2Vec(self.data, min_count=self.min_count, size=self.embedding_size,
                                   compute_loss=True, window=self.window, sg=0, iter=self.iterations, 
                                   workers=3, callbacks=[self.epoch_logger])
@@ -156,10 +151,8 @@ class EmbeddingOnYears:
         if self.model_name == 'w2v':
             self.model.wv.save(os.path.join(SAVE_PATH, f"word2vec_{self.start_year}_{self.end_year}{self.desc}.wordvectors"))
     
-            
 
 class PretrainedW2V:
-    
     def __init__(self, idf_path, vectors_path, ndocs, model_name='w2v'):
         self.model_name = model_name
         self.ndocs = ndocs
@@ -228,18 +221,6 @@ def read_w2v_model(year1: int, year2: int,
     print(f"Read w2v vectors from {vectors_path} and idf map from {idf_path}.")
     return w2v
 
-
-def read_w2v_model_to_matrix(year1: int, year2: int,
-                             abstract_weighting_mode='normal',
-                             pubmed_version=DEFAULT_PUBMED_VERSION,
-                             only_aact_data=True):
-    desc = params_to_description(abstract_weighting_mode, only_aact_data, pubmed_version)
-    vectors_path = os.path.join(SAVE_PATH, f"word2vec_{year1}_{year2}{desc}.wordvectors")
-    wv = KeyedVectors.load(vectors_path, mmap='r')
-    matrix = wv.vectors
-    index_to_word = wv.index2word
-    word_to_index = {w: i for i, w in enumerate(index_to_word)}
-    return matrix, index_to_word, word_to_index
 
 if __name__ == '__main__':
     hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2013',

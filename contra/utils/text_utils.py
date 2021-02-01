@@ -1,8 +1,8 @@
 import nltk.data
 from nltk.tokenize import word_tokenize
 
-class TextUtils:
 
+class TextUtils:
     def __init__(self):
         self.sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 

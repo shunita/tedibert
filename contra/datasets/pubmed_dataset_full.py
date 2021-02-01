@@ -1,24 +1,22 @@
 import os
 import sys
 import pandas as pd
-from datetime import datetime
-from tqdm import tqdm
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from contra.utils import text_utils as tu
-from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, pubmed_version_to_folder, params_to_description, process_aact_year_range_to_sentences
+from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, process_aact_year_range_to_sentences
+from contra.utils.pubmed_utils import params_to_description, pubmed_version_to_folder
 import pickle
 
 
 class PubMedFullModule(pl.LightningDataModule):
-
     def __init__(self, hparams):
         super().__init__()
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
-        self.test_size = 1- hparams.train_test_split
+        self.test_size = 1 - hparams.train_test_split
         self.only_aact = hparams.only_aact_data
         self.relevant_abstracts = None
         self.year_to_indexes = {}
@@ -30,7 +28,9 @@ class PubMedFullModule(pl.LightningDataModule):
         self.abstract_weighting_mode = hparams.abstract_weighting_mode
         self.pubmed_version = hparams.pubmed_version
         self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
-        self.desc = params_to_description(self.abstract_weighting_mode, only_aact_data=self.only_aact, pubmed_version=self.pubmed_version)
+        self.desc = params_to_description(self.abstract_weighting_mode,
+                                          only_aact_data=self.only_aact,
+                                          pubmed_version=self.pubmed_version)
         if self.abstract_weighting_mode not in ('normal', 'subsample'):
             print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
             sys.exit()
@@ -40,7 +40,6 @@ class PubMedFullModule(pl.LightningDataModule):
         if self.by_sentence:
             if not self.only_aact:
                 process_year_range_into_sentences(self.start_year, self.end_year, self.pubmed_version, self.abstract_weighting_mode)
-
 
     def setup(self, stage=None):
         """happens on all GPUs."""
@@ -71,7 +70,8 @@ class PubMedFullModule(pl.LightningDataModule):
                     self.year_to_pmids[year] = relevant.index.tolist()
                     current_index += len(relevant)
                 self.relevant_abstracts = current_index
-                train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size, random_state=1)
+                train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size,
+                                                              random_state=1)
                 self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year, self.pubmed_version,
                                                year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
                 self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year, self.pubmed_version,
@@ -125,4 +125,3 @@ class PubMedFullDataset(Dataset):
         row = df.iloc[0]
         text = '; '.join([str(row['title']), str(row['abstract'])])
         return {'text': text}
-

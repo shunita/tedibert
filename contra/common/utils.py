@@ -1,10 +1,5 @@
-import os
 import torch
 
-from contra.constants import SAVE_PATH
-
-def get_bert_model(date):
-    return os.path.join(SAVE_PATH, date.year)
 
 def mean_pooling(token_embeddings, attention_mask):
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()

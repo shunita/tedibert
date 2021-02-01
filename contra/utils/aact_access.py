@@ -2,15 +2,12 @@ import psycopg2
 import pandas as pd
 # code based on https://github.com/allenai/pubmedextract/blob/master/analysis_scripts/04_analysis.py
 
-
-
 # diseases_query = '''
 # select c.nct_id, c.mesh_term as mesh
 # from browse_conditions as c join studies as d on c.nct_id = d.nct_id
 # where d.overall_status = 'Completed';
 # '''
 # diseases = pd.read_sql_query(diseases_query, conn)
-
 
 sex_query = '''
 select s.study_first_submitted_date, b.nct_id, b.category as cat, sum(b.param_value_num) as total_participants

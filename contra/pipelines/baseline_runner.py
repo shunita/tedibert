@@ -18,11 +18,16 @@ from contra.constants import SAVE_PATH, DATA_PATH
 def find_interesting_CUI_pairs(first_w2v_years, second_w2v_years, test_w2v_years,
                                semtypes=None, top_percentile=None, filter_by_models=[], sample_fraction=0.01,
                                write_to_file=None, read_w2v_params={}):
+    """Find CUI pairs that have embeddings in all given models, and whose similarity has changed the most between
+    the given time ranges."""
+    # Read all CUIs
     df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
+    # Possibly filter by semantic types
     if semtypes is not None:
         if not isinstance(semtypes, list):
             semtypes = [semtypes]
         df = df[df['semtypes'].map(lambda sems: np.any([sem in semtypes for sem in eval(sems)]))]
+    # Possibly filter by how common the term is in abstracts.
     if top_percentile is not None:
         # filter only CUIs that appeared in enough abstracts
         df = df[df['abstracts'] >= df['abstracts'].quantile(1 - top_percentile)]
@@ -72,7 +77,6 @@ def find_interesting_CUI_pairs(first_w2v_years, second_w2v_years, test_w2v_years
         similarity_df.to_csv(write_to_file)
     else:
         return similarity_df
-    
 
 
 def calculate_sims_and_compare(cui_similarity_file, w2v_years, read_w2v_params={}, save_to_file=None):
@@ -108,7 +112,6 @@ if __name__ == "__main__":
     #test_pairs_path = os.path.join(SAVE_PATH, 'test_similarities_CUI_names_2019_2019.csv')
     test_pairs_path = os.path.join(SAVE_PATH, 'test_interesting_CUI_pairs_aact.csv')
     if not os.path.exists(test_pairs_path):
-        # TODO: need to filter out cuis that don't appear in all baseline models
         print("generating test pairs")
         cui_dataset = pmd.CUIDataset(bert=None, w2v_years=(2019, 2019),
                                      read_w2v_params=read_w2v_params,

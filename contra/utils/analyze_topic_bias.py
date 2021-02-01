@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import defaultdict
 
+
 def year_range_to_description(year_range):
     if year_range[0] == year_range[1]:
         return f'{year_range[0]}'

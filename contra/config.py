@@ -1,15 +1,15 @@
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
 import argparse
 from datetime import datetime
-
 from contra.constants import SAVE_PATH, LOG_PATH
 
 
-parser = argparse.ArgumentParser(add_help=False)
+def date_type(dt):
+    return datetime.strptime(dt, '%Y/%m/%d')
 
-date_type = lambda dt: datetime.strptime(dt, '%Y/%m/%d')
+
+parser = argparse.ArgumentParser(add_help=False)
 
 # Data choices - years
 parser.add_argument('--first_start_year', default=2010, type=int,
@@ -66,10 +66,13 @@ parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
 parser.add_argument('--max_epochs', default=100, type=int, metavar='N', help='number of total epochs to run')
 
 # Model Architecture
-parser.add_argument('--bn', action='store_true', help='Should batch normalization be used in the discriminator/ ratio prediction')
+parser.add_argument('--bn', action='store_true',
+                    help='Should batch normalization be used in discriminator/ratio prediction')
 parser.add_argument('--activation', default='relu', 
-                    help='Activation function to use in the discriminator/ ratio prediction. Supported: "relu" or "swish".')
-parser.add_argument('--regularize', default=0, type=float, help='weight decay parameter for the discriminator/ratio prediction.')                    
+                    help='Activation function to use in discriminator/ratio prediction. '
+                         'Currently supported: "relu" or "swish".')
+parser.add_argument('--regularize', default=0, type=float,
+                    help='weight decay parameter for discriminator/ratio prediction.')
 
-parser.add_argument('--lmb_isnew', default=1, type=float, help='lambda for the weighting of the discriminator')
-parser.add_argument('--lmb_ratio', default=1, type=float, help='lambda for the weighting of the ratio prediction')
+parser.add_argument('--lmb_isnew', default=1, type=float, help='discriminator weight in the loss function')
+parser.add_argument('--lmb_ratio', default=1, type=float, help='ratio prediction weight in the loss function')

@@ -12,11 +12,10 @@ from contra import config
 from contra.models import BertPretrainOnYears
 
 # For debug purposes: disable randomness
-import numpy as np
-import torch
-np.random.seed(1)
-torch.manual_seed(1)
-
+# import numpy as np
+# import torch
+# np.random.seed(1)
+# torch.manual_seed(1)
 
 hparams = config.parser.parse_args(['--name', 'BertYears11-13', 
                                     '--start_year', '2011',
@@ -24,12 +23,14 @@ hparams = config.parser.parse_args(['--name', 'BertYears11-13',
                                     '--by_sentence',
                                     '--max_epochs', '40',
                                     '--lr', '5e-5',
-                                    '--abstract_weighting_mode', 'normal', #subsample
+                                    '--abstract_weighting_mode', 'normal',  # subsample
                                     '--pubmed_version', '2020',
                                     #'--num_frozen_layers', '10',
                                     '--only_aact_data',
                                     ])
-#hparams.gpus = [0,1]
+# When running with two gpus:
+# hparams.gpus = [0,1]
+# When running with one gpu:
 hparams.gpus = 1
 
 dm = PubMedFullModule(hparams)
@@ -43,12 +44,11 @@ trainer = pl.Trainer(gpus=hparams.gpus,
                      max_epochs=hparams.max_epochs, 
                      logger=logger, 
                      log_every_n_steps=10, 
-                     accumulate_grad_batches=1, # no accumulation 
+                     accumulate_grad_batches=1,  # no accumulation
                      precision=16, 
                      distributed_backend='ddp')
 
 trainer.fit(model, datamodule=dm)
-#trainer.test(datamodule=dm)
 
 if __name__ == '__main__':
     freeze_support()

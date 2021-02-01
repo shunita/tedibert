@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -9,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import cosine_similarity
 
-from contra.common.utils import get_bert_model, mean_pooling
+from contra.common.utils import mean_pooling
 from contra.constants import DATA_PATH, SAVE_PATH
 from transformers import AutoTokenizer, AutoModel
 from contra.models.w2v_on_years import read_w2v_model
@@ -18,7 +19,6 @@ from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact
 
 
 class PubMedModule(pl.LightningDataModule):
-
     def __init__(self, hparams):
         super().__init__()
         self.min_num_participants = hparams.min_num_participants
@@ -61,12 +61,12 @@ class PubMedModule(pl.LightningDataModule):
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
 
         if self.emb_algorithm == 'w2v':
-            self.test = CUIDataset(bert=None, test_years=self.test_year_range, frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
-                                   read_from_file=self.test_fname)
+            self.test = CUIDataset(bert=None, test_years=self.test_year_range, frac=0.001, sample_type=1,
+                                   top_percentile=0.5, semtypes=['dsyn'], read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
             bert_path = f'bert_base_cased_{self.test_year_range[0]}_{self.test_year_range[1]}_v{self.pubmed_version}_epoch39'
-            self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path), 
-                                   test_years=self.test_year_range, 
+            self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
+                                   test_years=self.test_year_range,
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
                                    read_from_file=self.test_fname)
         else:
@@ -95,20 +95,18 @@ class PubMedDataset(Dataset):
     def __getitem__(self, index):
         if torch.is_tensor(index):
             index = index.tolist()
-
         row = self.df.iloc[index]
         text = row['text']
         # at this point we don't have data from outside the two ranges.
         is_new = torch.as_tensor(row['date'] >= self.second_range[0])
         female_ratio = torch.as_tensor(row['female'] / row['num_participants'])
-
         return {'text': text, 'is_new': is_new, 'female_ratio': female_ratio}
 
 
 class CUIDataset(Dataset):
     def __init__(self, bert='google/bert_uncased_L-2_H-128_A-2', test_years=(2018, 2018), read_w2v_params={},
                  top_percentile=0.01, semtypes=None, frac=1., sample_type=0, 
-                 filter_by_models=[],
+                 filter_by_models=(),
                  read_from_file=None):
         """
         This Dataset handles the CUI pairs and their similarity
@@ -145,7 +143,7 @@ class CUIDataset(Dataset):
             print("CUIDataset got no model to work with: both bert and w2v_years are None.")
             sys.exit()
 
-        # TODO: this table was generated based on pubmed 2018. There could be new CUIs in 2020 version.
+        # Note: this table was generated based on pubmed 2018.
         df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
         
         all_cuis = len(df)
@@ -176,7 +174,7 @@ class CUIDataset(Dataset):
                 CUI_names = [name for i, name in enumerate(CUI_names) if got_emb[i]]
                 print(f"Keeping {len(CUI_names)}/{before} CUIs.")
             
-            print(f"Filtering CUIs by main model: {first_year}_{last_year} model")
+            print(f"Filtering CUIs by main model: {test_years[0]}_{test_years[1]} model")
             CUI_embeddings = self.w2v_model.embed_batch(tokenized_names) 
             got_embedding = torch.count_nonzero(CUI_embeddings, dim=1) > 0
             CUI_embeddings = CUI_embeddings[got_embedding]
