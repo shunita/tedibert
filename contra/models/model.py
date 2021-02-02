@@ -19,7 +19,7 @@ class FairEmbedding(pl.LightningModule):
         super(FairEmbedding, self).__init__()
         self.hparams = hparams
         self.bn = hparams.bn
-        self.activation=hparams.activation
+        self.activation = hparams.activation
         self.do_ratio_prediction = (hparams.lmb_ratio > 0)
 
         self.initial_emb_algorithm = hparams.emb_algorithm
@@ -97,7 +97,7 @@ class FairEmbedding(pl.LightningModule):
             else:
                 isnew_pred = self.discriminator(self.fair_embedding)
             only_old_predicted = isnew_pred.squeeze()[~self.is_new]
-            # we take samples that "look old" to the discriminator and label them as new, to train the generator.
+            # we take old samples and label them as new, to train the generator.
             # Discriminator weights do not change while we train the generator because of the different optimizer_idx's.
             isnew_loss = self.BCELoss(only_old_predicted, torch.ones(only_old_predicted.shape[0], device=self.device))
 
@@ -115,39 +115,13 @@ class FairEmbedding(pl.LightningModule):
             emb = self.fair_embedding.detach()
             
             if self.do_ratio_prediction:
-                ratio = self.ratio_pred.detach()
-                only_new = emb[self.is_new], ratio[self.is_new]
-                only_old = emb[~self.is_new], ratio[~self.is_new]
+                isnew_pred = self.discriminator(torch.cat([emb, self.ratio_pred.detach()], dim=1))
             else:
-                only_new = emb[self.is_new]
-                only_old = emb[~self.is_new]
-            loss = None
-            if any(self.is_new):
-                if not self.bn or only_new.shape[0] > 1:
-                    if self.do_ratio_prediction:
-                        isnew_pred_only_new = self.discriminator(torch.cat(only_new, dim=1))
-                    else:
-                        isnew_pred_only_new = self.discriminator(only_new)
-                    isnew_loss_only_new = self.BCELoss(isnew_pred_only_new.squeeze(), 
-                                                       torch.ones(isnew_pred_only_new.shape[0], device=self.device).squeeze())
-                    loss = isnew_loss_only_new
-                    self.log(f'discriminator/{name}_new_loss', loss)  
+                isnew_pred = self.discriminator(emb)
+            isnew_loss = self.BCELoss(isnew_pred.squeeze(), self.is_new.float())
             
-            if not all(self.is_new):
-                if not self.bn or only_old.shape[0] > 1:
-                    if self.do_ratio_prediction:
-                        isnew_pred_only_old = self.discriminator(torch.cat(only_old, dim=1))
-                    else:
-                        isnew_pred_only_old = self.discriminator(only_old)
-                    isnew_loss_only_old = self.BCELoss(isnew_pred_only_old.squeeze(), 
-                                                       torch.zeros(isnew_pred_only_old.shape[0], device=self.device).squeeze())
-                    self.log(f'discriminator/{name}_old_loss', isnew_loss_only_old)
-                    if loss is None:
-                        loss = isnew_loss_only_old
-                    else:
-                        loss = (loss + isnew_loss_only_old)/2
             # final loss
-            self.log(f'discriminator/{name}_loss', loss)
+            self.log(f'discriminator/{name}_loss', isnew_loss)
         return loss
 
     def training_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None) -> dict:
@@ -172,7 +146,7 @@ class FairEmbedding(pl.LightningModule):
         return batch1
 
     def test_epoch_end(self, outputs) -> None:
-        rows = torch.cat((torch.stack(output) for output in outputs)).T.cpu().numpy()
+        rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
         df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
         df.to_csv(os.path.join(SAVE_PATH, 'test_similarities.csv'))
         df = df.sort_values(['true_similarity'], ascending=False).reset_index()
