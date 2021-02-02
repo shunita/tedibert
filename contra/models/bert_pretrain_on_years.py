@@ -15,11 +15,13 @@ class BertPretrainOnYears(pl.LightningModule):
         self.end_year = hparams.end_year
         self.pubmed_version = hparams.pubmed_version
 
-        # We use biobert tokenizer because it matches the bert tokenization, but also has word pieces.
-        self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
         pretrained = 'bert-base-cased'
         if hparams.bert_pretrained_path is not None:
             pretrained = hparams.bert_pretrained_path
+        self.model_desc = 'bert_base_cased'
+        if hparams.bert_save_prefix is not None:
+            self.model_desc = hparams.bert_save_prefix
+        self.tokenizer = AutoTokenizer.from_pretrained(pretrained)
         self.bert_model = BertForMaskedLM.from_pretrained(pretrained)
         self.num_frozen_layers = hparams.num_frozen_layers
         if self.num_frozen_layers > 0:
@@ -59,7 +61,8 @@ class BertPretrainOnYears(pl.LightningModule):
         return loss
 
     def validation_step(self, batch: dict, batch_idx: int):
-        path = os.path.join(SAVE_PATH, f'bert_base_cased_{self.start_year}_{self.end_year}_v{self.pubmed_version}_epoch{self.current_epoch}')
+        path = os.path.join(SAVE_PATH, '{}_{}_{}_v{}_epoch{}'.format(
+            self.model_desc, self.start_year, self.end_year, self.pubmed_version, self.current_epoch))
         if self.current_epoch > 0 and not os.path.exists(path):
             self.bert_model.save_pretrained(path)
         loss = self.step(batch, name='val')

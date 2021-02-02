@@ -27,8 +27,11 @@ class FairEmbedding(pl.LightningModule):
         self.embedding_size = hparams.embedding_size
 
         if self.initial_emb_algorithm == 'bert':
-            self.tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
-            self.bert_model = BertForMaskedLM.from_pretrained('bert-base-cased')
+            pretrained = 'bert-base-cased'
+            if hparams.bert_pretrained_path is not None:
+                pretrained = hparams.bert_pretrained_path
+            self.tokenizer = AutoTokenizer.from_pretrained(pretrained)
+            self.bert_model = BertForMaskedLM.from_pretrained(pretrained)
             self.initial_embedding_size = self.bert_model.get_input_embeddings().embedding_dim
             self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
 
