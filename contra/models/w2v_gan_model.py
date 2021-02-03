@@ -1,14 +1,13 @@
 from itertools import chain
 import torch
-import pytorch_lightning as pl
 from contra.models.w2v_on_years import PretrainedOldNewW2V, read_w2v_model
 from contra.utils.text_utils import TextUtils
 from contra.models.model import FairEmbedding, Autoencoder
 
 
-class FairEmbeddingW2V(pl.LightningModule):
+class FairEmbeddingW2V(FairEmbedding):
     def __init__(self, hparams):
-        super(FairEmbedding, self).__init__(hparams)
+        super(FairEmbeddingW2V, self).__init__(hparams)
         self.tokenizer = TextUtils()
         read_w2v_params = {'abstract_weighting_mode': hparams.abstract_weighting_mode,
                            'pubmed_version': hparams.pubmed_version,
@@ -20,7 +19,6 @@ class FairEmbeddingW2V(pl.LightningModule):
 
     def forward(self, batch):
         text = batch['text']
-        loss = None
         # Tokenization is the same for old and new (we use word_tokenize for both).
         # embedding is done by a different model for "old" or "new" samples.
         tokenized_texts = [self.tokenizer.word_tokenize_abstract(t) for t in text]
