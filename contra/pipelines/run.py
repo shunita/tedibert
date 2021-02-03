@@ -8,7 +8,7 @@ from pytorch_lightning.loggers import WandbLogger
 
 from contra.datasets import PubMedModule
 from contra import config
-from contra.models import FairEmbedding
+from contra.models import FairEmbeddingBert, FairEmbeddingW2V
 
 hparams = config.parser.parse_args(['--name', 'GAN bert',
                                     '--first_start_year', '2010',
@@ -33,7 +33,12 @@ hparams = config.parser.parse_args(['--name', 'GAN bert',
                                     ])
 hparams.gpus = 1
 dm = PubMedModule(hparams)
-model = FairEmbedding(hparams)
+if hparams.emb_algorithm == 'bert':
+    model = FairEmbeddingBert(hparams)
+elif hparams.emb_algorithm == 'w2v':
+    model = FairEmbeddingW2V(hparams)
+else:
+    raise Exception(f"Unsupported embedding algorithm: {hparams.emb_algorithm}")
 
 logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                      version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),

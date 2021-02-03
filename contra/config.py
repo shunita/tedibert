@@ -46,7 +46,9 @@ parser.add_argument('--by_sentence', dest='by_sentence', action='store_true')
 
 # Bert
 parser.add_argument('--num_frozen_layers', type=int, default=0, help='how many layers to freeze in the bert model')
-parser.add_argument('--bert_pretrained_path', type=str, help='path to a saved checkpoint to start bert training from') 
+parser.add_argument('--bert_pretrained_path', type=str, default='bert-base-cased',
+                    help='path to a saved checkpoint to start bert training from.')
+parser.add_argument('--bert_tokenizer', type=str, default='bert-base-cased', help='which tokenizer to use for bert')
 
 # Model parameters
 parser.add_argument('--min_num_participants', default=1, type=int, help='minimum number of total participants')

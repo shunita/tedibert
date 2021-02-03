@@ -32,8 +32,7 @@ class PubMedFullModule(pl.LightningDataModule):
                                           only_aact_data=self.only_aact,
                                           pubmed_version=self.pubmed_version)
         if self.abstract_weighting_mode not in ('normal', 'subsample'):
-            print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
-            sys.exit()
+            raise Exception(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
 
     def prepare_data(self):
         """happens only on one GPU."""
@@ -60,8 +59,7 @@ class PubMedFullModule(pl.LightningDataModule):
                                          by_sentence=True)
         else:
             if self.only_aact:
-                print("Currently unsupported: only_aact_data=True and by_sentence=False")
-                sys.exit()
+                raise Exception("Currently unsupported: only_aact_data=True and by_sentence=False")
             else:
                 current_index = 0
                 for year in range(self.start_year, self.end_year+1):

@@ -14,13 +14,8 @@ class BertPretrainOnYears(pl.LightningModule):
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
         self.pubmed_version = hparams.pubmed_version
-
-        # We use biobert tokenizer because it matches the bert tokenization, but also has word pieces.
-        self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
-        pretrained = 'bert-base-cased'
-        if hparams.bert_pretrained_path is not None:
-            pretrained = hparams.bert_pretrained_path
-        self.bert_model = BertForMaskedLM.from_pretrained(pretrained)
+        self.tokenizer = AutoTokenizer.from_pretrained(hparams.bert_tokenizer)
+        self.bert_model = BertForMaskedLM.from_pretrained(hparams.bert_pretrained_path)
         self.num_frozen_layers = hparams.num_frozen_layers
         if self.num_frozen_layers > 0:
             modules = [self.bert_model.bert.embeddings, *self.bert_model.bert.encoder.layer[:self.num_frozen_layers]]
