@@ -30,11 +30,11 @@ class FairEmbeddingW2V(FairEmbedding):
         return latent, g_loss
 
     def configure_optimizers(self):
-        opt1_params = self.autoencoder.parameters()
+        optimizer_1 = torch.optim.Adam(self.autoencoder.parameters(), lr=self.hparams.learning_rate)
+        opt2_params = self.discriminator.parameters()
         if self.do_ratio_prediction:
-            opt1_params = chain(opt1_params, self.ratio_reconstruction.parameters())
-        optimizer_1 = torch.optim.Adam(opt1_params, lr=self.hparams.learning_rate)
-        optimizer_2 = torch.optim.Adam(self.discriminator.parameters(), 
+            opt2_params = chain(opt2_params, self.ratio_reconstruction.parameters())
+        optimizer_2 = torch.optim.Adam(opt2_params,
                                        lr=self.hparams.learning_rate,
                                        weight_decay=self.hparams.regularize)
         return [optimizer_1, optimizer_2]

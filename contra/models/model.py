@@ -87,7 +87,7 @@ class FairEmbedding(pl.LightningModule):
         
     def wrap_text_to_batch(self, texts):
         batch1 = {'text': texts, 
-                  'is_new': torch.as_tensor([False for i in range(len(texts))], device=self.device)
+                  'is_new': torch.zeros(len(texts), dtype=bool, device=self.device)
                   }
         return batch1
 
