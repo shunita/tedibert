@@ -51,7 +51,7 @@ trainer = pl.Trainer(gpus=hparams.gpus,
 trainer.fit(model, datamodule=dm)
 
 if hparams.max_epochs == 0:
-    # Use last available chקckpoint. In this case it's also the only one.
+    # Use last available checkpoint. In this case it's also the only one.
     ckpt_path = None
 else:
     # Use the best performing checkpoint
