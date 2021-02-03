@@ -121,7 +121,8 @@ class FairEmbedding(pl.LightningModule):
             isnew_loss = self.BCELoss(isnew_pred.squeeze(), self.is_new.float())
             
             # final loss
-            self.log(f'discriminator/{name}_loss', isnew_loss)
+            loss = isnew_loss
+            self.log(f'discriminator/{name}_loss', loss)
         return loss
 
     def training_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None) -> dict:
