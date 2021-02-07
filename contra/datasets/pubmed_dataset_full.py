@@ -1,91 +1,125 @@
 import os
+import sys
 import pandas as pd
-from datetime import datetime
-from tqdm import tqdm
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
-
-from contra.constants import FULL_PUMBED_2018_PATH, PUBMED_SHARDS
-
-# helper function
-
-def read_shard(path, start_date, end_date):
-    # fields: 'title', 'abstract', 'labels', 'pub_types', 'date', 'file', 'mesh_headings', 'keywords'
-    print(f'reading pubmed shard: {path}')
-    df = pd.read_csv(path, index_col=0)
-    df = df.dropna(subset=['date'], axis=0)
-    df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
-    relevant = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
-    print(f'finished reading shard. found {len(relevant)} records with matching dates.')
-    return relevant
+from contra.utils import text_utils as tu
+from contra.utils.pubmed_utils import read_year, process_year_range_into_sentences, process_aact_year_range_to_sentences
+from contra.utils.pubmed_utils import params_to_description, pubmed_version_to_folder
+import pickle
 
 
 class PubMedFullModule(pl.LightningDataModule):
-
-    def __init__(self, start_year=2018, end_year=2018, test_size=0.2):
+    def __init__(self, hparams):
         super().__init__()
-        self.start_year = datetime(start_year, 1, 1)
-        self.end_year = datetime(end_year, 12, 31)
-        self.test_size = test_size
-        self.df = None
+        self.start_year = hparams.start_year
+        self.end_year = hparams.end_year
+        self.test_size = 1 - hparams.train_test_split
+        self.only_aact = hparams.only_aact_data
         self.relevant_abstracts = None
-        self.shard_to_indexes = []
+        self.year_to_indexes = {}
+        self.year_to_pmids = {}
+        self.by_sentence = hparams.by_sentence
+        if self.by_sentence:
+            self.text_utils = tu.TextUtils()
+            self.sentences = {}
+        self.abstract_weighting_mode = hparams.abstract_weighting_mode
+        self.pubmed_version = hparams.pubmed_version
+        self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
+        self.desc = params_to_description(self.abstract_weighting_mode,
+                                          only_aact_data=self.only_aact,
+                                          pubmed_version=self.pubmed_version)
+        if self.abstract_weighting_mode not in ('normal', 'subsample'):
+            raise Exception(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
 
     def prepare_data(self):
-        # Holding all shards in memory is too much: 50 shards*600 MB (per file).
-        # Instead, we remember which indexes belong to which file, and read that file only when we have to.
-        # That's why we have to use Shuffle=False in all the dataloaders.
-        current_index = 0
-        for i in tqdm(range(PUBMED_SHARDS)):
-            relevant = read_shard(os.path.join(FULL_PUMBED_2018_PATH, f'pubmed_v2_shard_{i}.csv'), 
-                                  self.start_year, 
-                                  self.end_year)
-            self.shard_to_indexes.append((current_index, current_index+len(relevant)))
-            current_index += len(relevant)
-        self.relevant_abstracts = current_index
+        """happens only on one GPU."""
+        if self.by_sentence:
+            if not self.only_aact:
+                process_year_range_into_sentences(self.start_year, self.end_year, self.pubmed_version, self.abstract_weighting_mode)
 
     def setup(self, stage=None):
-        train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size)
-        self.train = PubMedFullDataset(sorted(train_indices), self.shard_to_indexes, self.start_year, self.end_year)
-        self.val = PubMedFullDataset(sorted(val_indices), self.shard_to_indexes, self.start_year, self.end_year)
+        """happens on all GPUs."""
+        if self.by_sentence:
+            if self.only_aact:
+                self.sentences = process_aact_year_range_to_sentences(self.pubmed_version, (self.start_year, self.end_year))
+            else:
+                self.sentences = []
+                for year in range(self.start_year, self.end_year + 1):
+                    year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
+                    sentences = pickle.load(open(year_sentences_path, 'rb'))
+                    self.sentences.extend(sentences)
+            print(f'len(sentences) = {len(self.sentences)}')
+            train_sentences, val_sentences = train_test_split(self.sentences, test_size=self.test_size, random_state=1)
+            self.train = PubMedFullDataset(train_sentences, self.start_year, self.end_year, self.pubmed_version,
+                                           by_sentence=True)
+            self.val = PubMedFullDataset(val_sentences, self.start_year, self.end_year, self.pubmed_version,
+                                         by_sentence=True)
+        else:
+            if self.only_aact:
+                raise Exception("Currently unsupported: only_aact_data=True and by_sentence=False")
+            else:
+                current_index = 0
+                for year in range(self.start_year, self.end_year+1):
+                    relevant = read_year(year)
+                    self.year_to_indexes[year] = (current_index, current_index+len(relevant))
+                    self.year_to_pmids[year] = relevant.index.tolist()
+                    current_index += len(relevant)
+                self.relevant_abstracts = current_index
+                train_indices, val_indices = train_test_split(range(self.relevant_abstracts), test_size=self.test_size,
+                                                              random_state=1)
+                self.train = PubMedFullDataset(train_indices, self.start_year, self.end_year, self.pubmed_version,
+                                               year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
+                self.val = PubMedFullDataset(val_indices, self.start_year, self.end_year, self.pubmed_version,
+                                             year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.train, shuffle=True, batch_size=64, num_workers=8)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.val, shuffle=False, batch_size=64, num_workers=8)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=128, num_workers=32)
+        return DataLoader(self.val, shuffle=False, batch_size=64, num_workers=8)
 
 
 class PubMedFullDataset(Dataset):
-    def __init__(self, indexes, shard_to_index, start_year, end_year):
-        self.indexes = indexes
-        self.shard_to_index = shard_to_index
+    def __init__(self, indexes_or_sentences, start_year, end_year, pubmed_version,
+                 year_to_indexes=None, year_to_pmids=None,
+                 by_sentence=False):
+        if by_sentence:
+            self.sentences = indexes_or_sentences
+        else:
+            self.indexes = indexes_or_sentences
+        self.year_to_indexes = year_to_indexes
+        self.year_to_pmids = year_to_pmids
         self.start_year = start_year
         self.end_year = end_year
-        self.df = None
-        self.current_df_name = None
+        self.by_sentence = by_sentence
+        self.pubmed_folder = pubmed_version_to_folder(pubmed_version)
 
     def index_to_filename(self, index):
-        for shard, interval in enumerate(self.shard_to_index):
+        for year, interval in self.year_to_indexes.items():
             if interval[0] <= index < interval[1]:
-                return interval[0], os.path.join(FULL_PUMBED_2018_PATH, f'pubmed_v2_shard_{shard}.csv')
+                pmid = self.year_to_pmids[year][index-interval[0]]
+                return os.path.join(self.pubmed_folder, str(year), f'{pmid}.csv')
         raise IndexError
 
     def __len__(self):
+        if self.by_sentence:
+            return len(self.sentences)
         return len(self.indexes)
 
     def __getitem__(self, index):
         if torch.is_tensor(index):
             index = index.tolist()
-        first_index_in_shard, shard_fname = self.index_to_filename(index)
-        if self.current_df_name is None or self.current_df_name != shard_fname:
-            df = read_shard(shard_fname, self.start_year, self.end_year)
-            self.current_df_name = shard_fname
-        row = self.df.iloc[index - first_index_in_shard]
-        text = '; '.join([row['title'], row['abstract']])
+        if self.by_sentence:
+            return {'text': self.sentences[index]}
+        # Not by_sentence: (based on every abstract being in a different file)
+        fname = self.index_to_filename(index)
+        df = pd.read_csv(fname, index_col=0)
+        row = df.iloc[0]
+        text = '; '.join([str(row['title']), str(row['abstract'])])
         return {'text': text}
