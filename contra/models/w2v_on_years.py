@@ -13,7 +13,7 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
 from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description, load_aact_data
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description, load_aact_data, process_aact_year_range_to_sentences
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -98,15 +98,7 @@ class EmbeddingOnYears:
 
     def load_data_for_w2v(self):
         if self.only_aact_data:
-            df = load_aact_data(self.pubmed_version, (self.start_year, self.end_year))
-            print("Separating abstracts to sentences...")
-            abstracts_as_sent_list = df['title_and_abstract'].apply(self.text_utils.split_abstract_to_sentences)
-            sentences1 = []
-            print("Separating sentences to words...")
-            for abstract in tqdm(abstracts_as_sent_list):
-                for sent in abstract:
-                    sentences1.append(word_tokenize(sent))
-            self.data = sentences1
+            self.data = process_aact_year_range_to_sentences(self.pubmed_version, (self.start_year, self.end_year))
         else:
             for year in range(self.start_year, self.end_year + 1):
                 year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
@@ -116,12 +108,12 @@ class EmbeddingOnYears:
                     sentences1 = pickle.load(open(year_sentences_tokenized_path, 'rb'))
                 else:
                     if not os.path.exists(year_sentences_path):
-                        print(f"need to split year to sentences, mode: {self.abstract_weighting_mode}")
+                        print(f"Splitting year to sentences, mode: {self.abstract_weighting_mode}")
                         process_year_range_into_sentences(year, year,
                                                           abstract_weighting_mode=self.abstract_weighting_mode,
                                                           pubmed_version=self.pubmed_version)
                     sentences = pickle.load(open(year_sentences_path, 'rb'))
-                    print(f"need to tokenize sentences of {year}, mode: {self.abstract_weighting_mode}")
+                    print(f"Tokenizing sentences of {year}, mode: {self.abstract_weighting_mode}")
                     sentences1 = []
                     for sent in tqdm(sentences):
                         sentences1.append(word_tokenize(sent))
@@ -130,7 +122,7 @@ class EmbeddingOnYears:
         print(f'loaded {len(self.data)} sentences.')
 
     def load_data(self):
-        if self.model_name=='w2v':
+        if self.model_name == 'w2v':
             self.load_data_for_w2v()
         else:
             print(f"unsupported model name {self.model_name}")

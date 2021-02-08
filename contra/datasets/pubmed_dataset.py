@@ -21,16 +21,19 @@ from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact
 class PubMedModule(pl.LightningDataModule):
     def __init__(self, hparams):
         super().__init__()
+        self.hparams = hparams
         self.min_num_participants = hparams.min_num_participants
         self.first_time_range = (datetime(hparams.first_start_year, 1, 1), datetime(hparams.first_end_year, 12, 31))
         self.second_time_range = (datetime(hparams.second_start_year, 1, 1), datetime(hparams.second_end_year, 12, 31))
-        self.test_year_range = (hparams.test_start_year, hparams.test_end_year)
+        self.test_start_year = hparams.test_start_year
+        self.test_end_year = hparams.test_end_year
         self.test_fname = hparams.test_pairs_file
         if self.test_fname is not None:
             self.test_fname = os.path.join(SAVE_PATH, self.test_fname)
         self.train_test_split = hparams.train_test_split
         self.pubmed_version = hparams.pubmed_version
         self.emb_algorithm = hparams.emb_algorithm
+        self.batch_size = hparams.batch_size
         self.df = None
         self.train, self.test, self.val = None, None, None
 
@@ -61,12 +64,15 @@ class PubMedModule(pl.LightningDataModule):
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
 
         if self.emb_algorithm == 'w2v':
-            self.test = CUIDataset(bert=None, test_years=self.test_year_range, frac=0.001, sample_type=1,
-                                   top_percentile=0.5, semtypes=['dsyn'], read_from_file=self.test_fname)
+            self.test = CUIDataset(bert=None, test_start_year=self.test_start_year, test_end_year=self.test_end_year,
+                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'],
+                                   read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
-            bert_path = f'bert_base_cased_{self.test_year_range[0]}_{self.test_year_range[1]}_v{self.pubmed_version}_epoch39'
+            bert_path = f'bert_tiny_uncased_{self.test_year_range[0]}_{self.test_year_range[1]}_v{self.pubmed_version}_epoch39'
+            #bert_path = f'bert_base_cased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
-                                   test_years=self.test_year_range,
+                                   bert_tokenizer=self.hparams.bert_tokenizer,
+                                   test_start_year=self.test_start_year, test_end_year=self.test_end_year,
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
                                    read_from_file=self.test_fname)
         else:
@@ -74,13 +80,13 @@ class PubMedModule(pl.LightningDataModule):
         print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples.\nLoaded {len(self.test)} cui pairs for test.')
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=True, batch_size=32, num_workers=32)
+        return DataLoader(self.train, shuffle=True, batch_size=self.batch_size, num_workers=8)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=32, num_workers=32)
+        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
     def test_dataloader(self):
-        return DataLoader(self.test, shuffle=False, batch_size=32, num_workers=32)
+        return DataLoader(self.test, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
 
 class PubMedDataset(Dataset):
@@ -104,7 +110,9 @@ class PubMedDataset(Dataset):
 
 
 class CUIDataset(Dataset):
-    def __init__(self, bert='google/bert_uncased_L-2_H-128_A-2', test_years=(2018, 2018), read_w2v_params={},
+    def __init__(self, bert='google/bert_uncased_L-2_H-128_A-2', bert_tokenizer=None,
+                 test_start_year=2018, test_end_year=2018,
+                 read_w2v_params={},
                  top_percentile=0.01, semtypes=None, frac=1., sample_type=0, 
                  filter_by_models=(),
                  read_from_file=None):
@@ -133,12 +141,20 @@ class CUIDataset(Dataset):
         self.sample_type = sample_type
         if bert is not None:
             self.emb_algorithm = 'bert'
-            self.tokenizer = AutoTokenizer.from_pretrained('dmis-lab/biobert-base-cased-v1.1')
+            tokenizer_name = bert
+            if bert_tokenizer is not None:
+                tokenizer_name = bert_tokenizer
+            self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
             self.bert_model = AutoModel.from_pretrained(bert)
-        elif test_years is not None:
+            if bert == 'google/bert_uncased_L-2_H-128_A-2':
+                self.model_desc = 'tinybert'
+            else:
+                self.model_desc = 'bert'
+        elif test_start_year is not None and test_end_year is not None:
             self.emb_algorithm = 'w2v'
             self.tokenizer = TextUtils()
-            self.w2v_model = read_w2v_model(test_years[0], test_years[1], **read_w2v_params)
+            self.w2v_model = read_w2v_model(test_start_year, test_end_year, **read_w2v_params)
+            self.model_desc = 'w2v'
         else:
             print("CUIDataset got no model to work with: both bert and w2v_years are None.")
             sys.exit()
@@ -174,7 +190,7 @@ class CUIDataset(Dataset):
                 CUI_names = [name for i, name in enumerate(CUI_names) if got_emb[i]]
                 print(f"Keeping {len(CUI_names)}/{before} CUIs.")
             
-            print(f"Filtering CUIs by main model: {test_years[0]}_{test_years[1]} model")
+            print(f"Filtering CUIs by main model: {test_start_year}_{test_end_year} model")
             CUI_embeddings = self.w2v_model.embed_batch(tokenized_names) 
             got_embedding = torch.count_nonzero(CUI_embeddings, dim=1) > 0
             CUI_embeddings = CUI_embeddings[got_embedding]
@@ -197,9 +213,10 @@ class CUIDataset(Dataset):
         elif self.sample_type == 3:
             step_size = int(1/self.frac)
             self.similarity_df = self.similarity_df.sort_values('similarity', ascending=False).iloc[::step_size]
-        
-        self.similarity_df.to_csv(os.path.join(SAVE_PATH, 
-            f'test_similarities_CUI_names_{self.emb_algorithm}_{test_years[0]}_{test_years[1]}.csv'))
+
+        self.similarity_df.to_csv(
+            os.path.join(SAVE_PATH,
+                         f'test_similarities_CUI_names_{self.model_desc}_{test_start_year}_{test_end_year}.csv'))
 
     def __len__(self):
         return len(self.similarity_df)

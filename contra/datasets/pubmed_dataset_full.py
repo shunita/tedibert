@@ -25,6 +25,7 @@ class PubMedFullModule(pl.LightningDataModule):
         if self.by_sentence:
             self.text_utils = tu.TextUtils()
             self.sentences = {}
+        self.batch_size = hparams.batch_size
         self.abstract_weighting_mode = hparams.abstract_weighting_mode
         self.pubmed_version = hparams.pubmed_version
         self.pubmed_folder = pubmed_version_to_folder(self.pubmed_version)
@@ -32,8 +33,7 @@ class PubMedFullModule(pl.LightningDataModule):
                                           only_aact_data=self.only_aact,
                                           pubmed_version=self.pubmed_version)
         if self.abstract_weighting_mode not in ('normal', 'subsample'):
-            print(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
-            sys.exit()
+            raise Exception(f"Unsupported option for abstract_weighting_mode = {self.abstract_weighting_mode}")
 
     def prepare_data(self):
         """happens only on one GPU."""
@@ -60,8 +60,7 @@ class PubMedFullModule(pl.LightningDataModule):
                                          by_sentence=True)
         else:
             if self.only_aact:
-                print("Currently unsupported: only_aact_data=True and by_sentence=False")
-                sys.exit()
+                raise Exception("Currently unsupported: only_aact_data=True and by_sentence=False")
             else:
                 current_index = 0
                 for year in range(self.start_year, self.end_year+1):
@@ -78,13 +77,13 @@ class PubMedFullModule(pl.LightningDataModule):
                                              year_to_indexes=self.year_to_indexes, year_to_pmids=self.year_to_pmids)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=True, batch_size=64, num_workers=8)
+        return DataLoader(self.train, shuffle=True, batch_size=self.batch_size, num_workers=8)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=64, num_workers=8)
+        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=64, num_workers=8)
+        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
 
 class PubMedFullDataset(Dataset):

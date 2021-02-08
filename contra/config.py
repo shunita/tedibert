@@ -46,7 +46,9 @@ parser.add_argument('--by_sentence', dest='by_sentence', action='store_true')
 
 # Bert
 parser.add_argument('--num_frozen_layers', type=int, default=0, help='how many layers to freeze in the bert model')
-parser.add_argument('--bert_pretrained_path', type=str, help='path to a saved checkpoint to start bert training from')
+parser.add_argument('--bert_pretrained_path', type=str, default='bert-base-cased',
+                    help='path to a saved checkpoint to start bert training from.')
+parser.add_argument('--bert_tokenizer', type=str, default='bert-base-cased', help='which tokenizer to use for bert')
 parser.add_argument('--bert_save_prefix', type=str, help='prefix for saving bert checkpoints')
 
 # Model parameters
@@ -65,6 +67,7 @@ parser.add_argument('--dim', type=int, default=128, metavar='d', dest='embedding
 parser.add_argument('--lr', '--learning_rate', default=1e-4, type=float,
                     metavar='LR', help='initial learning rate', dest='learning_rate')
 parser.add_argument('--max_epochs', default=100, type=int, metavar='N', help='number of total epochs to run')
+parser.add_argument('--batch_size', default=32, type=int, help='batch size for training')
 
 # Model Architecture
 parser.add_argument('--bn', action='store_true',

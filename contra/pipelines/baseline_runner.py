@@ -101,26 +101,27 @@ def calculate_sims_and_compare(cui_similarity_file, w2v_years, read_w2v_params={
 
 
 if __name__ == "__main__":
+    # For some experiments we want only CUI pairs whose similarity changed a lot between the two time ranges.
+    CREATE_TEST_PAIRS_WITH_LARGE_CHANGE = False
     read_w2v_params = {'abstract_weighting_mode': 'normal', 'pubmed_version': 2019, 'only_aact_data': True}
-    #find_interesting_CUI_pairs((2010, 2013), (2018, 2018), (2019, 2019),
-    #                           semtypes=['dsyn'], top_percentile=0.5, filter_by_models=[], 
-    #                           sample_fraction=0.01,
-    #                           write_to_file=os.path.join(SAVE_PATH, 'test_interesting_CUI_pairs_aact.csv'),
-    #                           read_w2v_params=read_w2v_params)
-    #sys.exit()
+    if CREATE_TEST_PAIRS_WITH_LARGE_CHANGE:
+        find_interesting_CUI_pairs((2010, 2013), (2018, 2018), (2019, 2019),
+                                   semtypes=['dsyn'], top_percentile=0.5, filter_by_models=[],
+                                   sample_fraction=0.01,
+                                   write_to_file=os.path.join(SAVE_PATH, 'test_interesting_CUI_pairs_aact.csv'),
+                                   read_w2v_params=read_w2v_params)
+    else:  # create the test pairs file using CUIDataset
+        test_pairs_path = os.path.join(SAVE_PATH, 'test_similarities_CUI_names_w2v_2019_2019.csv')
+        if not os.path.exists(test_pairs_path):
+            print("generating test pairs")
+            cui_dataset = pmd.CUIDataset(bert=None, w2v_years=(2019, 2019),
+                                         read_w2v_params=read_w2v_params,
+                                         top_percentile=0.5,
+                                         semtypes=['dsyn'], frac=0.001, sample_type=1,
+                                         read_from_file=None)
+        else:
+            print(f"Using test pairs file: {test_pairs_path}")
 
-    #test_pairs_path = os.path.join(SAVE_PATH, 'test_similarities_CUI_names_2019_2019.csv')
-    test_pairs_path = os.path.join(SAVE_PATH, 'test_interesting_CUI_pairs_aact.csv')
-    if not os.path.exists(test_pairs_path):
-        print("generating test pairs")
-        cui_dataset = pmd.CUIDataset(bert=None, w2v_years=(2019, 2019),
-                                     read_w2v_params=read_w2v_params,
-                                     top_percentile=0.5,
-                                     semtypes=['dsyn'], frac=0.001, sample_type=1, 
-                                     read_from_file=None)
-    else:
-        print(f"Using test pairs file: {test_pairs_path}")
-    
     print("W2V years: 2018")
     calculate_sims_and_compare(test_pairs_path,
                                (2018, 2018),

@@ -1,15 +1,11 @@
-import numpy as np
 import ftplib
-import dq
 import gzip
 import xml.etree.ElementTree as ET
 import pandas as pd
-import pickle
 import os
-import time
 
 PUBMED_FILES_2019 = 1015
-PUBMED_FILES=1062 # 2020
+PUBMED_FILES = 1062  # 2020
 
 # Pubmed XML utilities
 def get_first_element(xml_object, xpath):

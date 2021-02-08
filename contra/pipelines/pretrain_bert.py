@@ -28,7 +28,9 @@ hparams = config.parser.parse_args(['--name', 'BertYears11-13',
                                     #'--num_frozen_layers', '10',
                                     '--only_aact_data',
                                     '--bert_pretrained_path', 'google/bert_uncased_L-2_H-128_A-2',
+                                    '--bert_tokenizer', 'google/bert_uncased_L-2_H-128_A-2',
                                     '--bert_save_prefix', 'bert_tiny_uncased',
+                                    '--batch_size', '256',
                                     ])
 # When running with two gpus:
 # hparams.gpus = [0,1]
