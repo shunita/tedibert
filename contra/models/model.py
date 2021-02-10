@@ -23,7 +23,7 @@ class FairEmbedding(pl.LightningModule):
             self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1, hid_layers=2,
                                             bn=self.bn, activation=self.activation)
         else:
-            self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=2,
+            self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0,
                                             bn=self.bn, activation=self.activation)
         self.L1Loss = torch.nn.L1Loss()
         self.BCELoss = torch.nn.BCELoss()
