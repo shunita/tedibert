@@ -197,11 +197,21 @@ def embed_in_batches(texts, bert_model, bert_tokenizer, batch_size=256):
     return np.concatenate(embs, axis=0)
 
 
-def classification_for_year_with_bert(df, binary):
+def embed_abstracts(abstracts, bert_model, bert_tokenizer):
+    embs = []
+    for abstract in tqdm(abstracts):
+        sentences = tu.split_abstract_to_sentences(abstract)
+        sent_embeddings = embed_with_bert(sentences, bert_model, bert_tokenizer)
+        embs.append(np.mean(sent_embeddings, axis=0))  # shape should be (128,)
+    return embs
+
+
+def classification_for_year_with_bert(df, binary, by_sentence):
     train, test = train_test_split(df, test_size=0.3)
     keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
-    train = split_abstracts_to_sentences_df(train.copy(), text_field='title_and_abstract', keep=keep_fields)
-    test = split_abstracts_to_sentences_df(test.copy(), text_field='title_and_abstract', keep=keep_fields)
+    if by_sentence:
+        train = split_abstracts_to_sentences_df(train.copy(), text_field='title_and_abstract', keep=keep_fields)
+        test = split_abstracts_to_sentences_df(test.copy(), text_field='title_and_abstract', keep=keep_fields)
     if binary:
         train, ytrain = get_binary_labels_from_df(train)
         test, ytest = get_binary_labels_from_df(test)
@@ -212,13 +222,19 @@ def classification_for_year_with_bert(df, binary):
     # Embed using bert - which bert?
     # Use tinybert (not trained on med)
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-    #bert_model = AutoModel.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-    bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
-    
-    print("Embedding train using bert:")
-    Xtrain = embed_in_batches(train['text'].values, bert_model, bert_tokenizer)
-    print("Embedding test using bert:")
-    Xtest = embed_in_batches(test['text'].values, bert_model, bert_tokenizer)
+    bert_model = AutoModel.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
+    #bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
+
+    if by_sentence:
+        print("Embedding train using bert:")
+        Xtrain = embed_in_batches(train['text'].values, bert_model, bert_tokenizer)
+        print("Embedding test using bert:")
+        Xtest = embed_in_batches(test['text'].values, bert_model, bert_tokenizer)
+    else:
+        print("Embedding train using bert:")
+        Xtrain = embed_abstracts(train['title_and_abstract'].values, bert_model, bert_tokenizer)
+        print("Embedding test using bert:")
+        Xtest = embed_abstracts(test['title_and_abstract'].values, bert_model, bert_tokenizer)
 
     #model = LogisticRegression()
     model = XGBClassifier()
@@ -254,5 +270,5 @@ if __name__ == "__main__":
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
     df = read_abstracts()
-    classification_for_year_with_bert(df, binary=True)
+    classification_for_year_with_bert(df, binary=True, by_sentence=False)
     #CUI_diff_bert()
