@@ -132,17 +132,19 @@ def get_binary_labels_from_df(df):
     return df, df['label']
 
 
-def classification_for_year(df, binary):
+def classification_for_year(df, binary, by_sentence, model_class=LogisticRegression):
     vocab, index_to_word = get_vocab(df['tokenized'])
     train, test = train_test_split(df, test_size=0.3)
+    train, test = train.copy(), test.copy()
     keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
-    train = split_abstracts_to_sentences_df(train.copy(), text_field='title_and_abstract', keep=keep_fields)
-    test = split_abstracts_to_sentences_df(test.copy(), text_field='title_and_abstract', keep=keep_fields)
-    train['tokenized'] = train['text'].apply(word_tokenize)
-    test['tokenized'] = test['text'].apply(word_tokenize)
+    if by_sentence:
+        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract', keep=keep_fields)
+        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract', keep=keep_fields)
+        train['tokenized'] = train['text'].apply(word_tokenize)
+        test['tokenized'] = test['text'].apply(word_tokenize)
     if binary:
-        train, ytrain = get_binary_labels_from_df(train.copy())
-        test, ytest = get_binary_labels_from_df(test.copy())
+        train, ytrain = get_binary_labels_from_df(train)
+        test, ytest = get_binary_labels_from_df(test)
     else:
         ytrain = train['year']
         ytest = test['year']
@@ -154,31 +156,29 @@ def classification_for_year(df, binary):
     shuff_Xtrain = shuffle_csr(Xtrain)
     shuff_Xtest = shuffle_csr(Xtest)
 
-    model = LogisticRegression()
+    model = model_class()
     model.fit(Xtrain, ytrain)
     ypred_train = model.predict_proba(Xtrain)[:, 1]
     ypred_test = model.predict_proba(Xtest)[:, 1]
+    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
+    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
     if binary:
         print(f"Accuracy on train: {accuracy_score(ytrain, model.predict(Xtrain))}")
         print(f"Accuracy on test: {accuracy_score(ytest, model.predict(Xtest))}")
         print(f"AUC on train: {roc_auc_score(ytrain, ypred_train)}")
         print(f"AUC on test: {roc_auc_score(ytest, ypred_test)}")
-    else:
-        print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
-        print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
 
-    model = LogisticRegression()
+    model = model_class()
     model.fit(shuff_Xtrain, ytrain)
     ypred_train = model.predict_proba(shuff_Xtrain)[:, 1]
     ypred_test = model.predict_proba(shuff_Xtest)[:, 1]
+    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(shuff_Xtrain))}")
+    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(shuff_Xtest))}")
     if binary:
         print(f"Accuracy on random train: {accuracy_score(ytrain, model.predict(Xtrain))}")
         print(f"Accuracy on random test: {accuracy_score(ytest, model.predict(Xtest))}")
         print(f"AUC on random train: {roc_auc_score(ytrain, ypred_train)}")
         print(f"AUC on random test: {roc_auc_score(ytest, ypred_test)}")
-    else:
-        print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(shuff_Xtrain))}")
-        print(f"Logloss on test: {log_loss(ytest, model.predict_proba(shuff_Xtest))}")
 
 
 def embed_with_bert(texts, bert_model, bert_tokenizer):
@@ -206,12 +206,13 @@ def embed_abstracts(abstracts, bert_model, bert_tokenizer):
     return np.stack(embs)
 
 
-def classification_for_year_with_bert(df, binary, by_sentence):
+def classification_for_year_with_bert(df, binary, by_sentence, model_class=LogisticRegression):
     train, test = train_test_split(df, test_size=0.3)
+    train, test = train.copy(), test.copy()
     keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
     if by_sentence:
-        train = split_abstracts_to_sentences_df(train.copy(), text_field='title_and_abstract', keep=keep_fields)
-        test = split_abstracts_to_sentences_df(test.copy(), text_field='title_and_abstract', keep=keep_fields)
+        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract', keep=keep_fields)
+        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract', keep=keep_fields)
     if binary:
         train, ytrain = get_binary_labels_from_df(train)
         test, ytest = get_binary_labels_from_df(test)
@@ -236,19 +237,19 @@ def classification_for_year_with_bert(df, binary, by_sentence):
         print("Embedding test using bert:")
         Xtest = embed_abstracts(test['title_and_abstract'].values, bert_model, bert_tokenizer)
 
-    #model = LogisticRegression()
-    model = XGBClassifier()
+    model = model_class()
     model.fit(Xtrain, ytrain)
     ypred_train = model.predict_proba(Xtrain)[:, 1]
     ypred_test = model.predict_proba(Xtest)[:, 1]
+    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
+    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
+
     if binary:
         print(f"Accuracy on train: {accuracy_score(ytrain, model.predict(Xtrain))}")
         print(f"Accuracy on test: {accuracy_score(ytest, model.predict(Xtest))}")
         print(f"AUC on train: {roc_auc_score(ytrain, ypred_train)}")
         print(f"AUC on test: {roc_auc_score(ytest, ypred_test)}")
-    else:
-        print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
-        print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
+
 
 
 def CUI_diff_bert():
@@ -270,5 +271,8 @@ if __name__ == "__main__":
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
     df = read_abstracts()
-    classification_for_year_with_bert(df, binary=True, by_sentence=False)
+    print("BOW sentence representation:")
+    classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression)
+    print("avg BERT sentence representation:")
+    classification_for_year_with_bert(df, binary=True, by_sentence=True, model_class=LogisticRegression)
     #CUI_diff_bert()
