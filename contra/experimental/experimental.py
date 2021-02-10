@@ -141,8 +141,8 @@ def classification_for_year(df, binary):
     train['tokenized'] = train['text'].apply(word_tokenize)
     test['tokenized'] = test['text'].apply(word_tokenize)
     if binary:
-        train, ytrain = get_binary_labels_from_df(train)
-        test, ytest = get_binary_labels_from_df(test)
+        train, ytrain = get_binary_labels_from_df(train.copy())
+        test, ytest = get_binary_labels_from_df(test.copy())
     else:
         ytrain = train['year']
         ytest = test['year']
@@ -203,7 +203,7 @@ def embed_abstracts(abstracts, bert_model, bert_tokenizer):
         sentences = tu.split_abstract_to_sentences(abstract)
         sent_embeddings = embed_with_bert(sentences, bert_model, bert_tokenizer)
         embs.append(np.mean(sent_embeddings, axis=0))  # shape should be (128,)
-    return embs
+    return np.stack(embs)
 
 
 def classification_for_year_with_bert(df, binary, by_sentence):
