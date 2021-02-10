@@ -7,6 +7,10 @@ from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import log_loss, accuracy_score, roc_auc_score
+from xgboost import XGBClassifier
+
+import sys
+sys.path.append('/home/shunita/fairemb')
 
 from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data
 from contra.utils.text_utils import TextUtils
@@ -16,6 +20,7 @@ from contra.common.utils import mean_pooling
 import os
 from scipy.spatial.distance import cosine
 from contra.constants import DATA_PATH, SAVE_PATH
+
 tu = TextUtils()
 
 
@@ -207,14 +212,16 @@ def classification_for_year_with_bert(df, binary):
     # Embed using bert - which bert?
     # Use tinybert (not trained on med)
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-    bert_model = AutoModel.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-
+    #bert_model = AutoModel.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
+    bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
+    
     print("Embedding train using bert:")
     Xtrain = embed_in_batches(train['text'].values, bert_model, bert_tokenizer)
     print("Embedding test using bert:")
     Xtest = embed_in_batches(test['text'].values, bert_model, bert_tokenizer)
 
-    model = LogisticRegression()
+    #model = LogisticRegression()
+    model = XGBClassifier()
     model.fit(Xtrain, ytrain)
     ypred_train = model.predict_proba(Xtrain)[:, 1]
     ypred_test = model.predict_proba(Xtest)[:, 1]
@@ -235,8 +242,8 @@ def CUI_diff_bert():
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
     bert1 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
     bert2 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch39'))
-    CUI_embeddings1 = embed_with_bert(CUI_names, bert_tokenizer, bert1)
-    CUI_embeddings2 = embed_with_bert(CUI_names, bert_tokenizer, bert2)
+    CUI_embeddings1 = embed_with_bert(CUI_names, bert1, bert_tokenizer)
+    CUI_embeddings2 = embed_with_bert(CUI_names, bert2, bert_tokenizer)
     dists = [cosine(CUI_embeddings1[i], CUI_embeddings2[i]) for i in range(len(CUI_names))]
     df['cosine_dist_old_v_new'] = dists
     df.to_csv(os.path.join(SAVE_PATH, 'CUI_emb_diff_old_v_new.csv'))
@@ -247,4 +254,5 @@ if __name__ == "__main__":
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
     df = read_abstracts()
-    classification_for_year(df, binary=True)
+    classification_for_year_with_bert(df, binary=True)
+    #CUI_diff_bert()
