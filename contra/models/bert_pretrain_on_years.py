@@ -16,6 +16,7 @@ class BertPretrainOnYears(pl.LightningModule):
         self.pubmed_version = hparams.pubmed_version
         self.tokenizer = AutoTokenizer.from_pretrained(hparams.bert_tokenizer)
         self.bert_model = BertForMaskedLM.from_pretrained(hparams.bert_pretrained_path)
+        self.model_desc = hparams.bert_save_prefix
         self.num_frozen_layers = hparams.num_frozen_layers
         if self.num_frozen_layers > 0:
             modules = [self.bert_model.bert.embeddings, *self.bert_model.bert.encoder.layer[:self.num_frozen_layers]]

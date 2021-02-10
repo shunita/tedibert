@@ -68,7 +68,7 @@ class PubMedModule(pl.LightningDataModule):
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'],
                                    read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
-            bert_path = f'bert_tiny_uncased_{self.test_year_range[0]}_{self.test_year_range[1]}_v{self.pubmed_version}_epoch39'
+            bert_path = f'bert_tiny_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             #bert_path = f'bert_base_cased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
                                    bert_tokenizer=self.hparams.bert_tokenizer,
