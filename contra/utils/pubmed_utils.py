@@ -135,11 +135,12 @@ def process_aact_year_range_to_sentences(version, year_range):
     return sentences_flat
 
 
-def split_abstracts_to_sentences_df(df_of_abstracts, text_field='title_and_abstract', keep=['date', 'year', 'female', 'male']):
+def split_abstracts_to_sentences_df(df_of_abstracts, text_field='title_and_abstract',
+                                    keep=('date', 'year', 'female', 'male')):
     text_utils = tu.TextUtils()
-    df_of_abstracts['sentences'] = df_of_abstracts['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    df_of_abstracts['sentences'] = df_of_abstracts[text_field].apply(text_utils.split_abstract_to_sentences)
     sentences = []
-    for pmid,r in df_of_abstracts.iterrows():
+    for pmid, r in df_of_abstracts.iterrows():
         d = {field: r[field] for field in keep}
         # TODO: add ncts? title? pmid?
         for sent in r['sentences']:
