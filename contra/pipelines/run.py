@@ -10,7 +10,7 @@ from contra.datasets import PubMedModule
 from contra import config
 from contra.models import FairEmbeddingBert, FairEmbeddingW2V
 
-hparams = config.parser.parse_args(['--name', 'GAN tiny bert',
+hparams = config.parser.parse_args(['--name', 'GAN tiny bert D&G peace',
                                     '--first_start_year', '2011',
                                     '--first_end_year', '2013',
                                     '--second_start_year', '2016',
@@ -24,8 +24,8 @@ hparams = config.parser.parse_args(['--name', 'GAN tiny bert',
                                     #'--initial_emb_size', '300',  # w2v
                                     '--lr', '1e-5',
                                     '--max_epochs', '10',
-                                    '--lmb_isnew', '0.1',
-                                    #'--lmb_isnew', '0',
+                                    #'--lmb_isnew', '0.1',
+                                    '--lmb_isnew', '0',
                                     '--lmb_ratio', '0',
                                     '--abstract_weighting_mode', 'normal',
                                     '--pubmed_version', '2020',
