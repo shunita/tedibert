@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, lil_matrix
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
@@ -60,11 +60,11 @@ def texts_to_BOW(texts_list, vocab):
     :param vocab: dictionary of word to index
     :return:
     """
-    X = csr_matrix((len(texts_list), len(vocab)))
+    X = lil_matrix((len(texts_list), len(vocab)))
     for i, abstract in tqdm(enumerate(texts_list), total=len(texts_list)):
         word_indices = [vocab[w] for w in sorted(set(abstract))]
         X[i, word_indices] = 1
-    return X
+    return X.tocsr()
 
 
 def shuffle_csr(mat):
