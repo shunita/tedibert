@@ -17,9 +17,9 @@ from contra.models import BertPretrainOnYears
 # np.random.seed(1)
 # torch.manual_seed(1)
 
-hparams = config.parser.parse_args(['--name', 'BertYears11-13', 
-                                    '--start_year', '2011',
-                                    '--end_year', '2013',
+hparams = config.parser.parse_args(['--name', 'BertYears10-18', 
+                                    '--start_year', '2010',
+                                    '--end_year', '2018',
                                     '--by_sentence',
                                     '--max_epochs', '40',
                                     '--lr', '5e-5',

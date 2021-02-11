@@ -224,7 +224,7 @@ def classification_for_year_with_bert(df, binary, by_sentence, model_class=Logis
     # Use tinybert (not trained on med)
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
     bert_model = AutoModel.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-    #bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
+    #bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39'))
 
     if by_sentence:
         print("Embedding train using bert:")
@@ -271,8 +271,8 @@ if __name__ == "__main__":
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
     df = read_abstracts()
-    print("BOW sentence representation:")
-    classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression)
+    #print("BOW sentence representation:")
+    #classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression)
     print("avg BERT sentence representation:")
     classification_for_year_with_bert(df, binary=True, by_sentence=True, model_class=LogisticRegression)
     #CUI_diff_bert()
