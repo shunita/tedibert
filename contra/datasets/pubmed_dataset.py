@@ -34,6 +34,7 @@ class PubMedModule(pl.LightningDataModule):
         self.pubmed_version = hparams.pubmed_version
         self.emb_algorithm = hparams.emb_algorithm
         self.batch_size = hparams.batch_size
+        self.by_sentence = hparams.by_sentence
         self.df = None
         self.train, self.test, self.val = None, None, None
 
@@ -57,8 +58,12 @@ class PubMedModule(pl.LightningDataModule):
         val_df = pd.concat([new_val_df, old_val_df])
         # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
         keep_fields = ['date', 'year', 'female', 'male', 'num_participants']
-        train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
-        val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
+        if self.by_sentence:
+            train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
+            val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
+        else:
+            train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
+            val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
 
         self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
         self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)

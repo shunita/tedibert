@@ -4,21 +4,31 @@ from transformers import AutoTokenizer, BertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
 from contra.models.model import FairEmbedding
 from contra.common.utils import mean_pooling
+from contra.utils.text_utils import TextUtils
 
 
 class FairEmbeddingBert(FairEmbedding):
     def __init__(self, hparams):
         super(FairEmbeddingBert, self).__init__(hparams)
+        self.by_sentence = hparams.by_sentence
+        self.max_len = 70 if self.by_sentence else 200
+        self.tu = TextUtils()
         self.tokenizer = AutoTokenizer.from_pretrained(hparams.bert_tokenizer)
         self.bert_model = BertForMaskedLM.from_pretrained(hparams.bert_pretrained_path)
         self.initial_embedding_size = self.bert_model.get_input_embeddings().embedding_dim
         self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
 
     def forward(self, batch):
-        text = batch['text']
+        if self.by_sentence:
+            text = batch['text']
+        else:
+            abstracts = batch['text']
+            text = [self.tu.split_abstract_to_sentences(abstract) for abstract in abstracts]
+            abstract_lens = [len(abstract) for abstract in text]
+            text = TextUtils.flatten_list_of_lists(text)
 
         # We use the same bert model for all abstracts, regardless of year.
-        inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=50,
+        inputs = self.tokenizer.batch_encode_plus(text, padding=True, truncation=True, max_length=self.max_len,
                                                   add_special_tokens=True, return_tensors="pt")
         collated = self.data_collator(inputs['input_ids'].tolist())
         inputs_for_emb = {k: v.to(self.device) for k, v in inputs.items()}
@@ -32,7 +42,18 @@ class FairEmbeddingBert(FairEmbedding):
         loss = self.bert_model(**inputs_for_lm).loss
         # TODO: inputs['attention_mask'] is just a tensor of ones so mean_pooling is a simple average
         sentence_embedding = mean_pooling(outputs['hidden_states'][-1], inputs_for_emb['attention_mask'])
-        return sentence_embedding, loss
+        if self.by_sentence:
+            return sentence_embedding, loss
+        # Otherwise: working on the abstract level: average the sentence vectors for each abstract
+        sent_index = 0
+        abstract_embeddings = []
+        for abstract_len in abstract_lens:
+            # TODO make sure indexing works like this
+            abstract_embeddings.append(mean_pooling(sentence_embedding[sent_index: sent_index + abstract_len],
+                                                    torch.ones(abstract_len)))
+            sent_index += abstract_len
+        abstract_embeddings = torch.as_tensor(abstract_embeddings)
+        return abstract_embeddings, loss
 
     def step(self, batch: dict, optimizer_idx: int = None, name='train') -> dict:
         if optimizer_idx == 0:

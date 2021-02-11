@@ -15,6 +15,10 @@ class TextUtils:
         for part in parts:
             sentences.extend(self.sent_tokenizer.tokenize(part))
         return sentences
+
+    @staticmethod
+    def flatten_list_of_lists(lst):
+        return [item for sublist in lst for item in sublist]
         
     def word_tokenize_abstract(self, abstract):
         sentences = self.split_abstract_to_sentences(abstract)
