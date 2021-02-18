@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import log_loss, accuracy_score, roc_auc_score
 from xgboost import XGBClassifier
+import re
 
 import sys
 sys.path.append('/home/shunita/fairemb')
@@ -19,7 +20,7 @@ from transformers import AutoTokenizer, AutoModel
 from contra.common.utils import mean_pooling
 import os
 from scipy.spatial.distance import cosine
-from contra.constants import DATA_PATH, SAVE_PATH
+from contra.constants import DATA_PATH, SAVE_PATH, EXP_PATH
 
 tu = TextUtils()
 
@@ -33,13 +34,13 @@ def word_tokenize(text):
     return filter_word_list(tu.word_tokenize_abstract(text))
 
 
-def read_abstracts():
+def read_abstracts(tokenize=True):
     df = load_aact_data(2019)
     df['all_participants'] = df['male'] + df['female']
     df['percent_female'] = df['male'] / df['all_participants']
-    df['tokenized'] = df['title_and_abstract'].apply(word_tokenize)
+    if tokenize:
+        df['tokenized'] = df['title_and_abstract'].apply(word_tokenize)
     return df
-
 
 
 def get_vocab(list_of_word_lists):
@@ -52,6 +53,19 @@ def get_vocab(list_of_word_lists):
     print("vocab size: {}".format(len(vocab)))
     return word_to_index, vocab
 # get_vocab(abstracts['tokenized'])
+
+
+def count_old_new_appearances(df_with_old_new_label, index_to_word):
+    d = {w: {0: 0, 1: 0} for w in index_to_word}
+
+    def word_origins(text, label):
+        for w in text:
+            d[w][label] += 1
+
+    for i in (0, 1):
+        df_with_old_new_label[df_with_old_new_label.label == i]['tokenized'].apply(
+            lambda x: word_origins(x, i))
+    return d
 
 
 def texts_to_BOW(texts_list, vocab):
@@ -132,14 +146,63 @@ def get_binary_labels_from_df(df):
     return df, df['label']
 
 
-def classification_for_year(df, binary, by_sentence, model_class=LogisticRegression):
+def run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, binary):
+    model = model_class()
+    model.fit(Xtrain, ytrain)
+
+    ypred_train = model.predict_proba(Xtrain)[:, 1]
+    ypred_test = model.predict_proba(Xtest)[:, 1]
+    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
+    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
+    if binary:
+        print(f"Accuracy on train: {accuracy_score(ytrain, model.predict(Xtrain))}")
+        print(f"Accuracy on test: {accuracy_score(ytest, model.predict(Xtest))}")
+        print(f"AUC on train: {roc_auc_score(ytrain, ypred_train)}")
+        print(f"AUC on test: {roc_auc_score(ytest, ypred_test)}")
+    return model
+
+
+def should_keep_sentence(sentence):
+    blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
+    s = sentence.lower()
+    for w in blacklist:
+        if w in s:
+            return False
+    # re, find NCTs
+    if len(re.findall('nct[0-9]+', s)) > 0:
+        return False
+    if len(sentence) < 40:
+        return False
+    return True
+
+
+def clean_abstracts(df):
+    df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
+    d = {'total': 0, 'remaining': 0}
+
+    def pick_sentences(sentences):
+        new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
+        d['total'] += len(sentences)
+        d['remaining'] += len(new_sents)
+        return " ".join(new_sents)
+
+    df['title_and_abstract_clean'] = df['sentences'].apply(pick_sentences)
+    print(f"kept {d['remaining']}/{d['total']} sentences")
+    return df
+
+
+def classification_for_year(df, binary, by_sentence, model_class=LogisticRegression,
+                            words_and_weights_file=None, sentence_analysis_file=None, shuffle=False):
+    print("filtering sentences from abstracts")
+    df = clean_abstracts(df)
+    df['tokenized'] = df['title_and_abstract_clean'].apply(word_tokenize)
     vocab, index_to_word = get_vocab(df['tokenized'])
     train, test = train_test_split(df, test_size=0.3)
     train, test = train.copy(), test.copy()
-    keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
     if by_sentence:
-        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract', keep=keep_fields)
-        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract', keep=keep_fields)
+        keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
+        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract_clean', keep=keep_fields)
+        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract_clean', keep=keep_fields)
         train['tokenized'] = train['text'].apply(word_tokenize)
         test['tokenized'] = test['text'].apply(word_tokenize)
     if binary:
@@ -152,33 +215,27 @@ def classification_for_year(df, binary, by_sentence, model_class=LogisticRegress
     Xtrain = texts_to_BOW(train['tokenized'], vocab)
     Xtest = texts_to_BOW(test['tokenized'], vocab)
 
-    # shuffle the data for a random baseline.
-    shuff_Xtrain = shuffle_csr(Xtrain)
-    shuff_Xtest = shuffle_csr(Xtest)
-
-    model = model_class()
-    model.fit(Xtrain, ytrain)
-    ypred_train = model.predict_proba(Xtrain)[:, 1]
-    ypred_test = model.predict_proba(Xtest)[:, 1]
-    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
-    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
-    if binary:
-        print(f"Accuracy on train: {accuracy_score(ytrain, model.predict(Xtrain))}")
-        print(f"Accuracy on test: {accuracy_score(ytest, model.predict(Xtest))}")
-        print(f"AUC on train: {roc_auc_score(ytrain, ypred_train)}")
-        print(f"AUC on test: {roc_auc_score(ytest, ypred_test)}")
-
-    model = model_class()
-    model.fit(shuff_Xtrain, ytrain)
-    ypred_train = model.predict_proba(shuff_Xtrain)[:, 1]
-    ypred_test = model.predict_proba(shuff_Xtest)[:, 1]
-    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(shuff_Xtrain))}")
-    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(shuff_Xtest))}")
-    if binary:
-        print(f"Accuracy on random train: {accuracy_score(ytrain, model.predict(Xtrain))}")
-        print(f"Accuracy on random test: {accuracy_score(ytest, model.predict(Xtest))}")
-        print(f"AUC on random train: {roc_auc_score(ytrain, ypred_train)}")
-        print(f"AUC on random test: {roc_auc_score(ytest, ypred_test)}")
+    model = run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, binary)
+    if words_and_weights_file is not None:
+        words_and_weights = list(zip(index_to_word, model.coef_.squeeze()))
+        words_df = pd.DataFrame(words_and_weights, columns=['word', 'weight'])
+        df, _ = get_binary_labels_from_df(df)
+        word_to_appearances = count_old_new_appearances(df, index_to_word)
+        words_df['old_appearances'] = pd.Series([word_to_appearances[w][0] for w in index_to_word])
+        words_df['new_appearances'] = pd.Series([word_to_appearances[w][1] for w in index_to_word])
+        words_df.to_csv(words_and_weights_file)
+    # Find which sentences confuse the model and which are easy
+    # extract: sentence, probability, actual label
+    if by_sentence and sentence_analysis_file is not None:
+        train['model_prob'] = model.predict_proba(Xtrain)[:, 1]
+        train[['text', 'year', 'label', 'model_prob']].to_csv(sentence_analysis_file)
+    if shuffle:
+        # shuffle the data for a random baseline.
+        shuff_Xtrain = shuffle_csr(Xtrain)
+        shuff_Xtest = shuffle_csr(Xtest)
+        print("Results on shuffled X:")
+        model = run_classifier_and_print_results(shuff_Xtrain, ytrain, shuff_Xtest, ytest, model_class, binary)
+    return model
 
 
 def embed_with_bert(texts, bert_model, bert_tokenizer):
@@ -237,18 +294,8 @@ def classification_for_year_with_bert(df, binary, by_sentence, model_class=Logis
         print("Embedding test using bert:")
         Xtest = embed_abstracts(test['title_and_abstract'].values, bert_model, bert_tokenizer)
 
-    model = model_class()
-    model.fit(Xtrain, ytrain)
-    ypred_train = model.predict_proba(Xtrain)[:, 1]
-    ypred_test = model.predict_proba(Xtest)[:, 1]
-    print(f"Logloss on train: {log_loss(ytrain, model.predict_proba(Xtrain))}")
-    print(f"Logloss on test: {log_loss(ytest, model.predict_proba(Xtest))}")
+    model = run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, binary)
 
-    if binary:
-        print(f"Accuracy on train: {accuracy_score(ytrain, model.predict(Xtrain))}")
-        print(f"Accuracy on test: {accuracy_score(ytest, model.predict(Xtest))}")
-        print(f"AUC on train: {roc_auc_score(ytrain, ypred_train)}")
-        print(f"AUC on test: {roc_auc_score(ytest, ypred_test)}")
 
 
 
@@ -270,9 +317,14 @@ if __name__ == "__main__":
     # df = read_abstracts()
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
-    df = read_abstracts()
-    #print("BOW sentence representation:")
-    #classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression)
-    print("avg BERT sentence representation:")
-    classification_for_year_with_bert(df, binary=True, by_sentence=True, model_class=LogisticRegression)
+    df = read_abstracts(tokenize=False)
+    print("BOW sentence representation:")
+    sent_file = os.path.join(EXP_PATH, 'sentence_analysis_after_filter.csv')
+    words_file = os.path.join(EXP_PATH, 'BOW_words_and_weights_old_new_by_abstract_after_filter.csv')
+    classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression,
+                            #words_and_weights_file=words_file,
+                            sentence_analysis_file=sent_file
+                            )
+    #print("avg BERT sentence representation:")
+    #classification_for_year_with_bert(df, binary=True, by_sentence=True, model_class=LogisticRegression)
     #CUI_diff_bert()

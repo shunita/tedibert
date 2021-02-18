@@ -7,6 +7,8 @@ DATA_PATH = os.path.join(PROJECT_ROOT, 'data')
 SAVE_PATH = os.path.join(PROJECT_ROOT, 'saved_models')
 CACHE_PATH = os.path.join(PROJECT_ROOT, 'cache')
 LOG_PATH = os.path.join(PROJECT_ROOT, 'logdir')
+EXP_PATH = os.path.join(PROJECT_ROOT, 'exp_results')
+
 
 FULL_PUMBED_2018_PATH = os.path.join(os.path.expanduser('~'), 'pubmed_2018')
 PUBMED_SHARDS = 50

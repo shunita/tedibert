@@ -113,7 +113,7 @@ def load_aact_data(version, year_range=None):
     df = pd.read_csv(file_path, index_col=0)
     df['title'] = df['title'].fillna('')
     df['title'] = df['title'].apply(lambda x: x.strip('[]'))
-    df['title_and_abstract'] = df['title'] + df['abstract']
+    df['title_and_abstract'] = df['title'] + ' ' + df['abstract']
     if year_range is not None:
         start_year, end_year = year_range
         df = df[(df['year'] >= start_year) & (df['year'] <= end_year)]
