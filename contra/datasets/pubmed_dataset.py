@@ -47,9 +47,9 @@ class PubMedModule(pl.LightningDataModule):
         df = df[df['num_participants'] >= self.min_num_participants]
         self.df = df
 
-    def setup(self, stage=None):
         old_df = self.df[(self.df['date'] >= self.first_time_range[0]) & (self.df['date'] <= self.first_time_range[1])]
-        new_df = self.df[(self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
+        new_df = self.df[
+            (self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
 
         # We split to train and test while we still have the whole abstract.
         old_train_df, old_val_df = train_test_split(old_df, test_size=self.test_size)
@@ -61,15 +61,15 @@ class PubMedModule(pl.LightningDataModule):
         # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
         keep_fields = ['date', 'year', 'female', 'male', 'num_participants']
         if self.by_sentence:
-            train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
-            val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
+            self.train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
+            self.val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
         else:
-            train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
-            val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
+            self.train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
+            self.val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
 
-        self.train = PubMedDataset(train_df, self.first_time_range, self.second_time_range)
-        self.val = PubMedDataset(val_df, self.first_time_range, self.second_time_range)
-
+    def setup(self, stage=None):
+        self.train = PubMedDataset(self.train_df, self.first_time_range, self.second_time_range)
+        self.val = PubMedDataset(self.val_df, self.first_time_range, self.second_time_range)
         if self.emb_algorithm == 'w2v':
             self.test = CUIDataset(bert=None, test_start_year=self.test_start_year, test_end_year=self.test_end_year,
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'],

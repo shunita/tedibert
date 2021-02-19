@@ -1,16 +1,16 @@
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix, lil_matrix
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import log_loss, accuracy_score, roc_auc_score
-from xgboost import XGBClassifier
-import re
 
 import sys
+
+from contra.experimental.exp_utils import get_vocab, texts_to_BOW
+
 sys.path.append('/home/shunita/fairemb')
 
 from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts
@@ -43,16 +43,6 @@ def read_abstracts(tokenize=True):
     return df
 
 
-def get_vocab(list_of_word_lists):
-    vocab_set = set()
-    for lst in list_of_word_lists:
-        for w in lst:
-            vocab_set.add(w)
-    vocab = sorted(list(vocab_set))
-    word_to_index = {w: i for i, w in enumerate(vocab)}
-    print("vocab size: {}".format(len(vocab)))
-    return word_to_index, vocab
-# get_vocab(abstracts['tokenized'])
 
 
 def count_old_new_appearances(df_with_old_new_label, index_to_word):
@@ -66,19 +56,6 @@ def count_old_new_appearances(df_with_old_new_label, index_to_word):
         df_with_old_new_label[df_with_old_new_label.label == i]['tokenized'].apply(
             lambda x: word_origins(x, i))
     return d
-
-
-def texts_to_BOW(texts_list, vocab):
-    """embed_with_bert abstracts using BOW. (set representation).
-    :param texts_list: list of abstracts, each is a list of words.
-    :param vocab: dictionary of word to index
-    :return:
-    """
-    X = lil_matrix((len(texts_list), len(vocab)))
-    for i, abstract in tqdm(enumerate(texts_list), total=len(texts_list)):
-        word_indices = [vocab[w] for w in sorted(set(abstract))]
-        X[i, word_indices] = 1
-    return X.tocsr()
 
 
 def shuffle_csr(mat):

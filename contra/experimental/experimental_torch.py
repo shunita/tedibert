@@ -1,11 +1,12 @@
 import sys
+
+from contra.datasets.pubmed_bow_dataset import PubMedBOWModule
+
 sys.path.append('/home/shunita/fairemb/')
 import torch
 from torch import nn
-from torch.nn import functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
-from contra.datasets import PubMedModule
 from datetime import datetime
 import pytz
 from contra import config
@@ -71,7 +72,7 @@ hparams = config.parser.parse_args(['--name', 'LogReg exp',
                                     ])
 hparams.gpus = 0
 if __name__ == '__main__':
-    dm = PubMedModule(hparams)
+    dm = PubMedBOWModule(hparams)
     model = LogReg(hparams)
     logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                          version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
