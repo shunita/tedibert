@@ -5,7 +5,7 @@ from contra.experimental.exp_utils import get_vocab, texts_to_BOW
 
 class PubMedBOWModule(PubMedModule):
     def __init__(self, hparams):
-        super(PubMedBOWModule).__init__(hparams)
+        super(PubMedBOWModule, self).__init__(hparams)
 
     def setup(self, stage=None):
         # self.train_df, self.val_df were filled by prepare_data

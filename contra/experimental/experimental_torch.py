@@ -1,8 +1,6 @@
 import sys
-
-from contra.datasets.pubmed_bow_dataset import PubMedBOWModule
-
 sys.path.append('/home/shunita/fairemb/')
+
 import torch
 from torch import nn
 import pytorch_lightning as pl
@@ -10,7 +8,7 @@ from pytorch_lightning.loggers import WandbLogger
 from datetime import datetime
 import pytz
 from contra import config
-
+from contra.datasets.pubmed_bow_dataset import PubMedBOWModule
 
 
 class LogReg(pl.LightningModule):
