@@ -25,21 +25,12 @@ from contra.constants import DATA_PATH, SAVE_PATH, EXP_PATH
 tu = TextUtils()
 
 
-def filter_word_list(word_list):
-    # decide_on_word removes punctuation, lowercases the words and replaces numbers with a specific token.
-    return [w for w in map(TextUtils.decide_on_word, word_list) if len(w) > 0]
-
-
-def word_tokenize(text):
-    return filter_word_list(tu.word_tokenize_abstract(text))
-
-
 def read_abstracts(tokenize=True):
     df = load_aact_data(2019)
     df['all_participants'] = df['male'] + df['female']
     df['percent_female'] = df['male'] / df['all_participants']
     if tokenize:
-        df['tokenized'] = df['title_and_abstract'].apply(word_tokenize)
+        df['tokenized'] = df['title_and_abstract'].apply(tu.word_tokenize)
     return df
 
 
@@ -172,7 +163,7 @@ def classification_for_year(df, binary, by_sentence, model_class=LogisticRegress
                             words_and_weights_file=None, sentence_analysis_file=None, shuffle=False):
     print("filtering sentences from abstracts")
     df = clean_abstracts(df)
-    df['tokenized'] = df['title_and_abstract_clean'].apply(word_tokenize)
+    df['tokenized'] = df['title_and_abstract_clean'].apply(tu.word_tokenize)
     vocab, index_to_word = get_vocab(df['tokenized'])
     train, test = train_test_split(df, test_size=0.3)
     train, test = train.copy(), test.copy()
@@ -180,8 +171,8 @@ def classification_for_year(df, binary, by_sentence, model_class=LogisticRegress
         keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
         train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract_clean', keep=keep_fields)
         test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract_clean', keep=keep_fields)
-        train['tokenized'] = train['text'].apply(word_tokenize)
-        test['tokenized'] = test['text'].apply(word_tokenize)
+        train['tokenized'] = train['text'].apply(tu.word_tokenize)
+        test['tokenized'] = test['text'].apply(tu.word_tokenize)
     if binary:
         train, ytrain = get_binary_labels_from_df(train)
         test, ytest = get_binary_labels_from_df(test)

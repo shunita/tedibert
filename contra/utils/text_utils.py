@@ -50,3 +50,11 @@ class TextUtils:
                 if s.definition().startswith("the cardinal number"):
                     return True
         return False
+
+    @staticmethod
+    def filter_word_list(word_list):
+        # decide_on_word removes punctuation, lowercases the words and replaces numbers with a specific token.
+        return [w for w in map(TextUtils.decide_on_word, word_list) if len(w) > 0]
+
+    def word_tokenize(self, text):
+        return TextUtils.filter_word_list(self.word_tokenize_abstract(text))

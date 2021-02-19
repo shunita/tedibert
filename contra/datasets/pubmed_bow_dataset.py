@@ -1,6 +1,8 @@
 from torch.utils.data import Dataset, DataLoader
 from contra.datasets import PubMedModule
 from contra.experimental.exp_utils import get_vocab, texts_to_BOW
+from contra.utils.text_utils import TextUtils
+tu = TextUtils()
 
 
 class PubMedBOWModule(PubMedModule):
@@ -9,9 +11,11 @@ class PubMedBOWModule(PubMedModule):
 
     def setup(self, stage=None):
         # self.train_df, self.val_df were filled by prepare_data
-        self.vocab = get_vocab(self.train_df['text'])
-        bow_train = texts_to_BOW(self.train_df['text'], self.vocab)
-        bow_val = texts_to_BOW(self.val_df['text'], self.vocab)
+        self.train_df['tokenized'] = self.train_df['text'].apply(tu.word_tokenize)
+        self.val_df['tokenized'] = self.val_df['text'].apply(tu.word_tokenize)
+        self.vocab = get_vocab(self.train_df['tokenized'])
+        bow_train = texts_to_BOW(self.train_df['tokenized'], self.vocab)
+        bow_val = texts_to_BOW(self.val_df['tokenized'], self.vocab)
         self.train = PubMedBOWDataset(bow_train, self.train_df['is_new'].values)
         self.val = PubMedBOWDataset(bow_val, self.val_df['is_new'].values)
 
