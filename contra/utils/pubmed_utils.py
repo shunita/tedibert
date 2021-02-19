@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import pickle
 from tqdm import tqdm
+import re
 import sys
 sys.path.append('/home/shunita/fairemb')
 from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
@@ -120,6 +121,36 @@ def load_aact_data(version, year_range=None):
     return df
 
 
+def should_keep_sentence(sentence):
+    blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
+    s = sentence.lower()
+    for w in blacklist:
+        if w in s:
+            return False
+    # re, find NCTs
+    if len(re.findall('nct[0-9]+', s)) > 0:
+        return False
+    if len(sentence) < 40:
+        return False
+    return True
+
+
+def clean_abstracts(df):
+    text_utils = tu.TextUtils()
+    df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    d = {'total': 0, 'remaining': 0}
+
+    def pick_sentences(sentences):
+        new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
+        d['total'] += len(sentences)
+        d['remaining'] += len(new_sents)
+        return " ".join(new_sents)
+
+    df['title_and_abstract'] = df['sentences'].apply(pick_sentences)
+    print(f"kept {d['remaining']}/{d['total']} sentences")
+    return df
+
+
 def process_aact_year_range_to_sentences(version, year_range):
     '''
     @param version: 2019 or 2020
@@ -149,6 +180,3 @@ def split_abstracts_to_sentences_df(df_of_abstracts, text_field='title_and_abstr
             sentences.append(new_row)
     return pd.DataFrame.from_records(sentences)
 
-
-if __name__ == "__main__":
-    compare_versions(2010, 2020)

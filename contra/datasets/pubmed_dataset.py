@@ -15,7 +15,7 @@ from contra.constants import DATA_PATH, SAVE_PATH
 from transformers import AutoTokenizer, AutoModel
 from contra.models.w2v_on_years import read_w2v_model
 from contra.utils.text_utils import TextUtils
-from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data
+from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts
 
 
 class PubMedModule(pl.LightningDataModule):
@@ -30,7 +30,7 @@ class PubMedModule(pl.LightningDataModule):
         self.test_fname = hparams.test_pairs_file
         if self.test_fname is not None:
             self.test_fname = os.path.join(SAVE_PATH, self.test_fname)
-        self.train_test_split = hparams.train_test_split
+        self.test_size = hparams.test_size
         self.pubmed_version = hparams.pubmed_version
         self.emb_algorithm = hparams.emb_algorithm
         self.batch_size = hparams.batch_size
@@ -52,10 +52,12 @@ class PubMedModule(pl.LightningDataModule):
         new_df = self.df[(self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
 
         # We split to train and test while we still have the whole abstract.
-        old_train_df, old_val_df = train_test_split(old_df, test_size=0.2)
-        new_train_df, new_val_df = train_test_split(new_df, test_size=0.2)
+        old_train_df, old_val_df = train_test_split(old_df, test_size=self.test_size)
+        new_train_df, new_val_df = train_test_split(new_df, test_size=self.test_size)
         train_df = pd.concat([new_train_df, old_train_df])
         val_df = pd.concat([new_val_df, old_val_df])
+        train_df = clean_abstracts(train_df)
+        val_df = clean_abstracts(val_df)
         # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
         keep_fields = ['date', 'year', 'female', 'male', 'num_participants']
         if self.by_sentence:

@@ -13,7 +13,7 @@ import re
 import sys
 sys.path.append('/home/shunita/fairemb')
 
-from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data
+from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts
 from contra.utils.text_utils import TextUtils
 
 from transformers import AutoTokenizer, AutoModel
@@ -162,33 +162,33 @@ def run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, 
     return model
 
 
-def should_keep_sentence(sentence):
-    blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
-    s = sentence.lower()
-    for w in blacklist:
-        if w in s:
-            return False
-    # re, find NCTs
-    if len(re.findall('nct[0-9]+', s)) > 0:
-        return False
-    if len(sentence) < 40:
-        return False
-    return True
-
-
-def clean_abstracts(df):
-    df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
-    d = {'total': 0, 'remaining': 0}
-
-    def pick_sentences(sentences):
-        new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
-        d['total'] += len(sentences)
-        d['remaining'] += len(new_sents)
-        return " ".join(new_sents)
-
-    df['title_and_abstract_clean'] = df['sentences'].apply(pick_sentences)
-    print(f"kept {d['remaining']}/{d['total']} sentences")
-    return df
+# def should_keep_sentence(sentence):
+#     blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
+#     s = sentence.lower()
+#     for w in blacklist:
+#         if w in s:
+#             return False
+#     # re, find NCTs
+#     if len(re.findall('nct[0-9]+', s)) > 0:
+#         return False
+#     if len(sentence) < 40:
+#         return False
+#     return True
+#
+#
+# def clean_abstracts(df):
+#     df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
+#     d = {'total': 0, 'remaining': 0}
+#
+#     def pick_sentences(sentences):
+#         new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
+#         d['total'] += len(sentences)
+#         d['remaining'] += len(new_sents)
+#         return " ".join(new_sents)
+#
+#     df['title_and_abstract_clean'] = df['sentences'].apply(pick_sentences)
+#     print(f"kept {d['remaining']}/{d['total']} sentences")
+#     return df
 
 
 def classification_for_year(df, binary, by_sentence, model_class=LogisticRegression,

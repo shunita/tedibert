@@ -53,7 +53,7 @@ parser.add_argument('--bert_save_prefix', type=str, help='prefix for saving bert
 
 # Model parameters
 parser.add_argument('--min_num_participants', default=1, type=int, help='minimum number of total participants')
-parser.add_argument('--train_test_split', default=0.8, type=float, help='train_test_split ratio')
+parser.add_argument('--test_size', default=0.2, type=float, help='train_test_split ratio')
 parser.add_argument('--name', type=str, help='a special name for the current model running')
 parser.add_argument('--save_path', metavar='DIR', default=SAVE_PATH, type=str, help='path to save model')
 parser.add_argument('--log_path', default=LOG_PATH, type=str, help='tensorboard log path')
