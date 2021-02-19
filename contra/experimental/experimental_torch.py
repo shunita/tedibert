@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/shunita/fairemb/')
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -9,13 +11,15 @@ import pytz
 from contra import config
 
 
+
 class LogReg(pl.LightningModule):
     # Logistic Regression as a pytorch module
     # TODO: support wandb
-    def __init__(self, dim):
+    def __init__(self, hparams):
         # dim = vocab size
         super(LogReg, self).__init__()
-        self.linear = nn.Linear(dim, 1)
+        self.hparams = hparams
+        self.linear = nn.Linear(hparams.embedding_size, 1)
         self.BCE_with_logits = nn.BCEWithLogitsLoss()
 
     def forward(self, x):
@@ -33,20 +37,11 @@ class LogReg(pl.LightningModule):
 
     def validation_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None) -> dict:
         return self.step(batch, 'val')
+        
+    def configure_optimizers(self):
+        optimizer_1 = torch.optim.Adam(self.linear.parameters(), lr=self.hparams.learning_rate)
+        return [optimizer_1]
 
-# Training without pytorch lightning
-# criterion = torch.nn.BCELoss(size_average=True)
-# optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-# for epoch in range(20):
-#     model.train()
-#     optimizer.zero_grad()
-#     # Forward pass
-#     y_pred = model(x_data)
-#     # Compute Loss
-#     loss = criterion(y_pred, y_data)
-#     # Backward pass
-#     loss.backward()
-#     optimizer.step()
 
 
 # dataset - or can we use the pubmed_dataset?
@@ -77,7 +72,7 @@ hparams = config.parser.parse_args(['--name', 'LogReg exp',
 hparams.gpus = 0
 if __name__ == '__main__':
     dm = PubMedModule(hparams)
-    model = LogReg(hparams.embedding_size)
+    model = LogReg(hparams)
     logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                          version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                          project='Experimental', config=hparams)
