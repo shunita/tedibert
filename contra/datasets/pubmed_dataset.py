@@ -39,6 +39,8 @@ class PubMedModule(pl.LightningDataModule):
         self.train, self.test, self.val = None, None, None
 
     def prepare_data(self):
+        if self.df is not None:
+            return
         # This is a df containing a row for each abstract.
         df = load_aact_data(self.pubmed_version, year_range=None)
         df = df.dropna(subset=['date', 'male', 'female'], axis=0)
@@ -66,6 +68,7 @@ class PubMedModule(pl.LightningDataModule):
         else:
             self.train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
             self.val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
+        print(f'Loaded {len(self.train_df)} train samples and {len(self.val_df)} validation samples.')
 
     def setup(self, stage=None):
         self.train = PubMedDataset(self.train_df, self.first_time_range, self.second_time_range)
@@ -84,7 +87,7 @@ class PubMedModule(pl.LightningDataModule):
                                    read_from_file=self.test_fname)
         else:
             print(f'Unsupported emb_algorithm: {self.emb_algorithm}')
-        print(f'Loaded {len(train_df)} train samples and {len(val_df)} validation samples.\nLoaded {len(self.test)} cui pairs for test.')
+        print(f'Loaded {len(self.test)} cui pairs for test.')
 
     def train_dataloader(self):
         return DataLoader(self.train, shuffle=True, batch_size=self.batch_size, num_workers=8)

@@ -1,52 +1,25 @@
+import sys
+sys.path.append('/home/shunita/fairemb')
+import os
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+from scipy.spatial.distance import cosine
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.linear_model import LogisticRegression
-from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import log_loss, accuracy_score, roc_auc_score
-
-import sys
-
-from contra.experimental.exp_utils import get_vocab, texts_to_BOW
-
-sys.path.append('/home/shunita/fairemb')
-
-from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts
-from contra.utils.text_utils import TextUtils
-
 from transformers import AutoTokenizer, AutoModel
+from contra.experimental.exp_utils import get_vocab, texts_to_BOW, get_binary_labels_from_df, read_abstracts, \
+    count_old_new_appearances
+from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, clean_abstracts
+from contra.utils.text_utils import TextUtils
 from contra.common.utils import mean_pooling
-import os
-from scipy.spatial.distance import cosine
 from contra.constants import DATA_PATH, SAVE_PATH, EXP_PATH
+from scipy.linalg import orthogonal_procrustes
 
 tu = TextUtils()
-
-
-def read_abstracts(tokenize=True):
-    df = load_aact_data(2019)
-    df['all_participants'] = df['male'] + df['female']
-    df['percent_female'] = df['male'] / df['all_participants']
-    if tokenize:
-        df['tokenized'] = df['title_and_abstract'].apply(tu.word_tokenize)
-    return df
-
-
-
-
-def count_old_new_appearances(df_with_old_new_label, index_to_word):
-    d = {w: {0: 0, 1: 0} for w in index_to_word}
-
-    def word_origins(text, label):
-        for w in text:
-            d[w][label] += 1
-
-    for i in (0, 1):
-        df_with_old_new_label[df_with_old_new_label.label == i]['tokenized'].apply(
-            lambda x: word_origins(x, i))
-    return d
 
 
 def shuffle_csr(mat):
@@ -101,19 +74,6 @@ def regression_for_percent_female(df):
     return vocab, Xtrain, Xtest, ytrain, ytest
 
 
-def year_to_binary_label(year):
-    if 2010 <= year <= 2013:
-        return 0
-    if 2016 <= year <= 2018:
-        return 1
-
-
-def get_binary_labels_from_df(df):
-    df['label'] = df['year'].apply(year_to_binary_label)
-    df = df.dropna(subset=['label'])
-    return df, df['label']
-
-
 def run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, binary):
     model = model_class()
     model.fit(Xtrain, ytrain)
@@ -130,47 +90,18 @@ def run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, 
     return model
 
 
-# def should_keep_sentence(sentence):
-#     blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
-#     s = sentence.lower()
-#     for w in blacklist:
-#         if w in s:
-#             return False
-#     # re, find NCTs
-#     if len(re.findall('nct[0-9]+', s)) > 0:
-#         return False
-#     if len(sentence) < 40:
-#         return False
-#     return True
-#
-#
-# def clean_abstracts(df):
-#     df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
-#     d = {'total': 0, 'remaining': 0}
-#
-#     def pick_sentences(sentences):
-#         new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
-#         d['total'] += len(sentences)
-#         d['remaining'] += len(new_sents)
-#         return " ".join(new_sents)
-#
-#     df['title_and_abstract_clean'] = df['sentences'].apply(pick_sentences)
-#     print(f"kept {d['remaining']}/{d['total']} sentences")
-#     return df
-
-
 def classification_for_year(df, binary, by_sentence, model_class=LogisticRegression,
                             words_and_weights_file=None, sentence_analysis_file=None, shuffle=False):
     print("filtering sentences from abstracts")
     df = clean_abstracts(df)
-    df['tokenized'] = df['title_and_abstract_clean'].apply(tu.word_tokenize)
+    df['tokenized'] = df['title_and_abstract'].apply(tu.word_tokenize)
     vocab, index_to_word = get_vocab(df['tokenized'])
     train, test = train_test_split(df, test_size=0.3)
     train, test = train.copy(), test.copy()
     if by_sentence:
         keep_fields = ('date', 'year', 'female', 'male', 'all_participants', 'percent_female')
-        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract_clean', keep=keep_fields)
-        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract_clean', keep=keep_fields)
+        train = split_abstracts_to_sentences_df(train, text_field='title_and_abstract', keep=keep_fields)
+        test = split_abstracts_to_sentences_df(test, text_field='title_and_abstract', keep=keep_fields)
         train['tokenized'] = train['text'].apply(tu.word_tokenize)
         test['tokenized'] = test['text'].apply(tu.word_tokenize)
     if binary:
@@ -188,7 +119,7 @@ def classification_for_year(df, binary, by_sentence, model_class=LogisticRegress
         words_and_weights = list(zip(index_to_word, model.coef_.squeeze()))
         words_df = pd.DataFrame(words_and_weights, columns=['word', 'weight'])
         df, _ = get_binary_labels_from_df(df)
-        word_to_appearances = count_old_new_appearances(df, index_to_word)
+        word_to_appearances = count_old_new_appearances(df)
         words_df['old_appearances'] = pd.Series([word_to_appearances[w][0] for w in index_to_word])
         words_df['new_appearances'] = pd.Series([word_to_appearances[w][1] for w in index_to_word])
         words_df.to_csv(words_and_weights_file)
@@ -274,11 +205,13 @@ def CUI_diff_bert():
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
     bert1 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
     bert2 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch39'))
-    CUI_embeddings1 = embed_with_bert(CUI_names, bert1, bert_tokenizer)
-    CUI_embeddings2 = embed_with_bert(CUI_names, bert2, bert_tokenizer)
-    dists = [cosine(CUI_embeddings1[i], CUI_embeddings2[i]) for i in range(len(CUI_names))]
+    CUI_embeddings1 = embed_with_bert(CUI_names, bert1, bert_tokenizer)  # first matrix
+    CUI_embeddings2 = embed_with_bert(CUI_names, bert2, bert_tokenizer)  # second matrix
+    proc_matrix, _ = orthogonal_procrustes(CUI_embeddings1, CUI_embeddings2)
+    aligned_CUI_embeddings1 = CUI_embeddings1 @ proc_matrix
+    dists = [cosine(aligned_CUI_embeddings1[i], CUI_embeddings2[i]) for i in range(len(CUI_names))]
     df['cosine_dist_old_v_new'] = dists
-    df.to_csv(os.path.join(SAVE_PATH, 'CUI_emb_diff_old_v_new.csv'))
+    df.to_csv(os.path.join(SAVE_PATH, 'CUI_emb_diff_old_v_new_procrustes.csv'))
 
 
 if __name__ == "__main__":

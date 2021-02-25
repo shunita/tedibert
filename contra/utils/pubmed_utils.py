@@ -104,7 +104,7 @@ def read_subsample(year, version=DEFAULT_PUBMED_VERSION):
     return df.loc[sample_index]
 
 
-def load_aact_data(version, year_range=None):
+def load_aact_data(version, year_range=None, sample=False):
     '''
     @param version: 2019 or 2020
     @param year_range: a tuple of (start_year, end_year). If given, will be used to filter the abstracts to these years.
@@ -112,6 +112,8 @@ def load_aact_data(version, year_range=None):
     file_path = os.path.join(DATA_PATH, f'pubmed{version}_abstracts_with_participants.csv')
     print(f"reading: {file_path}")
     df = pd.read_csv(file_path, index_col=0)
+    if sample:
+        df = df.sample(1000)
     df['title'] = df['title'].fillna('')
     df['title'] = df['title'].apply(lambda x: x.strip('[]'))
     df['title_and_abstract'] = df['title'] + ' ' + df['abstract']
