@@ -8,12 +8,15 @@ from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 tqdm.pandas(desc="pandas")
+import pandas as pd
 import torch
 from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.callbacks import CallbackAny2Vec
 from nltk.tokenize import word_tokenize
 from contra.constants import SAVE_PATH, FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
-from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, params_to_description, load_aact_data, process_aact_year_range_to_sentences
+from contra.utils.pubmed_utils import read_year, read_year_to_ndocs, process_year_range_into_sentences, \
+    params_to_description, load_aact_data, process_aact_year_range_to_sentences, clean_abstracts, \
+    df_to_tokenized_sentence_list
 from contra.utils import text_utils as tu
 from contra import config
 import wandb
@@ -60,6 +63,7 @@ class EmbeddingOnYears:
         self.pubmed_folder = {2019: FULL_PUMBED_2019_PATH, 2020: FULL_PUMBED_2020_PATH}[self.pubmed_version]
         
         self.model_name = hparams.emb_algorithm
+        self.df = None
         self.data = []
         self.model = None
         monitor_loss = (self.model_name == 'w2v')
@@ -76,7 +80,7 @@ class EmbeddingOnYears:
         self.text_utils = tu.TextUtils()
 
     def count_words_in_abstract(self, abstract):
-        tokenized = word_tokenize(abstract)
+        tokenized = self.text_utils.word_tokenize(abstract)
         for word in set(tokenized):
             self.idf[word] += 1
 
@@ -87,8 +91,9 @@ class EmbeddingOnYears:
             return
         print("Generating idf dict")
         if self.only_aact_data:
-            df = load_aact_data(self.pubmed_version, (self.start_year, self.end_year))
-            df['title_and_abstract'].apply(self.count_words_in_abstract)
+            if self.df is None:
+                self.load_data()
+            self.df['title_and_abstract'].apply(self.count_words_in_abstract)
         else:
             for year in range(self.start_year, self.end_year + 1):
                 df = read_year(year, version=self.pubmed_version, subsample=(self.abstract_weighting_mode=='subsample'))
@@ -98,7 +103,11 @@ class EmbeddingOnYears:
 
     def load_data_for_w2v(self):
         if self.only_aact_data:
-            self.data = process_aact_year_range_to_sentences(self.pubmed_version, (self.start_year, self.end_year))
+            # self.df = load_aact_data(self.pubmed_version, (self.start_year, self.end_year), sample=False)
+            self.df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
+            self.df = self.df[self.df['assignment'] == 0]  # only train samples, like in BOW
+            self.df = clean_abstracts(self.df)
+            self.data = df_to_tokenized_sentence_list(self.df)
         else:
             for year in range(self.start_year, self.end_year + 1):
                 year_sentences_path = os.path.join(self.pubmed_folder, f'{year}{self.desc}_sentences.pickle')
@@ -215,12 +224,12 @@ def read_w2v_model(year1: int, year2: int,
 
 
 if __name__ == '__main__':
-    hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2013',
+    hparams = config.parser.parse_args(['--name', 'W2VYears+IDF_aact2010-2018',
                                         '--emb_algorithm', 'w2v',
                                         '--abstract_weighting_mode', 'normal', #subsample
                                         '--start_year', '2010',
-                                        '--end_year', '2013',
-                                        '--pubmed_version', '2019',
+                                        '--end_year', '2018',
+                                        '--pubmed_version', '2020',
                                         '--max_epochs', '45',
                                         '--only_aact_data'])
     wandb.init(project="Contra")
