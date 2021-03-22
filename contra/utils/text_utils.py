@@ -39,16 +39,16 @@ class TextUtils:
         possible_numbers = re.findall(r'[\d\.]+', word_to_check)
         if len(possible_numbers) > 0 and len(possible_numbers[0]) == len(word_to_check):
             return True
-        syns = wordnet.synsets(word_to_check)
-        for s in syns:
-            if s.definition().startswith("the cardinal number"):
-                return True
-        if "-" in word_to_check:
-            word = word_to_check.split("-")[0]
-            syns = wordnet.synsets(word)
-            for s in syns:
-                if s.definition().startswith("the cardinal number"):
-                    return True
+        # syns = wordnet.synsets(word_to_check)
+        # for s in syns:
+        #     if s.definition().startswith("the cardinal number"):
+        #         return True
+        # if "-" in word_to_check:
+        #     word = word_to_check.split("-")[0]
+        #     syns = wordnet.synsets(word)
+        #     for s in syns:
+        #         if s.definition().startswith("the cardinal number"):
+        #             return True
         return False
 
     @staticmethod

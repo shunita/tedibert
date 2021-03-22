@@ -22,6 +22,7 @@ class PubMedModule(pl.LightningDataModule):
     def __init__(self, hparams):
         super().__init__()
         self.hparams = hparams
+        self.serve_type = hparams.serve_type
         self.min_num_participants = hparams.min_num_participants
         self.first_time_range = (datetime(hparams.first_start_year, 1, 1), datetime(hparams.first_end_year, 12, 31))
         self.second_time_range = (datetime(hparams.second_start_year, 1, 1), datetime(hparams.second_end_year, 12, 31))
@@ -34,40 +35,56 @@ class PubMedModule(pl.LightningDataModule):
         self.pubmed_version = hparams.pubmed_version
         self.emb_algorithm = hparams.emb_algorithm
         self.batch_size = hparams.batch_size
-        self.by_sentence = hparams.by_sentence
+        self.reassign = False
         self.df = None
+        self.train_df, self.val_df = None, None
         self.train, self.test, self.val = None, None, None
 
     def prepare_data(self):
-        if self.df is not None:
+        if self.train_df is not None:
             return
-        # This is a df containing a row for each abstract.
-        df = load_aact_data(self.pubmed_version, year_range=None)
-        df = df.dropna(subset=['date', 'male', 'female'], axis=0)
-        df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
-        df['num_participants'] = df['female'] + df['male']
-        df = df[df['num_participants'] >= self.min_num_participants]
-        self.df = df
+        if self.reassign:
+            # This is a df containing a row for each abstract.
+            df = load_aact_data(self.pubmed_version, year_range=None, sample=self.hparams.debug)
+            df = df.dropna(subset=['date', 'male', 'female'], axis=0)
+            df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
+            df['num_participants'] = df['female'] + df['male']
+            df = df[df['num_participants'] >= self.min_num_participants]
+            self.df = df
 
-        old_df = self.df[(self.df['date'] >= self.first_time_range[0]) & (self.df['date'] <= self.first_time_range[1])]
-        new_df = self.df[
-            (self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
+            old_df = self.df[(self.df['date'] >= self.first_time_range[0]) & (self.df['date'] <= self.first_time_range[1])]
+            new_df = self.df[
+                (self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
 
-        # We split to train and test while we still have the whole abstract.
-        old_train_df, old_val_df = train_test_split(old_df, test_size=self.test_size)
-        new_train_df, new_val_df = train_test_split(new_df, test_size=self.test_size)
-        train_df = pd.concat([new_train_df, old_train_df])
-        val_df = pd.concat([new_val_df, old_val_df])
+            # We split to train and test while we still have the whole abstract.
+            old_train_df, old_val_df = train_test_split(old_df, test_size=self.test_size)
+            new_train_df, new_val_df = train_test_split(new_df, test_size=self.test_size)
+            train_df = pd.concat([new_train_df, old_train_df])
+            val_df = pd.concat([new_val_df, old_val_df])
+        else:
+            df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
+            if self.hparams.debug:
+                df = df.sample(1000)
+            train_df = df[df['assignment'] == 0].copy()
+            val_df = df[df['assignment'] == 1].copy()
+            print(f"Read from pre-assigned train, test file. Read: {len(train_df)} train, {len(val_df)} test.")
+
         train_df = clean_abstracts(train_df)
         val_df = clean_abstracts(val_df)
-        # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
-        keep_fields = ['date', 'year', 'female', 'male', 'num_participants']
-        if self.by_sentence:
-            self.train_df = split_abstracts_to_sentences_df(train_df, keep=keep_fields)
-            self.val_df = split_abstracts_to_sentences_df(val_df, keep=keep_fields)
-        else:
+
+        if self.serve_type == 0:  # Full abstract
             self.train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
             self.val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
+        elif self.serve_type > 1:  # single sentence or three sentences
+            # Transform the Dataframes to have a row for each sentence, and the details of the abstract it came from.
+            keep_fields = ['date', 'year', 'female', 'male', 'num_participants', 'title_and_abstract']
+            split_params = {'text_field': 'title_and_abstract',
+                            'keep': keep_fields,
+                            'overlap': self.hparams.overlap_sentences}
+            print(f"Before splitting to (3?) sentences, train: {len(train_df)} val: {len(val_df)}")
+            self.train_df = split_abstracts_to_sentences_df(train_df, **split_params)
+            self.val_df = split_abstracts_to_sentences_df(val_df, **split_params)
+        print(f'Serve type: {self.serve_type}, overlap: {self.hparams.overlap_sentences}')
         print(f'Loaded {len(self.train_df)} train samples and {len(self.val_df)} validation samples.')
 
     def setup(self, stage=None):

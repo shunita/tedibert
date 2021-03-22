@@ -1,9 +1,16 @@
 import os
+import string
+from collections import defaultdict
+
 import pandas as pd
 import pickle
 from tqdm import tqdm
 import re
 import sys
+import numpy as np
+
+from transformers import AutoTokenizer
+
 sys.path.append('/home/shunita/fairemb')
 from contra.constants import FULL_PUMBED_2019_PATH, FULL_PUMBED_2020_PATH, DATA_PATH, DEFAULT_PUBMED_VERSION
 from contra.utils import text_utils as tu
@@ -124,7 +131,7 @@ def load_aact_data(version, year_range=None, sample=False):
 
 
 def should_keep_sentence(sentence):
-    blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by']
+    blacklist = ['http', 'https', 'url', 'www', 'clinicaltrials.gov', 'copyright', 'funded by', 'published by', 'subsidiary']
     s = sentence.lower()
     for w in blacklist:
         if w in s:
@@ -139,6 +146,25 @@ def should_keep_sentence(sentence):
 
 def clean_abstracts(df):
     text_utils = tu.TextUtils()
+    # consolidate some terms
+    # term_replacement = {'hba(1c)': 'hba1c', 'hemoglobin A1c': 'hba1c', 'a1c': 'hba1c',
+    #                     # 'â‰¤': '',  # less-than sign
+    #                     # 'â‰¥': ''  # greater-than sign
+    #                     }
+    # printable = set(string.printable)
+    #
+    # def replace_terms(text):
+    #     text_lower = text.lower()
+    #     for k, v in term_replacement.items():
+    #         text_lower = text_lower.replace(k, v)
+    #     # remove all non-ascii characters
+    #     text_lower = ''.join(filter(lambda x: x in printable, text_lower))
+    #     return text_lower
+    #
+    # df['title_and_abstract'] = df['title_and_abstract'].apply(replace_terms)
+
+
+    # filter sentences
     df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
     d = {'total': 0, 'remaining': 0}
 
@@ -146,14 +172,18 @@ def clean_abstracts(df):
         new_sents = [sent for sent in sentences if should_keep_sentence(sent)]
         d['total'] += len(sentences)
         d['remaining'] += len(new_sents)
-        return " ".join(new_sents)
+        return new_sents
 
-    df['title_and_abstract'] = df['sentences'].apply(pick_sentences)
+    def join_to_abstract(sentences):
+        return ' '.join(sentences)
+
+    df['sentences'] = df['sentences'].apply(pick_sentences)
+    df['title_and_abstract'] = df['sentences'].apply(join_to_abstract)
     print(f"kept {d['remaining']}/{d['total']} sentences")
     return df
 
 
-def process_aact_year_range_to_sentences(version, year_range):
+def process_aact_year_range_to_sentences(version, year_range, word_list):
     '''
     @param version: 2019 or 2020
     @param year_range: a tuple of (start_year, end_year). Used to filter the abstracts to these years.
@@ -165,20 +195,58 @@ def process_aact_year_range_to_sentences(version, year_range):
     sentences_flat = []
     for abstract in df['sentences'].values:
         sentences_flat.extend(abstract)
+    if word_list:
+        sentences_flat = [tu.word_tokenize(sent) for sent in sentences_flat]
+    return sentences_flat
+
+def df_to_tokenized_sentence_list(df):
+    text_utils = tu.TextUtils()
+    if 'sentences' not in df.columns:
+        df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    sentences_flat = []
+    for abstract in df['sentences'].values:
+        sentences_flat.extend(abstract)
+    sentences_flat = [text_utils.word_tokenize(sent) for sent in sentences_flat]
     return sentences_flat
 
 
 def split_abstracts_to_sentences_df(df_of_abstracts, text_field='title_and_abstract',
-                                    keep=('date', 'year', 'female', 'male')):
+                                    keep=('date', 'year', 'female', 'male'), overlap=True):
     text_utils = tu.TextUtils()
     df_of_abstracts['sentences'] = df_of_abstracts[text_field].apply(text_utils.split_abstract_to_sentences)
     sentences = []
+    keep = list(keep)+['sentences']
     for pmid, r in df_of_abstracts.iterrows():
         d = {field: r[field] for field in keep}
-        # TODO: add ncts? title? pmid?
-        for sent in r['sentences']:
-            new_row = d.copy()
-            new_row['text'] = sent   
-            sentences.append(new_row)
+        for pos, sent in enumerate(r['sentences']):
+            if overlap or pos % 3 == 1:
+                new_row = d.copy()
+                new_row['text'] = sent
+                new_row['pos'] = pos
+                sentences.append(new_row)
     return pd.DataFrame.from_records(sentences)
 
+
+def populate_idf_dict_bert(tokenizer_path='google/bert_uncased_L-2_H-128_A-2'):
+    idf_file = os.path.join(DATA_PATH, 'pubmed2020train_idf_dict.pickle')
+    if os.path.exists(idf_file):
+        print(f"reading idf dict from {idf_file}")
+        token_idf = pickle.load(open(idf_file, 'rb'))
+        return token_idf
+    print(f"populating idf dict from train.")
+    df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
+    df = df[df['assignment'] == 0]  # only train
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    tokenized = tokenizer.batch_encode_plus(df['title_and_abstract'].values.tolist(), add_special_tokens=False).input_ids
+    token_counter = defaultdict(int)
+    for abs in tokenized:
+        for token_id in set(abs):
+            token_counter[token_id] += 1
+    N = len(df)
+    # cnt is guaranteed to be positive
+    token_idf = {}
+    for token in token_counter:
+        token_idf[token] = np.log(N/token_counter[token])
+    # token_idf = {token_id: np.log(N/cnt) for token_id, cnt in token_counter.items()}
+    pickle.dump(token_idf, open(idf_file, 'wb'))
+    return token_idf

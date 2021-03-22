@@ -42,7 +42,17 @@ parser.add_argument('--pubmed_version', type=int, default=2019, help='2019 or 20
 parser.add_argument('--only_aact_data', dest='only_aact_data', action='store_true')
 
 # Data choices - parsing
-parser.add_argument('--by_sentence', dest='by_sentence', action='store_true')
+# parser.add_argument('--by_sentence', dest='by_sentence', action='store_true')
+parser.add_argument('--serve_type', type=int, dest='serve_type',
+                    help='0 - full abstract as text\n'
+                    '1 - full abstract as BOW\n'
+                    '2 - single sentence as text\n'
+                    '3 - single sentence as BOW\n'
+                    '4 - three sentences as text\n'
+                    '5 - three sentences as BOW'
+                    )
+parser.add_argument('--overlap_sentences', dest='overlap_sentences', action='store_true')
+parser.add_argument('--debug', dest='debug', action='store_true')
 
 # Bert
 parser.add_argument('--num_frozen_layers', type=int, default=0, help='how many layers to freeze in the bert model')
