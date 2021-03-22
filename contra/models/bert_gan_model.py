@@ -1,5 +1,6 @@
 from itertools import chain
 import torch
+from sklearn.metrics import roc_auc_score
 from transformers import AutoTokenizer, BertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
 from contra.models.model import FairEmbedding
@@ -11,7 +12,7 @@ class FairEmbeddingBert(FairEmbedding):
     def __init__(self, hparams):
         super(FairEmbeddingBert, self).__init__(hparams)
         self.by_sentence = hparams.by_sentence
-        self.max_len = 70 if self.by_sentence else 200
+        self.max_len = 70  # if self.by_sentence else 200
         self.tu = TextUtils()
         self.tokenizer = AutoTokenizer.from_pretrained(hparams.bert_tokenizer)
         self.bert_model = BertForMaskedLM.from_pretrained(hparams.bert_pretrained_path)
@@ -48,14 +49,13 @@ class FairEmbeddingBert(FairEmbedding):
         sent_index = 0
         abstract_embeddings = []
         for abstract_len in abstract_lens:
-            # TODO make sure indexing works like this
-            abstract_embeddings.append(mean_pooling(sentence_embedding[sent_index: sent_index + abstract_len],
-                                                    torch.ones(abstract_len)))
+            abstract_embeddings.append(torch.mean(sentence_embedding[sent_index: sent_index + abstract_len], dim=0))
             sent_index += abstract_len
-        abstract_embeddings = torch.as_tensor(abstract_embeddings)
+        abstract_embeddings = torch.stack(abstract_embeddings)
         return abstract_embeddings, loss
 
     def step(self, batch: dict, optimizer_idx: int = None, name='train') -> dict:
+        #print(f"step, name: {name} optimizer index: {optimizer_idx}")
         if optimizer_idx == 0:
             self.ratio_true = batch['female_ratio']
             self.is_new = batch['is_new']
@@ -90,15 +90,23 @@ class FairEmbeddingBert(FairEmbedding):
                 isnew_pred = self.discriminator(torch.cat([emb, self.ratio_pred.detach()], dim=1))
             else:
                 isnew_pred = self.discriminator(emb)
+            #print("calc discriminator loss")
+            print(f"isnew_pred: {isnew_pred.squeeze()}, is_new_true: {self.is_new.float()}")
             isnew_loss = self.BCELoss(isnew_pred.squeeze(), self.is_new.float())
-            
             # final loss
             loss = isnew_loss
             self.log(f'discriminator/{name}_loss', loss)
+            # print(f'discriminator loss: {loss}')
+            # if not all(self.is_new) and any(self.is_new):
+            #     # Calc auc only if batch has more than one class.
+            #     self.log(f'discriminator/{name}_auc', roc_auc_score(self.is_new, isnew_pred.detach()))
         return loss
 
     def configure_optimizers(self):
-        optimizer_1 = torch.optim.Adam(self.bert_model.parameters(), lr=self.hparams.learning_rate)
+        # TODO: unfreeze
+        # freeze the generator
+        #optimizer_1 = torch.optim.Adam(self.bert_model.parameters(), lr=self.hparams.learning_rate)
+        optimizer_1 = torch.optim.Adam(self.bert_model.parameters(), lr=0)
         opt2_params = self.discriminator.parameters()
         if self.do_ratio_prediction:
             opt2_params = chain(opt2_params, self.ratio_reconstruction.parameters())
