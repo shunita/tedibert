@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from collections import defaultdict
 from scipy.spatial.distance import cosine
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.linear_model import LogisticRegression
@@ -196,12 +197,29 @@ def classification_for_year_with_bert(df, binary, by_sentence, model_class=Logis
     model = run_classifier_and_print_results(Xtrain, ytrain, Xtest, ytest, model_class, binary)
 
 
+def count_cui_appearances_by_year(CUI_names_list):
+    abstracts = pd.read_csv(os.path.join(DATA_PATH, 'abstracts_and_population_tokenized_for_cui2vec.csv'), index_col=0)
+    abstracts = abstracts.dropna(subset=['tokenized'])
+    abstracts_years = pd.read_csv(os.path.join(DATA_PATH, 'abstracts_population_date_topics.csv'), index_col=0)
+    abstracts_years['year'] = abstracts_years['date'].apply(lambda x: int(x[-4:]))
+    abstracts = abstracts.merge(abstracts_years['year'], left_index=True, right_index=True)
+    counter = {cui: defaultdict(int) for cui in CUI_names_list}
+    for i, r in abstracts.iterrows():
+        year = r['year']
+        for w in r['tokenized'].split():
+            if w in counter:
+                counter[w][year] += 1
+    return counter
 
 
 def CUI_diff_bert():
     df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
-
     CUI_names = df['name'].tolist()
+    counter = count_cui_appearances_by_year(CUI_names)
+    df['cui_tf_11_13'] = [counter[cui][2011] + counter[cui][2012] + counter[cui][2013] for cui in CUI_names]
+    df['cui_tf_16_18'] = [counter[cui][2016] + counter[cui][2017] + counter[cui][2018] for cui in CUI_names]
+    df.to_csv()
+
     bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
     bert1 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2011_2013_v2020_epoch39'))
     bert2 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch39'))
@@ -218,14 +236,14 @@ if __name__ == "__main__":
     # df = read_abstracts()
     # vocab, Xtrain, Xtest, ytrain, ytest = regression_for_percent_female(df)
 
-    df = read_abstracts(tokenize=False)
-    print("BOW sentence representation:")
-    sent_file = os.path.join(EXP_PATH, 'sentence_analysis_after_filter.csv')
-    words_file = os.path.join(EXP_PATH, 'BOW_words_and_weights_old_new_by_abstract_after_filter.csv')
-    classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression,
-                            #words_and_weights_file=words_file,
-                            sentence_analysis_file=sent_file
-                            )
+    # df = read_abstracts(tokenize=False)
+    # print("BOW sentence representation:")
+    # sent_file = os.path.join(EXP_PATH, 'sentence_analysis_after_filter.csv')
+    # words_file = os.path.join(EXP_PATH, 'BOW_words_and_weights_old_new_by_abstract_after_filter.csv')
+    # classification_for_year(df, binary=True, by_sentence=True, model_class=LogisticRegression,
+    #                         #words_and_weights_file=words_file,
+    #                         sentence_analysis_file=sent_file
+    #                         )
     #print("avg BERT sentence representation:")
     #classification_for_year_with_bert(df, binary=True, by_sentence=True, model_class=LogisticRegression)
-    #CUI_diff_bert()
+    CUI_diff_bert()

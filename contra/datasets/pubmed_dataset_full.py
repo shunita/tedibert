@@ -16,7 +16,7 @@ class PubMedFullModule(pl.LightningDataModule):
         super().__init__()
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
-        self.test_size = 1 - hparams.train_test_split
+        self.test_size = hparams.test_size
         self.only_aact = hparams.only_aact_data
         self.relevant_abstracts = None
         self.year_to_indexes = {}

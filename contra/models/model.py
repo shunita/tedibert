@@ -2,6 +2,7 @@ import os
 from scipy import stats
 import pandas as pd
 import torch
+from sklearn.metrics import roc_auc_score
 from torch import nn
 import pytorch_lightning as pl
 from contra.constants import SAVE_PATH
@@ -23,8 +24,10 @@ class FairEmbedding(pl.LightningModule):
             self.discriminator = Classifier(self.embedding_size + 1, int(self.embedding_size / 2), 1, hid_layers=2,
                                             bn=self.bn, activation=self.activation)
         else:
-            self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0,
-                                            bn=self.bn, activation=self.activation)
+            # self.discriminator = Classifier(self.embedding_size, int(self.embedding_size / 2), 1, hid_layers=0,
+            #                                 bn=self.bn, activation=self.activation)
+            # simplest classifier
+            self.discriminator = LogRegClassifier(self.embedding_size)
         self.L1Loss = torch.nn.L1Loss()
         self.BCELoss = torch.nn.BCELoss()
 
@@ -34,7 +37,7 @@ class FairEmbedding(pl.LightningModule):
             self.is_new = batch['is_new']
             # generate
             self.fair_embedding, g_loss = self.forward(batch)
-            
+
             if self.do_ratio_prediction:
                 self.ratio_pred = self.ratio_reconstruction(self.fair_embedding)
                 ratio_loss = self.BCELoss(self.ratio_pred.squeeze()[self.is_new].float(), self.ratio_true[self.is_new].float())
@@ -58,7 +61,7 @@ class FairEmbedding(pl.LightningModule):
         if optimizer_idx == 1:
             # discriminate
             emb = self.fair_embedding.detach()
-            
+
             if self.do_ratio_prediction:
                 isnew_pred = self.discriminator(torch.cat([emb, self.ratio_pred.detach()], dim=1))
             else:
@@ -84,9 +87,9 @@ class FairEmbedding(pl.LightningModule):
         pred_similarity = nn.CosineSimilarity()(CUI1_embedding, CUI2_embedding)
         true_similarity = batch['true_similarity']
         return pred_similarity, true_similarity
-        
+
     def wrap_text_to_batch(self, texts):
-        batch1 = {'text': texts, 
+        batch1 = {'text': texts,
                   'is_new': torch.zeros(len(texts), dtype=bool, device=self.device)
                   }
         return batch1
@@ -143,7 +146,7 @@ class Classifier(nn.Module):
             layers.append(nn.Linear(hid_dim, hid_dim))
             layers.append(act_func)
             if bn:
-                layers.append(nn.BatchNorm1d(hid_dim))  
+                layers.append(nn.BatchNorm1d(hid_dim))
 
         layers.append(nn.Linear(hid_dim, out_dim))
         layers.append(nn.Sigmoid())
@@ -151,3 +154,12 @@ class Classifier(nn.Module):
 
     def forward(self, input: torch.Tensor):
         return self.model(input)
+
+
+class LogRegClassifier(nn.Module):
+    def __init__(self, in_dim):
+        super(LogRegClassifier, self).__init__()
+        self.linear = nn.Linear(in_dim, 1)
+
+    def forward(self, input: torch.Tensor):
+        return torch.sigmoid(self.linear(input.float()))
