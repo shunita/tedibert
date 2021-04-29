@@ -1,5 +1,5 @@
+import numpy as np
 from collections import defaultdict
-
 from scipy.sparse import lil_matrix
 from tqdm import tqdm
 from contra.utils.pubmed_utils import load_aact_data, clean_abstracts
@@ -32,11 +32,24 @@ def texts_to_BOW(texts_list, vocab):
     return X.tocsr()
 
 
-def year_to_binary_label(year):
-    if 2010 <= year <= 2013:
+def text_seq_to_BOW(word_list, vocab):
+    x = np.zeros(len(vocab))
+    word_indices = [vocab[w] for w in sorted(set(word_list)) if w in vocab]
+    x[word_indices] = 1
+    return x
+
+
+def year_to_binary_label(year, first_time_range, second_time_range):
+    if first_time_range[0].year <= year <= first_time_range[1].year:
         return 0
-    if 2016 <= year <= 2018:
+    if second_time_range[0].year <= year <= second_time_range[1].year:
         return 1
+
+
+def fill_binary_year_label(df, first_time_range, second_time_range):
+    df['label'] = df['year'].apply(lambda x: year_to_binary_label(x, first_time_range, second_time_range))
+    df = df.dropna(subset=['label'])
+    return df
 
 
 def get_binary_labels_from_df(df):
@@ -72,3 +85,7 @@ def count_old_new_appearances(df_with_old_new_label):
         df_with_old_new_label[df_with_old_new_label.label == i]['tokenized'].apply(
             lambda x: word_origins(x, i))
     return d
+
+
+def make_array(string):
+    return np.array([float(x) for x in string.strip('[]').split()], dtype='float32')
