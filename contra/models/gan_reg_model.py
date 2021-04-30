@@ -257,7 +257,7 @@ class GAN(pl.LightningModule):
         return [optimizer0, optimizer1]
 
 
-hparams = config.parser.parse_args(['--name', 'bert 10-13+16-18',
+hparams = config.parser.parse_args(['--name', 'tinybert_non_medical',
                                     '--first_start_year', '2010',
                                     '--first_end_year', '2013',
                                     '--second_start_year', '2016',
@@ -267,7 +267,7 @@ hparams = config.parser.parse_args(['--name', 'bert 10-13+16-18',
                                     '--batch_size', '16',
                                     '--lr', '2e-5',
                                     '--lmb_isnew', '0',  #'0.1',
-                                    '--max_epochs', '30',
+                                    '--max_epochs', '0',  #'30',
                                     '--test_size', '0.3',
                                     '--serve_type', '0',  # Full abstract
                                     # '--serve_type', '2',  # single sentence as text
@@ -299,10 +299,10 @@ if __name__ == '__main__':
                          num_sanity_val_steps=0,
                          # gradient_clip_val=0.3
                          )
-    if hparams.max_epochs == 0:
-        model.set_output_validation_flag()
-        trainer.predict(model, dataloaders=[dm.val_dataloader()])
+    #if hparams.max_epochs == 0:
+        #model.set_output_validation_flag()
+        #trainer.predict(model, dataloaders=[dm.val_dataloader()])
     trainer.fit(model, datamodule=dm)
     trainer.test(model, datamodule=dm)
     model.set_output_validation_flag()
-    trainer.validate(model, datamodule=dm)
+    #trainer.predict(model, datamodule=dm)
