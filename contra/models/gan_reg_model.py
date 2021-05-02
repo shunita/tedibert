@@ -126,7 +126,7 @@ class GAN(pl.LightningModule):
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         outputs = self.bert_model(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
 
-        if optimizer_idx == 0 and self.hparams.lmb_isnew > 0:  # if lmb_isnew is 0, the only optimizer is the generator.
+        if optimizer_idx == 0:  # if lmb_isnew is 0, the only optimizer is the generator.
             y_pred = self.discriminator_step(outputs, indexes, max_len)
             losses = self.loss_func(y_pred, y_true)  # calculates loss per sample
             loss = losses.mean()
@@ -139,7 +139,7 @@ class GAN(pl.LightningModule):
                 self.log(f'discriminator/{name}_auc', roc_auc_score(y_true.cpu().detach(), y_proba))
             self.log(f'discriminator/{name}_accuracy', accuracy_score(y_true.cpu().detach(), y_proba.round()))
 
-        if optimizer_idx == 1 or self.hparams.lmb_isnew == 0:
+        if optimizer_idx == 1:
             mlm_loss = self.generator_step(inputs)
 
             y_pred = self.discriminator_step(outputs, indexes, max_len)
@@ -165,16 +165,12 @@ class GAN(pl.LightningModule):
         return self.step(batch, optimizer_idx, 'train')
 
     def validation_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None) -> dict:
-        if self.hparams.lmb_isnew > 0:
-            outs = []
-            for i in range(len(self.optimizers())):
-                outs.append(self.step(batch, i, 'val'))
-            # print(f"outs[1] keys: {outs[1].keys()}")
-            return outs[1]  # generator
-        else: # discriminator is disabled
-            out = self.step(batch, 1, 'val')
-            # print(f"out keys: {out.keys()}")
-            return out
+        outs = []
+        for i in range(len(self.optimizers())):
+            outs.append(self.step(batch, i, 'val'))
+        # print(f"outs[1] keys: {outs[1].keys()}")
+        return outs[1]  # generator
+
 
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
@@ -203,8 +199,8 @@ class GAN(pl.LightningModule):
 
     def on_end(self, outputs, name):
         # outputs is a list (len=number of batches) of dicts (as returned from the step methods).
-        # if name == 'train':
-        #     outputs = outputs[0]  # TODO: WHY?
+        if name == 'train':
+            outputs = outputs[0]  # TODO: WHY?
         losses = torch.cat([output['losses'] for output in outputs])
         y_true = torch.cat([output['y_true'] for output in outputs])
         y_proba = torch.cat([output['y_proba'] for output in outputs])
@@ -252,8 +248,6 @@ class GAN(pl.LightningModule):
             # {'params': self.classifier.parameters()}
         ]
         optimizer1 = torch.optim.Adam(grouped_parameters1, lr=self.hparams.learning_rate)
-        if self.hparams.lmb_isnew == 0:
-            return [optimizer1]
         return [optimizer0, optimizer1]
 
 
@@ -264,10 +258,10 @@ hparams = config.parser.parse_args(['--name', 'tinybert_non_medical',
                                     '--second_end_year', '2018',
                                     '--test_start_year', '2010',
                                     '--test_end_year', '2018',
-                                    '--batch_size', '16',
+                                    '--batch_size', '32',
                                     '--lr', '2e-5',
-                                    '--lmb_isnew', '0',  #'0.1',
-                                    '--max_epochs', '0',  #'30',
+                                    '--lmb_isnew', '0.2',  #'0.1',
+                                    '--max_epochs', '10',  #'30',
                                     '--test_size', '0.3',
                                     '--serve_type', '0',  # Full abstract
                                     # '--serve_type', '2',  # single sentence as text
@@ -283,11 +277,12 @@ hparams = config.parser.parse_args(['--name', 'tinybert_non_medical',
                                     # '--debug',
                                     ])
 hparams.gpus = 1
+hparams.name = f'lambda-{hparams.lmb_isnew};epochs-{hparams.max_epochs}'
 if __name__ == '__main__':
     dm = PubMedModule(hparams)
     model = GAN(hparams)
     logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
-                         version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
+                         version=   datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                          project='Experimental', config=hparams)
     #lr_logger = LearningRateMonitor(logging_interval='step')
     trainer = pl.Trainer(gpus=hparams.gpus,
@@ -304,5 +299,5 @@ if __name__ == '__main__':
         #trainer.predict(model, dataloaders=[dm.val_dataloader()])
     trainer.fit(model, datamodule=dm)
     trainer.test(model, datamodule=dm)
-    model.set_output_validation_flag()
+    # model.set_output_validation_flag()
     #trainer.predict(model, datamodule=dm)
