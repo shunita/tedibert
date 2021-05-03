@@ -304,5 +304,5 @@ if __name__ == '__main__':
         #trainer.predict(model, dataloaders=[dm.val_dataloader()])
     trainer.fit(model, datamodule=dm)
     trainer.test(model, datamodule=dm)
-    model.set_output_validation_flag()
+    # model.set_output_validation_flag()
     #trainer.predict(model, datamodule=dm)
