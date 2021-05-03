@@ -67,15 +67,15 @@ class PubMedModule(pl.LightningDataModule):
         else:
             df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
             tu = TextUtils()
-            df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
             if self.hparams.debug:
                 df = df.sample(1000)
+            df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
             train_df = df[df['assignment'] == 0].copy()
             val_df = df[df['assignment'] == 1].copy()
             print(f"Read from pre-assigned train, test file. Read: {len(train_df)} train, {len(val_df)} test.")
 
-        train_df = clean_abstracts(train_df)
-        val_df = clean_abstracts(val_df)
+        # train_df = clean_abstracts(train_df)
+        # val_df = clean_abstracts(val_df)
 
         if self.serve_type == 0:  # Full abstract
             self.train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
