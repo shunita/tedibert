@@ -165,7 +165,8 @@ def clean_abstracts(df):
 
 
     # filter sentences
-    df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    if 'sentences' not in df.columns:
+        df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
     d = {'total': 0, 'remaining': 0}
 
     def pick_sentences(sentences):

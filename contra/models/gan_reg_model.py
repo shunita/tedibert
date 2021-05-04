@@ -200,7 +200,7 @@ class GAN(pl.LightningModule):
     def on_end(self, outputs, name):
         # outputs is a list (len=number of batches) of dicts (as returned from the step methods).
         if name == 'train':
-            outputs = outputs[0]  # TODO: WHY?
+            outputs = outputs[0]  # TODO: WHY? only generator outputs. TODO: really?
         losses = torch.cat([output['losses'] for output in outputs])
         y_true = torch.cat([output['y_true'] for output in outputs])
         y_proba = torch.cat([output['y_proba'] for output in outputs])
@@ -228,15 +228,16 @@ class GAN(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        # Discriminator step paramteres - bert model, transformer and classifier.
+        # Discriminator step paramteres - bert model (sometimes), transformer and classifier.
         grouped_parameters0 = [
             # {'params': chain(*[x.parameters() for x in list(self.bert_model.children())[:1]])},
             # {'params': chain(*[x.parameters() for x in list(self.bert_model.children())[1:]])},
-            {'params': self.bert_model.parameters()},
             {'params': self.cls.parameters()},
             {'params': self.sentence_transformer_encoder.parameters()},
             {'params': self.classifier.parameters()}
         ]
+        if self.hparams.lmb_isnew > 0:
+            grouped_parameters0.append({'params': self.bert_model.parameters()})
         optimizer0 = torch.optim.Adam(grouped_parameters0, lr=self.hparams.learning_rate)
         # Generator step parameters - only the bert model.
         grouped_parameters1 = [
@@ -251,17 +252,17 @@ class GAN(pl.LightningModule):
         return [optimizer0, optimizer1]
 
 
-hparams = config.parser.parse_args(['--name', 'tinybert_non_medical',
+hparams = config.parser.parse_args(['--name', 'GAN',
                                     '--first_start_year', '2010',
                                     '--first_end_year', '2013',
                                     '--second_start_year', '2016',
                                     '--second_end_year', '2018',
-                                    '--test_start_year', '2010',
-                                    '--test_end_year', '2018',
-                                    '--batch_size', '32',
+                                    '--test_start_year', '2020',
+                                    '--test_end_year', '2020',
+                                    '--batch_size', '16',
                                     '--lr', '2e-5',
-                                    '--lmb_isnew', '0.2',  #'0.1',
-                                    '--max_epochs', '10',  #'30',
+                                    '--lmb_isnew', '0',  #'0.2', '0.5',
+                                    '--max_epochs', '10',  #'10',
                                     '--test_size', '0.3',
                                     '--serve_type', '0',  # Full abstract
                                     # '--serve_type', '2',  # single sentence as text
@@ -282,7 +283,7 @@ if __name__ == '__main__':
     dm = PubMedModule(hparams)
     model = GAN(hparams)
     logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
-                         version=   datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
+                         version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                          project='Experimental', config=hparams)
     #lr_logger = LearningRateMonitor(logging_interval='step')
     trainer = pl.Trainer(gpus=hparams.gpus,
