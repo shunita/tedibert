@@ -26,6 +26,8 @@ parser.add_argument('--test_end_year', type=int,
                     help='last year of the test range')
 parser.add_argument('--test_pairs_file', type=str,
                     help='a prepared test file with pairs of concepts for test.')
+parser.add_argument('--abstract_pairs_file', type=str,
+                    help='a data file with abstract pairs, matched by bow similarity.')
 
 parser.add_argument('--start_year', default=2018, type=int,
                     help='start year for BERT pretraining')
@@ -87,6 +89,10 @@ parser.add_argument('--activation', default='relu',
                          'Currently supported: "relu" or "swish".')
 parser.add_argument('--regularize', default=0, type=float,
                     help='weight decay parameter for discriminator/ratio prediction.')
+parser.add_argument('--agg_sentences', default='transformer',
+                    help='How should sentence embeddings from bert be aggregated into an abstract embedding?'
+                         'Supported options: "transformer" or "concat".')
 
 parser.add_argument('--lmb_isnew', default=1, type=float, help='discriminator weight in the loss function')
 parser.add_argument('--lmb_ratio', default=1, type=float, help='ratio prediction weight in the loss function')
+parser.add_argument('--lmb_ref', default=1, type=float, help='diff from reference bert weight in the loss function')

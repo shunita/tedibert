@@ -144,7 +144,7 @@ def should_keep_sentence(sentence):
     return True
 
 
-def clean_abstracts(df):
+def clean_abstracts(df, abstract_field='title_and_abstract', output_sentences_field='sentences'):
     text_utils = tu.TextUtils()
     # consolidate some terms
     # term_replacement = {'hba(1c)': 'hba1c', 'hemoglobin A1c': 'hba1c', 'a1c': 'hba1c',
@@ -165,8 +165,8 @@ def clean_abstracts(df):
 
 
     # filter sentences
-    if 'sentences' not in df.columns:
-        df['sentences'] = df['title_and_abstract'].apply(text_utils.split_abstract_to_sentences)
+    if output_sentences_field not in df.columns:
+        df[output_sentences_field] = df[abstract_field].apply(text_utils.split_abstract_to_sentences)
     d = {'total': 0, 'remaining': 0}
 
     def pick_sentences(sentences):
@@ -178,8 +178,8 @@ def clean_abstracts(df):
     def join_to_abstract(sentences):
         return ' '.join(sentences)
 
-    df['sentences'] = df['sentences'].apply(pick_sentences)
-    df['title_and_abstract'] = df['sentences'].apply(join_to_abstract)
+    df[output_sentences_field] = df[output_sentences_field].apply(pick_sentences)
+    df[abstract_field] = df[output_sentences_field].apply(join_to_abstract)
     print(f"kept {d['remaining']}/{d['total']} sentences")
     return df
 
@@ -252,3 +252,80 @@ def populate_idf_dict_bert(tokenizer_path='google/bert_uncased_L-2_H-128_A-2'):
     # token_idf = {token_id: np.log(N/cnt) for token_id, cnt in token_counter.items()}
     pickle.dump(token_idf, open(idf_file, 'wb'))
     return token_idf
+
+def is_cui(word):
+    return word.startswith("C") and len(word) == 8
+
+
+def read_cui_prevalence(with_total=False):
+    dandp = pd.read_csv(os.path.join(DATA_PATH, 'diseases_and_prevalence.csv'))
+    dandp['total_patients'] = dandp['W'] + dandp['M']
+    dandp = dandp[dandp['total_patients'] > 0]
+    dandp['fem_prevalence_prop'] = dandp['W'] / dandp['total_patients']
+    #dandp[dandp['total_patients'] == 0]['fem_prevalence_prop'] = -1
+    dandp = dandp.set_index(['cui'])
+    if with_total:
+        return dandp[['fem_prevalence_prop', 'total_patients']].to_dict(orient='index')
+    return dandp['fem_prevalence_prop'].to_dict()
+
+def read_cui_names():
+    cui_table = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec.tsv'), sep='\t', index_col=0)
+    cui_table = cui_table.set_index(['cui'])
+    return cui_table['name'].to_dict()
+
+
+def calculate_prevalence(abstract, prevalence_dict, prev_agg_mode=0, return_cui=False, cui_names=None):
+    '''
+    :param abstract: abstract as a list of strings (sentences)
+    :param fem_prop: female participant proportion in the clinical trial
+    :param prevalence_dict: dictionary of the form CUI->female prevalence proportion
+    :param prev_agg_mode: how to estimate the expected prevalence for the abstract:
+                0 - use the prevalence of the first CUI-with-prevalence in the abstract
+                1 - average the prevalences for each CUI in the abstract
+                2 - average the prevalences for each CUI from the first sentence of the abstract (title)
+                3 - most common CUI's prevalence
+    :return: the estimated bias (participant_prop - estimated female prevalence) or None if prevalence is unknown
+    '''
+    prevalences = []
+    cuis = defaultdict(int)
+    if len(abstract) == 0:
+        return None
+    if prev_agg_mode == 2:
+        sentences = [abstract[0]]
+    else:
+        sentences = abstract
+    for sent in sentences:
+        for token in sent.split():
+            if not is_cui(token):
+                continue
+            if token in prevalence_dict:
+                cuis[token] += 1
+                prevalences.append((token, prevalence_dict[token]))
+
+    def cui2name(cui):
+        if cui_names is not None:
+            return cui_names[cui]
+        return cui
+
+    # return len(cuis)
+    # aggregate to a single expected prevalence according to aggregation mode
+    if len(cuis) == 0:
+        # print(f"cuis: {cuis}")
+        return None  # Unknown bias
+    if prev_agg_mode == 0:
+        prevalence = prevalences[0][1]
+        if return_cui:
+            return prevalence, cui2name(prevalences[0][0])
+        return prevalence
+    elif prev_agg_mode in (1, 2):  # mean of prevalences of cuis in all the abstract or the first sentence (title)
+        prevalence = np.mean([x[1] for x in prevalences])
+        if return_cui:
+            return prevalence, None
+        return prevalence
+    else:  # most common cui
+        cuis_and_counts = list(cuis.items())
+        most_common_cui = cuis_and_counts[np.argmax([x[1] for x in cuis_and_counts])][0]
+        prevalence = prevalence_dict[most_common_cui]
+        if return_cui:
+            return prevalence, cui2name(most_common_cui)
+        return prevalence

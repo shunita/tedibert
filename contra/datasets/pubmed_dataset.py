@@ -21,7 +21,7 @@ from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact
 
 
 class PubMedModule(pl.LightningDataModule):
-    def __init__(self, hparams):
+    def __init__(self, hparams, reassign=False, test_mlm=False):
         super().__init__()
         self.hparams = hparams
         self.serve_type = hparams.serve_type
@@ -37,15 +37,18 @@ class PubMedModule(pl.LightningDataModule):
         self.pubmed_version = hparams.pubmed_version
         self.emb_algorithm = hparams.emb_algorithm
         self.batch_size = hparams.batch_size
-        self.reassign = False
+        self.reassign = reassign
+        self.test_mlm = test_mlm
         self.df = None
         self.train_df, self.val_df = None, None
         self.train, self.test, self.val = None, None, None
 
     def prepare_data(self):
+        print("prepare data called for pubmed_dataset")
         if self.train_df is not None:
             return
         if self.reassign:
+            print("reassign is True, not reading from assigned")
             # This is a df containing a row for each abstract.
             df = load_aact_data(self.pubmed_version, year_range=None, sample=self.hparams.debug)
             df = df.dropna(subset=['date', 'male', 'female'], axis=0)
@@ -61,9 +64,13 @@ class PubMedModule(pl.LightningDataModule):
             df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
             # We split to train and test while we still have the whole abstract.
             old_train_df, old_val_df = train_test_split(old_df, test_size=self.test_size)
-            new_train_df, new_val_df = train_test_split(new_df, test_size=self.test_size)
-            train_df = pd.concat([new_train_df, old_train_df])
-            val_df = pd.concat([new_val_df, old_val_df])
+            if len(new_df) > 0:
+                new_train_df, new_val_df = train_test_split(new_df, test_size=self.test_size)
+                train_df = pd.concat([new_train_df, old_train_df])
+                val_df = pd.concat([new_val_df, old_val_df])
+            else:
+                train_df, val_df = old_train_df, old_val_df
+
         else:
             df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
             tu = TextUtils()
@@ -97,7 +104,7 @@ class PubMedModule(pl.LightningDataModule):
         self.val = PubMedDataset(self.val_df, self.first_time_range, self.second_time_range)
         if self.emb_algorithm == 'w2v':
             self.test = CUIDataset(bert=None, test_start_year=self.test_start_year, test_end_year=self.test_end_year,
-                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'],
+                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], filter_cuis=False,
                                    read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
             bert_path = f'bert_tiny_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
@@ -106,7 +113,8 @@ class PubMedModule(pl.LightningDataModule):
             self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
                                    bert_tokenizer=self.hparams.bert_tokenizer,
                                    test_start_year=self.test_start_year, test_end_year=self.test_end_year,
-                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], 
+                                   # When filter_cuis=True, better use sample_type=0 (no sampling). Otherwise, sample_type=1.
+                                   frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], filter_cuis=False,
                                    read_from_file=self.test_fname)
         else:
             print(f'Unsupported emb_algorithm: {self.emb_algorithm}')
@@ -119,6 +127,8 @@ class PubMedModule(pl.LightningDataModule):
         return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
     def test_dataloader(self):
+        if self.test_mlm:
+            return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
         return DataLoader(self.test, shuffle=False, batch_size=self.batch_size, num_workers=8)
 
 
@@ -127,6 +137,7 @@ class PubMedDataset(Dataset):
         self.df = df
         self.first_range = first_range
         self.second_range = second_range
+        # This line will drop every abstract out of the first and second time ranges.
         self.df = fill_binary_year_label(self.df, self.first_range, self.second_range)
         self.tu = TextUtils()
 
@@ -144,6 +155,7 @@ class PubMedDataset(Dataset):
         # text = row['text']
         text = self.create_text_field(row['sentences'])
         female_ratio = torch.as_tensor(row['female'] / row['num_participants'])
+        # text is a list of all sentences (title+abstract) separated by "<BREAK>".
         return {'text': text, 'is_new': row['label'], 'female_ratio': female_ratio}
 
 
@@ -151,7 +163,8 @@ class CUIDataset(Dataset):
     def __init__(self, bert='google/bert_uncased_L-2_H-128_A-2', bert_tokenizer=None,
                  test_start_year=2018, test_end_year=2018,
                  read_w2v_params={},
-                 top_percentile=0.01, semtypes=None, frac=1., sample_type=0, 
+                 top_percentile=0.01, semtypes=None, frac=1., sample_type=0,
+                 filter_cuis=True,
                  filter_by_models=(),
                  read_from_file=None):
         """
@@ -167,6 +180,7 @@ class CUIDataset(Dataset):
                             1 - random sample
                             2 - top similar
                             3 - uniform distribution of similarities
+                            4 - top change in female participant percent
         """
         if read_from_file is not None:
             self.similarity_df = pd.read_csv(read_from_file, index_col=0)
@@ -197,9 +211,14 @@ class CUIDataset(Dataset):
             print("CUIDataset got no model to work with: both bert and w2v_years are None.")
             sys.exit()
 
-        # Note: this table was generated based on pubmed 2018.
-        df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
-        
+        if filter_cuis:
+            # Note: abstract counts are based on pubmed 2018 while other columns are based on pubmed 2020.
+            df = pd.read_csv(os.path.join(DATA_PATH, 'cui_fem_prop_by_year_by_mean_with_trend.csv'))
+            df = df[(df['fparticipants_trend'] > 0) & (df['count_year8-19'] > 5)]
+            self.model_desc += '_pos_fp'
+        else:
+            # Note: this table was generated based on pubmed 2018.
+            df = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec_with_abstract_counts.csv'))
         all_cuis = len(df)
         if self.semtypes is not None:
             if not isinstance(self.semtypes, list):

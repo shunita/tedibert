@@ -18,7 +18,7 @@ def get_vocab(list_of_word_lists):
     return word_to_index, vocab
 
 
-def texts_to_BOW(texts_list, vocab):
+def texts_to_BOW(texts_list, vocab, set_based=True):
     """embed_with_bert abstracts using BOW. (set representation).
     :param texts_list: list of abstracts, each is a list of words.
     :param vocab: dictionary of word to index
@@ -27,8 +27,14 @@ def texts_to_BOW(texts_list, vocab):
     X = lil_matrix((len(texts_list), len(vocab)))
     for i, abstract in tqdm(enumerate(texts_list), total=len(texts_list)):
         # if the word is unknown we ignore it (could possibly add UNK token)
-        word_indices = [vocab[w] for w in sorted(set(abstract)) if w in vocab]
-        X[i, word_indices] = 1
+        if set_based:
+            word_indices = [vocab[w] for w in sorted(set(abstract)) if w in vocab]
+            X[i, word_indices] = 1
+        else:
+            for word in abstract:
+                if word not in vocab:
+                    continue
+                X[i, vocab[word]] += 1
     return X.tocsr()
 
 

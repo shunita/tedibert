@@ -1,5 +1,8 @@
 
 import sys
+
+from pytorch_lightning import Callback, Trainer
+
 sys.path.append('/home/shunita/fairemb/')
 import wandb
 from scipy.stats import stats
@@ -20,8 +23,8 @@ from transformers import AutoTokenizer, AutoModel, BertConfig, AutoConfig, DataC
 from contra import config
 # from contra.datasets.pubmed_bow_dataset import PubMedExpModule
 from contra.datasets.pubmed_dataset import PubMedModule
-from contra.constants import EXP_PATH, SAVE_PATH, FULL_PUMBED_2020_PATH
-from contra.common.utils import mean_pooling
+from contra.constants import EXP_PATH, SAVE_PATH, FULL_PUMBED_2020_PATH, DATA_PATH
+from contra.common.utils import mean_pooling, break_sentence_batch
 from itertools import chain
 from pytorch_lightning.callbacks import LearningRateMonitor
 
@@ -33,25 +36,25 @@ class GAN(pl.LightningModule):
 
         self.bert_tokenizer = AutoTokenizer.from_pretrained(hparams.bert_tokenizer)
         self.bert_model = BertForMaskedLM.from_pretrained(hparams.bert_pretrained_path)
+        self.frozen_bert_model = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39'))
+        # self.frozen_bert_model = AutoModel.from_pretrained(
+        #     os.path.join(SAVE_PATH, 'bert_bert10-13+16-18_epoch39'))
         self.data_collator = DataCollatorForLanguageModeling(self.bert_tokenizer)
         self.sentence_embedding_size = self.bert_model.get_input_embeddings().embedding_dim
         self.max_len = 50
+        self.max_sentences = 20
 
         self.heads_num = int(self.sentence_embedding_size/64)
-        # TODO: originally EncoderLayer and not Encoder1DLayer - why?
         self.sentence_transformer_encoder = Encoder1DLayer(d_model=self.sentence_embedding_size, n_head=self.heads_num)
-        # Embedding for CLS token:
+        # Embedding for abstract-level CLS token:
         self.cls = nn.Embedding(1, self.sentence_embedding_size)
-        self.classifier = nn.Linear(self.sentence_embedding_size, 1)
+        if self.hparams.agg_sentences == 'transformer':
+            self.classifier = nn.Linear(self.sentence_embedding_size, 1)
+        elif self.hparams.agg_sentences == 'concat':
+            # TODO: masking?
+            self.classifier = nn.Linear(self.sentence_embedding_size*self.max_sentences, 1)
         self.loss_func = torch.nn.BCEWithLogitsLoss(reduction='none')
-        self.output_validation = False
-
-    def set_output_validation_flag(self):
-        self.output_validation = True
-
-    # def on_train_epoch_start(self):
-    #     if self.current_epoch == 2:
-    #         self.trainer.lightning_optimizers[0].param_groups[0]['lr'] = 0.
+        self.test_mlm = False
 
     def forward(self, texts):
         inputs = self.bert_tokenizer.batch_encode_plus(texts, padding=True, truncation=True,
@@ -76,6 +79,30 @@ class GAN(pl.LightningModule):
         return loss
 
     def discriminator_step(self, sent_embedding, indexes, max_len):
+        if self.hparams.agg_sentences == 'transformer':
+            return self.discriminator_step_transformer(sent_embedding, indexes, max_len)
+        else:
+            return self.discriminator_step_concat(sent_embedding, indexes, max_len)
+
+    def discriminator_step_concat(self, sent_embedding, indexes, max_len):
+        """returns old/new prediction probabilities"""
+        sample_embedding = []
+        for start, end in indexes:
+            cur_sent_embedding = sent_embedding[start:end]
+            if len(cur_sent_embedding) > self.max_sentences:  # Too many sentences
+                cur_sent_embedding = cur_sent_embedding[:self.max_sentences]
+                sample_embedding.append(torch.flatten(cur_sent_embedding))
+            else:  # Too few sentences - add padding
+                padding = torch.zeros(self.max_sentences - len(cur_sent_embedding), self.sentence_embedding_size,
+                                      device=self.device)
+                sample_embedding.append(torch.flatten(torch.cat([cur_sent_embedding, padding], dim=0)))
+
+        aggregated = torch.stack(sample_embedding)
+        # at this point sample_embedding holds a row for each abstract. Each row is max_sentences * sentence_embedding_size long.
+        y_pred = self.classifier(aggregated).squeeze(1)
+        return y_pred
+
+    def discriminator_step_transformer(self, sent_embedding, indexes, max_len):
         """returns old/new prediction probabilities"""
         sample_embedding, mask = [], []
         for start, end in indexes:
@@ -104,29 +131,21 @@ class GAN(pl.LightningModule):
         #print(f"step: optimizer_idx = {optimizer_idx}")
         y_true = batch['is_new'].float()
 
-        # embed the text
-        # x['text'] is a tensor where each item is a list of sentences.
-        indexes = []
-        all_sentences = []
-        index = 0
-        max_len = 0
-        for sample in batch['text']:
-            sample_as_list = sample.split('<BREAK>')
-            # sample is a list of sentences
-            indexes.append((index, index + len(sample_as_list)))
-            index += len(sample_as_list)
-            all_sentences.extend(sample_as_list)
-            if max_len < len(sample_as_list):
-                max_len = len(sample_as_list)
+        indexes, all_sentences, max_len = break_sentence_batch(batch['text'])
 
         # We use the same bert model for all abstracts, regardless of year.
         inputs = self.bert_tokenizer.batch_encode_plus(all_sentences, padding=True, truncation=True,
                                                        max_length=self.max_len,
                                                        add_special_tokens=True, return_tensors="pt")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        outputs = self.bert_model(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
-
-        if optimizer_idx == 0:  # if lmb_isnew is 0, the only optimizer is the generator.
+        outputs = self.bert_model(**inputs, output_hidden_states=True).hidden_states[-1]
+        reference_outputs = self.frozen_bert_model(**inputs, output_hidden_states=True).hidden_states[-1]
+        # compute loss based on the difference of the two outputs
+        diff_from_frozen = torch.norm(outputs - reference_outputs, 2)
+        # Going further, only the last output of the first (CLS) token is needed
+        outputs = outputs[:, 0]
+        if optimizer_idx == 0:
+            mlm_loss = 0
             y_pred = self.discriminator_step(outputs, indexes, max_len)
             losses = self.loss_func(y_pred, y_true)  # calculates loss per sample
             loss = losses.mean()
@@ -145,18 +164,27 @@ class GAN(pl.LightningModule):
             y_pred = self.discriminator_step(outputs, indexes, max_len)
             y_proba = self.y_pred_to_probabilities(y_pred).cpu().detach()
 
+            # we take old samples and label them as new (old - 0, new - 1), to train the generator.
+            # ypred_only_old = y_pred[~y_true.long()]
+            # losses = self.loss_func(ypred_only_old, torch.ones(ypred_only_old.shape[0], device=self.device))
+            # instead, we could train on confusing the discriminator both ways.
             losses = self.loss_func(y_pred, 1-y_true)
 
             d_loss = losses.mean()
-            loss = (1-self.hparams.lmb_isnew) * mlm_loss + self.hparams.lmb_isnew * d_loss
+            loss = (1-self.hparams.lmb_isnew-self.hparams.lmb_ref) * mlm_loss + \
+                self.hparams.lmb_isnew * d_loss + \
+                self.hparams.lmb_ref * diff_from_frozen * 0.1  # this is in O(100) while the others are O(1)
 
             self.log(f'generator/{name}_loss', loss)
             self.log(f'generator/{name}_mlm_loss', mlm_loss)
+            self.log(f'generator/{name}_frozen_diff_loss', diff_from_frozen)
             self.log(f'generator/{name}_discriminator_loss', d_loss)
 
         return {'loss': loss,
                 'losses': losses.detach().cpu(),
-                'text': batch['text'], 'y_true': y_true.cpu(),
+                'mlm_loss': mlm_loss,
+                'text': batch['text'],
+                'y_true': y_true.cpu(),
                 'y_proba': y_proba,
                 'y_score': y_true.cpu().detach() * y_proba + (1-y_true.cpu().detach()) * (1-y_proba),
                 'optimizer_idx': optimizer_idx}
@@ -171,9 +199,9 @@ class GAN(pl.LightningModule):
         # print(f"outs[1] keys: {outs[1].keys()}")
         return outs[1]  # generator
 
-
-
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
+        if self.test_mlm:
+            return self.validation_step(batch, batch_idx, optimizer_idx)
         CUI1_embedding = self.forward(batch['CUI1'])
         CUI2_embedding = self.forward(batch['CUI2'])
         pred_similarity = nn.CosineSimilarity()(CUI1_embedding, CUI2_embedding)
@@ -181,15 +209,21 @@ class GAN(pl.LightningModule):
         return pred_similarity, true_similarity
 
     def test_epoch_end(self, outputs) -> None:
-        rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
-        df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
-        df.to_csv(os.path.join(SAVE_PATH, 'test_similarities.csv'))
-        df = df.sort_values(['true_similarity'], ascending=False).reset_index()
-        true_rank = list(df.index)
-        pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).index)
-        correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
-        self.log('test/correlation', correlation)
-        self.log('test/pvalue', pvalue)
+        if self.test_mlm:
+            self.log('test/val_mlm_loss_avg', torch.Tensor([output['mlm_loss'] for output in outputs]).mean())
+        else:
+            rows = torch.cat([torch.stack(output) for output in outputs], axis=1).T.cpu().numpy()
+            df = pd.DataFrame(rows, columns=['pred_similarity', 'true_similarity'])
+            df.to_csv(os.path.join(SAVE_PATH, f'test_similarities_{self.hparams.name}.csv'))
+            df = df.sort_values(['true_similarity'], ascending=False).reset_index()
+            true_rank = list(df.index)
+            pred_rank = list(df.sort_values(['pred_similarity'], ascending=False).index)
+            correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
+            self.log('test/correlation', correlation)
+            self.log('test/pvalue', pvalue)
+            if self.hparams.max_epochs > 0:
+                self.bert_model.save_pretrained(
+                    os.path.join(SAVE_PATH, f'bert_{self.hparams.name}_epoch{self.hparams.max_epochs-1}'))
 
     def training_epoch_end(self, outputs):
         self.on_end(outputs, 'train')
@@ -221,11 +255,6 @@ class GAN(pl.LightningModule):
             df = df[(df['loss'] <= df['loss'].quantile(0.05)) | (df['loss'] >= df['loss'].quantile(0.95))]
 
             self.log(f'debug/{name}_table', wandb.Table(dataframe=df))
-            if self.output_validation:
-                mlm_loss = torch.cat([output['loss'] for output in outputs])
-                self.log(f'test/val_mlm_loss', mlm_loss.mean())
-                self.output_validation = False
-
 
     def configure_optimizers(self):
         # Discriminator step paramteres - bert model (sometimes), transformer and classifier.
@@ -251,18 +280,31 @@ class GAN(pl.LightningModule):
         optimizer1 = torch.optim.Adam(grouped_parameters1, lr=self.hparams.learning_rate)
         return [optimizer0, optimizer1]
 
+    def generate_cui_embeddings(self):
+        df = pd.read_csv(os.path.join(DATA_PATH, 'cui_and_name_for_com_class.csv'), index_col=0)
+        str_embs = []
+        for i in range(0, len(df), 32):
+            embedded = self.forward(df.iloc[i:i + 32]['name'].values.tolist()).detach().cpu().numpy()
+            for emb in embedded:
+                str_embs.append(",".join([str(x) for x in emb]))
+        df['emb'] = str_embs
+        df[['cui', 'emb']].to_csv(os.path.join(SAVE_PATH, f'cui_{self.hparams.name}_ep{self.hparams.max_epochs}_emb.tsv'),
+                                  sep='\t', header=False, index=False)
 
-hparams = config.parser.parse_args(['--name', 'GAN',
+
+hparams = config.parser.parse_args(['--name', 'medical_bert_specialized20', #'GAN_new0.3_ref0.3_concat_1sideloss',
                                     '--first_start_year', '2010',
                                     '--first_end_year', '2013',
                                     '--second_start_year', '2016',
                                     '--second_end_year', '2018',
-                                    '--test_start_year', '2020',
-                                    '--test_end_year', '2020',
+                                    '--test_start_year', '2018',
+                                    '--test_end_year', '2018',
                                     '--batch_size', '16',
                                     '--lr', '2e-5',
-                                    '--lmb_isnew', '0',  #'0.2', '0.5',
-                                    '--max_epochs', '10',  #'10',
+                                    '--lmb_isnew', '0',  # '0.3'
+                                    '--lmb_ref', '0',  # '0.3'
+                                    '--agg_sentences', 'concat',
+                                    '--max_epochs', '20',  #'10',
                                     '--test_size', '0.3',
                                     '--serve_type', '0',  # Full abstract
                                     # '--serve_type', '2',  # single sentence as text
@@ -272,13 +314,18 @@ hparams = config.parser.parse_args(['--name', 'GAN',
                                     '--abstract_weighting_mode', 'normal',
                                     '--pubmed_version', '2020',
                                     '--only_aact_data',
-                                    #'--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39'),
-                                    '--bert_pretrained_path', 'google/bert_uncased_L-2_H-128_A-2',
+                                    '--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39'),
+                                    # bert_GAN_new0.3_ref0.3_concat_1sideloss_epoch19
+                                    #'--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_concat_epoch19'),
+                                    # '--bert_pretrained_path', 'google/bert_uncased_L-2_H-128_A-2',
                                     '--bert_tokenizer', 'google/bert_uncased_L-2_H-128_A-2',
                                     # '--debug',
+                                    # '--test_pairs_file', 'test_similarities_CUI_names_bert_pos_fp_2020_2020.csv',
+                                    '--test_pairs_file', 'test_similarities_CUI_names_bert_2020_2020_new_sample.csv',
+                                    # '--test_pairs_file', 'test_similarities_CUI_names_bert_2018_2018.csv',
                                     ])
 hparams.gpus = 1
-hparams.name = f'lambda-{hparams.lmb_isnew};epochs-{hparams.max_epochs}'
+#hparams.name = f'GAN_lmb{hparams.lmb_isnew}'
 if __name__ == '__main__':
     dm = PubMedModule(hparams)
     model = GAN(hparams)
@@ -291,7 +338,7 @@ if __name__ == '__main__':
                          logger=logger,
                          log_every_n_steps=20,
                          accumulate_grad_batches=1,
-                         #callbacks=[lr_logger],
+                         # callbacks=[lr_logger],
                          num_sanity_val_steps=0,
                          # gradient_clip_val=0.3
                          )
@@ -300,5 +347,9 @@ if __name__ == '__main__':
         #trainer.predict(model, dataloaders=[dm.val_dataloader()])
     trainer.fit(model, datamodule=dm)
     trainer.test(model, datamodule=dm)
+    model.test_mlm = True
+    dm2 = PubMedModule(hparams, test_mlm=True)
+    trainer.test(model, datamodule=dm2)
+    #model.generate_cui_embeddings()
     # model.set_output_validation_flag()
     #trainer.predict(model, datamodule=dm)

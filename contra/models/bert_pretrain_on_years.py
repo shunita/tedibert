@@ -4,13 +4,14 @@ import torch
 from transformers import AutoTokenizer, BertForMaskedLM
 from transformers import DataCollatorForLanguageModeling
 from contra.constants import SAVE_PATH
+from contra.common.utils import break_sentence_batch
 
 
 class BertPretrainOnYears(pl.LightningModule):
     def __init__(self, hparams):
         super(BertPretrainOnYears, self).__init__()
         self.hparams = hparams
-        self.bert_embedding_size = 768
+        # self.bert_embedding_size = 768  # TODO: this should come from hparams? or from the model maybe, if it is even needed
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
         self.pubmed_version = hparams.pubmed_version
@@ -25,18 +26,17 @@ class BertPretrainOnYears(pl.LightningModule):
                     param.requires_grad = False
         
         self.data_collator = DataCollatorForLanguageModeling(self.tokenizer)
-        self.by_sentence = hparams.by_sentence
-        self.max_len = 70 if self.by_sentence else 200
-        print(f'initialized BertPretrainOnYears with {self.by_sentence}, with max len: {self.max_len}')
+        self.max_len = 70
 
     def forward(self, batch):
-        text = batch['text']
-        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=self.max_len,
+        # break the text into sentences
+        indexes, all_sentences, max_len = break_sentence_batch(batch['text'])
+        inputs = self.tokenizer(all_sentences, padding=True, truncation=True, max_length=self.max_len,
                                 add_special_tokens=True, return_tensors="pt")
         # Collator output is a dict, and it will have 'input_ids' and 'labels'
         collated = self.data_collator(inputs['input_ids'].tolist())
-        inputs = self.tokenizer(text, padding=True, truncation=True, max_length=self.max_len,
-                                add_special_tokens=True, return_tensors="pt")
+        # inputs = self.tokenizer(text, padding=True, truncation=True, max_length=self.max_len,
+        #                         add_special_tokens=True, return_tensors="pt")
         # Copy the masked inputs and the original token labels to the inputs dictionary.
         inputs['labels'] = collated['labels']
         inputs['input_ids'] = collated['input_ids']
