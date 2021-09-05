@@ -25,26 +25,15 @@ from contra.utils.diebold_mariano import dm_test
 MIMIC3_CUSTOM_TASKS_PATH = '/home/shunita/mimic3/custom_tasks/data'
 MIMIC_PATH = "/home/shunita/mimic3/physionet.org/files/mimiciii/1.4/"
 
-DESCS_AND_MODELS = [('GAN10', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_epoch9')),  # 0
-                    ('BERT10-18_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39')),  # 1
-                    ('BERT10-13+16-18_40eps', os.path.join(SAVE_PATH, 'bert_bert10-13+16-18_epoch39')),  # 2
-                    ('tinybert_non_medical', 'google/bert_uncased_L-2_H-128_A-2'),  # 3
-                    ('GAN20_ref_bert10-13+16-18', os.path.join(SAVE_PATH, 'bert_GAN_ref_bert10-13+16-18_epoch19')),  # 4
-                    ('GAN20', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_concat_epoch19')),  # 5
-                    ('BERT10-13_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2013_v2020_epoch39')),  # 6
-                    ('BERT16-18_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch39')),  # 7
-                    ('BERT2020_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2020_2020_v2020_epoch39')),  # 8
-                    ('female40', os.path.join(DATA_PATH, 'embs', 'fem40_heur_emb.tsv')),  # 9
-                    ('neutral40', os.path.join(DATA_PATH, 'embs', 'neutral40_emb.tsv')),  # 10
-                    ('randomup40', os.path.join(DATA_PATH, 'embs', 'random_upsample40_emb.tsv')),  # 11
-                    ('all40', os.path.join(DATA_PATH, 'embs', 'all40_heur_emb.tsv')),  # 12
-
-                    ('GAN20_1side', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.3_concat_1sideloss_epoch19')),  # 13
-                    ('medical_bert_specialized20', os.path.join(SAVE_PATH, 'bert_medical_bert_specialized20_epoch19')),  # 14
+DESCS_AND_MODELS = [('BERT10-18_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39')),  # 0
+                    ('tinybert_non_medical', 'google/bert_uncased_L-2_H-128_A-2'),  # 1
+                    ('GAN20', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_concat_epoch19')),  # 2
+                    ('BERT2020_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2020_2020_v2020_epoch39')),  # 3
+                    ('BERT18_20eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2018_2018_v2020_epoch19')),  # 4
                     ]
 LR = 1e-3
 BATCH_SIZE = 128
-RUN_MODEL_INDEX = 1
+RUN_MODEL_INDEX = 0
 
 # setting random seeds
 torch.manual_seed(0)

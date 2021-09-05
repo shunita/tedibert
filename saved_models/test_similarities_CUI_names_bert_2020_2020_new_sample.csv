@@ -1,0 +1,2994 @@
+,CUI1,CUI2,similarity
+2429699,Pneumoperitoneum,Retinal Hemorrhage,0.5686939
+1735768,Primary amyloidosis,Diabetic Angiopathies,0.58070785
+260841,Burnett Schwartz Berberian syndrome,Vitelliform Macular Dystrophy,0.6267496
+1642453,Adrenal gland hypofunction,Ileus,0.5805235
+172320,"SYNOVITIS, GRANULOMATOUS, WITH UVEITIS AND CRANIAL NEUROPATHIES (disorder)",Allergic asthma,0.602236
+1812760,Migraine with Aura,Carotid artery occlusion,0.5702038
+1831608,Plasmodium falciparum infection,Episodic ataxia type 1,0.59028864
+1714142,Cerebellar Ataxia,Central Core Myopathy (disorder),0.6032485
+1219188,"Pneumonia, Ventilator-Associated",Episodic ataxia type 1,0.5673161
+931596,Coronary Occlusion,Hypertensive heart failure,0.59203565
+936313,"Leukoencephalopathy, Progressive Multifocal",Periodontitis,0.5843945
+2163196,Osteopenia/osteoporosis,Disorder of lymph node,0.5441536
+2347162,Observation of Neuromuscular Block,Lumbosacral radiculopathy,0.76576155
+1199053,Hemoglobin SC Disease,Urinary tract infection,0.6837188
+794578,Recurrent Cerebral Ischemia,Acute respiratory infections,0.6959567
+726716,Klinefelter Syndrome,Chronic pain syndrome,0.7298663
+1313861,Bacteremia due to Staphylococcus aureus,Congenital dyserythropoietic anemia,0.71929324
+2128943,Exophthalmos,Adolescent Obesity,0.42999437
+2985354,Thalassemia Intermedia,Acute miliary tuberculosis,0.610879
+273705,Dysglycemia,Lumbar facet joint pain,0.45034114
+1760090,Constipation - functional,Drug Resistant Epilepsy,0.46399707
+1472310,Diabetes in youth,Hyperemia,0.7127789
+1998734,Spinal Muscular Atrophy,Hyperparathyroidism,0.58156216
+292555,Sarcoidosis,Pediatric Obesity,0.6734921
+2095700,Overactive Detrusor,Pityriasis Rubra Pilaris,0.6900916
+2224235,Myopia,Recurrent genital herpes simplex,0.6407698
+1492609,Sphincter of Oddi Dysfunction,Asteatosis cutis,0.6392838
+291195,"Sarcoidosis, Pulmonary",Epilepsy,0.5909241
+1742457,Hyperprolactinemia,Ulcerative Colitis,0.56763035
+2478410,Severe Aplastic Anemia,Allergic asthma,0.67393446
+1559648,Meningitis,"Malaria, Falciparum",0.60947895
+1582406,Septicemia,Esophageal Diseases,0.6144044
+2345923,Observation of Neuromuscular Block,First myocardial infarction,0.63976085
+2533543,Curb,Nyctalopia,0.5437352
+2406180,Urinary Bladder Diseases,Nephrotic Syndrome,0.77114743
+209385,Cytokine Release Syndrome,Diabetic Retinopathy,0.61685514
+459026,Benign Paroxysmal Positional Vertigo,Viral gastroenteritis due to Rotavirus,0.58754414
+1443180,hemorrhage symptom,Primary dysmenorrhea,0.79202247
+1769194,Alcohol withdrawal syndrome,Ocular hyperemia,0.69977254
+526219,Non ST elevation acute coronary syndrome,Lung disease with systemic sclerosis,0.7199555
+2369063,Hand eczema,Hemoglobin SC Disease,0.52553254
+1197937,Tardive Dyskinesia,Obstructive Ureterocele,0.5551494
+850996,Complete atrioventricular block,Painful Bladder Syndrome,0.60669214
+393565,Restless Legs Syndrome,Hypertriglyceridemia,0.6130558
+2613655,Inflammatory acne,Rheumatic Fever,0.7841694
+543854,Trachoma,Abdominal Infection,0.61826366
+608091,Hypoxic-Ischemic Encephalopathy,Bacterial corneal ulcer,0.5928867
+30612,"Ventricular Fibrillation, Paroxysmal Familial, 1",CULLER-JONES SYNDROME,0.6347368
+1273969,Musculoskeletal Diseases,Chronic idiopathic urticaria,0.69783974
+1302150,Spinal Diseases,Kidney Calculi,0.55773175
+1965593,Hydronephrosis,Trichiasis,0.73433745
+878346,Barrett Esophagus,Alopecia universalis,0.67358416
+2880165,Ischemic congestive cardiomyopathy,Extensively Drug-Resistant Tuberculosis,0.5644245
+356819,Terminal illness,Movement Disorders,0.7487464
+895175,Hyperlipasaemia,Latent Tuberculosis,0.6965356
+1940147,Autosomal Dominant Disorder,Thrombocytopenia 4,0.650911
+352985,Recurrent urinary tract infection,Coronary Artery Disease,0.79559606
+2183535,Scalp psoriasis,Synovitis,0.6148764
+641137,Transformed migraine,metabolic disturbance,0.6836646
+659588,Malnutrition,Freeman-Sheldon syndrome,0.5176686
+1009964,"Hyperparathyroidism, Secondary",Streptococcal pneumonia,0.5662848
+2749668,Cholestatic hepatitis,"Myasthenia Gravis, Generalized",0.6447314
+574091,Dermatologic disorders,Pleurisy,0.57365704
+2846849,Noncommunicable Diseases,Lysosomal Storage Diseases,0.7027116
+543996,Trachoma,Pelvic Inflammatory Disease,0.62102395
+2697154,Deficiency of glucose-6-phosphate dehydrogenase,Early infantile epileptic encephalopathy with suppression bursts,0.6105562
+2127270,Thyroid associated opthalmopathies,Malignant Carcinoid Syndrome,0.70697945
+503140,Thrombosis of vena cava,Brain Edema,0.6279549
+2159150,Hyaloideoretinal degeneration of Wagner,"Angioedemas, Hereditary",0.68596876
+1432460,Postthrombotic Syndrome,Acute Coronary Syndrome,0.7578282
+178201,Human immunodeficiency virus I infection,Myocardial Infarction,0.5385217
+154597,LAURIN-SANDROW SYNDROME,Retinitis Pigmentosa,0.6708634
+1297418,gout tophaceous,Mucopolysaccharidosis I,0.715664
+818204,Steroid Refractory Graft Versus Host Disease,Thyroid Diseases,0.639682
+1692956,Acute gout,Fecal Incontinence,0.4646196
+2034341,Polyneuropathy,Paroxysmal nocturnal hemoglobinuria,0.642161
+1816908,Allergic asthma,Sensory neuropathy,0.5910216
+2888937,Analgesic Overuse Headache,Mucocutaneous leishmaniasis,0.67976487
+2767391,Osteogenesis Imperfecta,Autosomal Dominant Disorder,0.6305632
+1237646,Poliomyelitis,Disorder of lymph node,0.47840524
+82245,Idiopathic pulmonary arterial hypertension,Thoracic Outlet Syndrome,0.6804311
+2074179,Hemodynamic instability,"Candidiasis, Vulvovaginal",0.44410753
+1839833,AL-RAQAD SYNDROME,Systolic hypertension,0.43211737
+2071697,Pneumonia due to methicillin resistant Staphylococcus aureus,Chorea,0.6301434
+1215778,Endocrine-Cerebroosteodysplasia,Focal glomerulosclerosis,0.7530855
+1007345,Hypocalcemia,Vitreomacular traction,0.536341
+512751,"Arthritis, Psoriatic",Proliferative diabetic retinopathy,0.67384464
+2934799,Cardiac arrest in children,Miscarriage,0.63483787
+939698,Old myocardial infarction,Heart failure with normal ejection fraction,0.7023023
+796700,Anemia due to infection,Diamond-Blackfan Anemia 1,0.75185925
+1857885,Irritable bowel syndrome with constipation,Gastroenteritis in children,0.63676083
+1873032,OROFACIAL CLEFT 1,"SCLERODERMA, PULMONARY",0.55312306
+318612,Human papilloma virus infection,Neuropathy,0.5730448
+2810536,RING DERMOID OF CORNEA,Fecal Incontinence,0.6582167
+1625557,Drug Hypersensitivity Syndrome,Autonomic neuropathy,0.7563744
+1979073,"Osteogenesis imperfecta, dominant perinatal lethal",Neuroleptic Malignant Syndrome,0.68052155
+1840936,"Muscular Dystrophy, Duchenne",Stomatitis,0.5350902
+1824992,Intestinal Perforation,Intrahepatic Cholestasis,0.5691438
+568457,end organ damage,Constipation - functional,0.5808544
+1859350,Type 2 diabetes mellitus in obese,Bundle-Branch Block,0.39427626
+2197398,gender disorders,"Lung Diseases, Interstitial",0.65179056
+875257,Chronic hcv genotype 1,Raynaud Disease,0.56244224
+2629112,Menkes Kinky Hair Syndrome,Intravenous bisphosphonates,0.4344622
+2770261,Chronic anemia,"Polycystic Kidney, Autosomal Dominant",0.5804762
+2531281,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME",Tumor Lysis Syndrome,0.6631553
+1689379,Nance-Horan syndrome,Gastroparesis with diabetes mellitus,0.6176646
+610514,Aortic Valve Insufficiency,Cerebral Small Vessel Diseases,0.6392341
+2751074,Apert-Crouzon Disease,Systemic mycosis,0.6061422
+556462,Erythema,Aspergillosis,0.6818558
+92841,Juvenile arthritis,Anisometropia,0.55200696
+2047119,"Arthritis, Reactive",Virus Diseases,0.67120165
+1912627,Acute Disease,Rhinitis,0.6701726
+880885,genital fungal infection,Entropion,0.60941225
+2294900,Subarachnoid Hemorrhage,"Thrombotic thrombocytopenic purpura, acquired",0.76937085
+307459,Lymphopenia,Idiopathic fecal incontinence,0.54964733
+1639723,Chronic disease of skin,Gilbert Disease (disorder),0.80274177
+305402,Primary Ciliary Dyskinesia,Hemolytic disorder,0.67028385
+2779207,Croup,Neglected Diseases,0.5280415
+443403,Chronic low back pain,Retinal Diseases,0.62753433
+2512249,Sarcopenia,Deep Vein Thrombosis,0.6768227
+2786235,Cerebral dysfunction,Thoracic Outlet Syndrome,0.64441353
+417586,Aneurysm of internal carotid artery,"Infections, Hospital",0.6299473
+2308000,Chronic heart disease,"POLYARTERITIS NODOSA, CHILDHOOD-ONSET",0.651982
+229092,cardiovascular risk factor,Telangiectasis,0.41627154
+212120,Persistent asthma,"Deafness, Sensorineural, And Male Infertility",0.52486366
+1082623,Carpal Tunnel Syndrome,gram negative sepsis,0.5304256
+684408,Enthesitis,Plasmodium falciparum infection,0.6018886
+2439097,Mild visual impairment,Early childhood caries,0.58572114
+1030736,seizure disorder complex,Lower limb ischemia,0.6816954
+1920173,Condylomata Acuminata,Chronic postoperative pain,0.63880914
+2282912,Primary Focal Segmental Glomerulosclerosis,"Cholestasis-edema syndrome, Norwegian type",0.74120003
+2053372,Esophageal Diseases,Hemoglobinemia,0.52650285
+80750,Right Ventricular Hypertrophy,atrial fibrillation recurrent,0.7030603
+1640554,Infection caused by Helicobacter pylori,exudative macular degeneration,0.6229711
+706476,Sensory neuropathy,Clostridium difficile colitis,0.4469458
+1383947,Maturity onset diabetes mellitus in young,"Leishmaniasis, Visceral",0.69011635
+1612610,Paroxysmal atrial fibrillation,Atrial Fibrillation,0.9271311
+343501,Infective uveitis,Selenium deficiency,0.59518963
+2391049,Severe Acute Respiratory Syndrome,Pneumococcal Infections,0.5811556
+733567,Wolf-Hirschhorn Syndrome,Idiopathic pulmonary arterial hypertension,0.535267
+2872440,Dupuytren Contracture,Venous retinal branch occlusion,0.67070866
+1621642,Cushing Syndrome,Acute asthma,0.7092337
+2468244,Sensory polyneuropathy,Postcapillary pulmonary hypertension,0.6541283
+2528518,Pleurisy,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",0.68489444
+702183,Barber Say syndrome,Widespread Chronic Pain,0.7142874
+2987685,"Hyperbilirubinemia, Neonatal",Cystitis,0.55689234
+1845528,Hypertensive heart disease,Cluster Headache,0.5386951
+642705,"SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS SYNDROME",Inflammatory dermatosis,0.7755031
+2341392,Turner Syndrome,Endocrine-Cerebroosteodysplasia,0.5947635
+332049,Pneumonia,Anterior uveitis,0.6550348
+190313,"Angioedemas, Hereditary",Coronary Arteriosclerosis,0.62846464
+2911087,Primary Lesion,Syphilis,0.55695295
+938552,Edema of bone marrow,"ALZHEIMER DISEASE 6, LATE-ONSET",0.6230482
+2355272,Bronchiolitis Obliterans,Short Bowel Syndrome,0.62281173
+690675,Liver Failure,Barber Say syndrome,0.62850016
+1327473,Hepatolenticular Degeneration,Hypothyroidism,0.64487
+544783,Trachoma,Microvascular Angina,0.48045796
+1043744,Herpesviridae Infections,Infection of ear,0.70699614
+1680274,Human immunodeficiency virus II infection,Hepatic impairment,0.48613924
+2001383,"Pneumonia, Bacterial",Disorders of fatty acid oxidation,0.5880294
+668625,"Sleep Apnea, Central",Infestation,0.6393762
+151586,Asthma,Mucopolysaccharidosis Type IIIA,0.54987276
+2485560,vascular ischemia,Sudden sensorineural hearing loss,0.6294647
+1484850,Pulmonary Edema,Chronic heart failure,0.6209531
+895325,Hyperlipasaemia,Demyelinating Diseases,0.6426715
+2956412,Erysipelas,Intrahepatic Cholestasis,0.6951674
+915468,Virus Diseases,"Lung Diseases, Interstitial",0.8003857
+2274051,Posterior reversible encephalopathy syndrome,Pulmonary congestion,0.59368676
+264597,Lichen Sclerosus et Atrophicus,Xerosis,0.6558685
+2271306,B Virus Infection,Chronic systolic heart failure,0.6180084
+1762826,Lung hyperinflation,Supine hypertension,0.7307041
+2113032,Decompensated cirrhosis of liver,Endocrine-Cerebroosteodysplasia,0.67755604
+494265,Liver diseases,Infantile hypophosphatasia,0.5220588
+1909112,THROMBOCYTOPENIA 6,Hemolytic disorder,0.6916488
+2597717,Sinus Node Dysfunction (disorder),Postural Orthostatic Tachycardia Syndrome,0.7279643
+2921208,Partial hypopituitarism,Vasculitis,0.60677844
+1544987,CAMPOMELIC DYSPLASIA,Bacterial conjunctivitis,0.5697767
+884788,Chronic gouty arthritis,Bacteremia,0.6594741
+1831785,Plasmodium falciparum infection,Extensively Drug-Resistant Tuberculosis,0.67078197
+2738631,Chlamydia trachomatis infection,SCHIZOPHRENIA 6 (disorder),0.6493474
+890931,exudative macular degeneration,Premenstrual Tension,0.7127671
+1614336,Specific viral infections,Multiple Sulfatase Deficiency Disease,0.59277326
+763171,Sialorrhea,Aneurysm of internal carotid artery,0.5515184
+491164,Acquired aplastic anemia,"Pregnancy Complications, Infectious",0.69904584
+2431820,Superficial Thrombophlebitis,atrial fibrillation recurrent,0.56466216
+2508790,Carotid artery occlusion,Thrombosis of vena cava,0.7162959
+111591,Disease,Internal Carotid Artery Stenosis,0.6261561
+756823,Carotid Artery Diseases,antepartum malaria,0.63396436
+578672,CNS disorder,Fasting Hypoglycemia,0.6605041
+2922553,Central Nervous System Sensitization,"Hyperparathyroidism, Secondary",0.61970836
+2001824,Pericardial effusion,NOONAN SYNDROME 3,0.5180055
+499768,"Angina, Unstable",lower extremity neuropathy,0.52084285
+997037,Viral gastroenteritis due to Rotavirus,"Macular dystrophy, corneal type 1",0.6507466
+2064270,End stage heart failure,Inflammatory disorder,0.6171579
+2314445,Moderate obesity,"Aneurysm, Ruptured",0.5493081
+846668,Severe persistent allergic asthma,"Myasthenia Gravis, Generalized",0.45556623
+2020955,Low Tension Glaucoma,Entropion,0.59236383
+552355,Endometriosis,Vitreomacular traction,0.6125041
+2429622,Pneumoperitoneum,Endocrine-Cerebroosteodysplasia,0.6469178
+1089596,Eczema,Sensory polyneuropathy,0.5593078
+2403856,Cervical dysplasia,Subclinical hypothyroidism,0.65866095
+1236440,Skin lesion,Aspiration Pneumonia,0.7448375
+2621313,Stomach Diseases,Osteoarthritis of hip,0.5159123
+536196,Cardiac fibrosis,"Nephritis, Interstitial",0.72112274
+843151,Influenza A,Peripheral motor neuropathy,0.438315
+2415752,Hypogalactia,Recurrent skin infections,0.5907046
+608276,Hypoxic-Ischemic Encephalopathy,Globoid cell leukodystrophy,0.8218845
+2037642,Infection by site,Severe Aplastic Anemia,0.6017597
+453777,Peripheral Arterial Diseases,Hyperlipasaemia,0.6601906
+838021,Cyst,Cerebrovascular Disorders,0.5818109
+2896721,Endometritis,Cerebrovascular Disorders,0.61099714
+383125,Carotid Stenosis,Cervical disc disorder,0.61887723
+2851393,Mucopolysaccharidosis I,Pharyngitis,0.77529943
+2694134,Mucocutaneous Lymph Node Syndrome,abortion in first trimester,0.518491
+433002,Atrial Fibrillation,non-gonococcal urethritis (NGU),0.5272442
+243115,Febrile Neutropenia,Demyelinating Diseases,0.7214711
+1527674,"Glaucoma, Neovascular",Early infantile epileptic encephalopathy with suppression bursts,0.61940473
+2111783,Aspiration Pneumonia,"Arthritis, Reactive",0.67068714
+2780041,Croup,Disease of capillaries,0.5531629
+1588074,Influenza due to Influenza A virus subtype H1N1,Ischemic congestive cardiomyopathy,0.6218224
+1447593,Allergic Conjunctivitis,Keratosis Follicularis,0.61214226
+422300,Overactive Bladder,"POLYARTERITIS NODOSA, CHILDHOOD-ONSET",0.73341614
+1221608,Glucocorticoid-remediable aldosteronism,Barakat syndrome,0.59873265
+709655,"Respiratory Distress Syndrome, Adult",Acute exacerbation of chronic obstructive airways disease,0.7593829
+949726,Ischemic myocardial dysfunction,Supine hypertension,0.66416
+2431794,Superficial Thrombophlebitis,Pulmonary Fibrosis,0.6368266
+1991430,Anisometropia,"Alzheimer disease, familial, type 3",0.5643088
+2619999,Cataplexy,Retinal Hemorrhage,0.5645444
+416205,Gigantism,Senile cardiac amyloidosis,0.6557584
+818395,Pulmonary Emphysema,Vascular Diseases,0.71427125
+929746,Acute heart failure,Musculoskeletal Diseases,0.46132317
+404673,Hepatic Veno-Occlusive Disease,Chlamydia trachomatis infection,0.6769542
+1661221,Intervertebral Disc Degeneration,Histiocytosis with joint contractures and sensorineural deafness,0.68807256
+1073688,Bone marrow depression,"Bronchiolitis, Viral",0.6122521
+2989365,Gastrointestinal irritation,Acute Kidney Insufficiency,0.5659978
+1128707,Hyperphosphaturia,Nervous diarrhea,0.6104817
+549223,Liver Cirrhosis,antepartum malaria,0.6818948
+2272709,Keratosis Follicularis,Miosis disorder,0.5536138
+1220829,Blood Coagulation Disorders,Irreversible pulpitis,0.62481076
+2827439,Peripheral spondyloarthritis,Genetic syndrome,0.5153649
+2327476,Granulomatosis,Alopecia,0.70750916
+2342308,Turner Syndrome,Ureteral Calculi,0.46421394
+1779547,Acute respiratory tract infection,Atrophic retina,0.50913256
+2362223,Hyperammonemia,Viral respiratory infection,0.65668386
+578950,CNS disorder,Tricuspid Valve Insufficiency,0.5602686
+2446722,Spinal instability,non-gonococcal urethritis (NGU),0.58969134
+2407066,herpes 2,Clostridium difficile colitis,0.5117377
+1991615,Anisometropia,Chronic Periodontitis,0.57682145
+1944551,Disorder of skeletal muscle,Multiple Sclerosis,0.62594277
+1828605,Osteonecrosis of Jaw,Thalassemia Intermedia,0.65742147
+599579,Cooley's anemia,Lysosomal Storage Diseases,0.599675
+2709567,Painful Bladder Syndrome,Sleep Apnea Syndromes,0.8129627
+1566596,Renal carnitine transport defect,PHOTOPAROXYSMAL RESPONSE 1,0.67877835
+2801248,Anterior uveitis,HIV Coinfection,0.57082176
+1680696,Human immunodeficiency virus II infection,"Epilepsies, Partial",0.5822293
+2825380,Joint-ill,Thrombosis of vena cava,0.568064
+1201494,Pseudohyperkalemia Cardiff,Cat eye syndrome,0.63068104
+227656,Vascular occlusion,Wolman Disease,0.5472895
+80880,Right Ventricular Hypertrophy,Child Malnutrition,0.6338149
+1923349,Amyloidosis cutis dyschromia,Primary Focal Segmental Glomerulosclerosis,0.81443256
+1998182,Spinal Muscular Atrophy,Clinically isolated syndrome,0.5840689
+2775046,"Infarction, Lacunar",Hepatitis,0.4997254
+987673,Cardiac Arrhythmia,Mucopolysaccharidosis III,0.6553033
+902276,Influenza A (H5N1),PHOTOPAROXYSMAL RESPONSE 1,0.7188633
+661241,Pressure Ulcer,Malnutrition,0.5567649
+1691999,Acute gout,Crohn Disease,0.63089776
+1598929,Congenital Hemidysplasia with Ichthyosiform Erythroderma and Limb Defects,Acne,0.57400733
+2546908,Impetigo,Neurodegenerative Disorders,0.6859159
+1538292,Oral Ulcer,Uncomplicated Hypertension,0.4822865
+1653978,Pulmonary Cystic Fibrosis,Conjunctival hyperemia,0.6385802
+642892,"SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS SYNDROME",Pneumothorax,0.615075
+1368306,Premature aging syndrome,Croup,0.5595636
+1800843,Hyponatremia,Coronary Aneurysm,0.753939
+1941990,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",Uterine Perforation,0.73356366
+2991798,Flap necrosis,Pleural effusion disorder,0.5891687
+1669706,Corneal ectasia,Chronic low back pain,0.56947756
+631386,Chronic osteoarthritis,Autoimmune Lymphoproliferative Syndrome,0.51530004
+1600207,Congenital Hemidysplasia with Ichthyosiform Erythroderma and Limb Defects,Chronically Ill,0.6182722
+2969405,Androgen-Insensitivity Syndrome,Measles,0.5910771
+987419,Cardiac Arrhythmia,Primary Focal Segmental Glomerulosclerosis,0.6602858
+1389755,Camurati-Engelmann Syndrome,Eosinophilia,0.53229374
+2502050,hypertensive nephropathy,Brain Diseases,0.655914
+987568,Cardiac Arrhythmia,Latent Autoimmune Diabetes in Adults,0.6194308
+2231531,Congenital malformation syndrome,Epileptic drop attack,0.6627099
+2852550,Mucopolysaccharidosis I,Inflammatory acne,0.6963212
+322095,Persistent infection,Entropion,0.6395175
+541917,Trichiasis,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",0.6398703
+2155733,Agranulocytosis,Pelvic Organ Prolapse,0.6359918
+766634,Collagen Diseases,Overactive Bladder,0.65222305
+1050417,Peptic Esophagitis,Urinary Stress Incontinence,0.55418324
+1155521,"Gaucher Disease, Type 1",Severe uncontrolled persistent asthma,0.55525714
+2205078,Severe Bronchopulmonary Dysplasia,Plasmodium falciparum infection,0.72416997
+2734007,abortion in second trimester,Peptic Esophagitis,0.47162965
+1160694,Pityriasis Rubra Pilaris,Metabolic Bone Disorder,0.4638666
+1779729,Acute respiratory tract infection,Congenital malformation syndrome,0.7605211
+2258583,Infection by Cryptococcus neoformans,Specific viral infections,0.7478129
+2737175,Antibiotic-associated diarrhea,Entropion,0.6623274
+2825412,Joint-ill,Uncomplicated Hypertension,0.52834
+853374,Choroidal retinal neovascularization,Cyst,0.55830175
+2958041,Muscular Dystrophy,TNF receptor-associated periodic fever syndrome (TRAPS),0.5810037
+2449584,Hypervitaminosis D,Peripheral spondyloarthritis,0.57286066
+2207978,"Heart Failure, Right-Sided",Immunosuppression,0.4304197
+2158592,"Arthritis, Gouty",Lumbosacral radiculopathy,0.61815995
+417170,Aneurysm of internal carotid artery,Gigantism,0.59312236
+2399783,Pancytopenia,Clostridium difficile infection,0.5756986
+2757370,Barretts esophagus with dysplasia,Nephrotic Syndrome,0.7232905
+1664950,iliac disease,temporal pain,0.70081663
+1833911,"Deafness, Sensorineural, And Male Infertility",Hereditary Diseases,0.5154446
+956313,Nonischemic congestive cardiomyopathy,Turner Syndrome,0.5450075
+812013,Hepatic Encephalopathy,Measurable Disease,0.5255968
+1004719,Encephalitis,Primary Focal Segmental Glomerulosclerosis,0.6042988
+658661,Inflammatory disorder,Viral upper respiratory tract infection,0.64870507
+647543,Systemic mycosis,Retinal Diseases,0.6835251
+62757,Hypoglycemia,Acne Vulgaris,0.57398677
+1103996,Retinal Vein Occlusion,Chronic low back pain,0.5610575
+2917903,Supine hypertension,airway disease,0.5974673
+168674,Bacterial conjunctivitis,Meibomian gland dysfunction,0.54474944
+2174941,Idiopathic osteoporosis,Dermatologic disorders,0.7029292
+1555382,Gastroparesis with diabetes mellitus,Atrophy of vagina,0.64072764
+1687606,Hyperopia,Hypertensive heart failure,0.71359354
+774679,"Hepatitis, Chronic",Hand eczema,0.5785722
+1642340,Adrenal gland hypofunction,Cardiac Arrhythmia,0.68351865
+2975205,Vaginitis,Interstitial Cystitis,0.6411493
+1105344,Retinal Vein Occlusion,"Infarction, Lacunar",0.5990945
+889822,exudative macular degeneration,Atrioventricular Block,0.77921677
+687336,Tonic - clonic seizures,Aortic Stiffness,0.6185309
+1444338,hemorrhage symptom,Hospital acquired pneumonia,0.5988809
+869708,non-gonococcal urethritis (NGU),Hyaloideoretinal degeneration of Wagner,0.69492334
+273966,Dysglycemia,Alopecia,0.6845432
+2470214,Hyperthyroidism,Plasmodium vivax infection,0.4903595
+2623044,Viral meningitis,Chronic osteoarthritis,0.5622042
+167306,Subacute Bacterial Endocarditis,Torsades de Pointes,0.57363683
+2965647,Acute disease of cardiovascular system,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",0.6451176
+1465063,Mucolipidosis Type IV,Vaginal Diseases,0.7224133
+2259928,Hydrocephalus,Ischemic myocardial dysfunction,0.5337889
+162329,Spinal stenosis of lumbar region,Renal Artery Stenosis,0.77834374
+2127292,Thyroid associated opthalmopathies,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",0.6736137
+1164713,Peripheral neuropathy due to and following chemotherapy,Dyskinetic syndrome,0.67992616
+1077554,Lupus erythematosus tumidus,Comedone,0.5471577
+2576410,Primary Autoimmune Thrombocytopenic Purpura,Dental caries,0.5574966
+733557,Wolf-Hirschhorn Syndrome,Pregnancy associated hypertension,0.5672706
+1142942,"Robinow syndrome, autosomal recessive",insulin hypoglycemia,0.6237642
+1784340,Fatty Liver Disease,Herpes Simplex Infections,0.5786021
+536703,hemorrhage as a complication,Weaver syndrome,0.63760513
+2978083,Neonatal disorder,Non-radiographic axial spondyloarthritis,0.57868403
+2933693,Primary infertility,Microscopic Polyarteritis,0.62186086
+2731558,incurable diseases,Ureteral Calculi,0.54570127
+2352730,"Diabetes, Autoimmune",Dupuytren Contracture,0.5546974
+1702935,Hypertrophic Cardiomyopathy,Deglutition Disorders,0.5645035
+1243212,"Abortion, Habitual",Irritable bowel syndrome characterized by constipation,0.59868664
+2945867,triple vessel disease,Hypoglycemia of childhood,0.59951335
+1786134,Cystic Fibrosis Pulmonary Exacerbation,Residual proteinuria,0.5111515
+1073271,Bone marrow depression,Proliferative diabetic retinopathy,0.61950743
+2113631,Decompensated cirrhosis of liver,Oral infection,0.52867323
+1723412,Epstein,Diverticulitis,0.64937276
+1226835,Secondary diabetes mellitus,Benign Paroxysmal Positional Vertigo,0.536418
+1709992,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",Spinal Diseases,0.69596785
+1338883,Viral respiratory infection,Barretts esophagus with dysplasia,0.5186953
+2562811,Membranous glomerulonephritis,TUBEROUS SCLEROSIS 2 (disorder),0.6287908
+1859286,Type 2 diabetes mellitus in obese,Akinesia,0.49180004
+150328,Chronic idiopathic thrombocytopenic purpura,silent CEREBRAL INFARCTION,0.52185714
+1820434,Onychomycosis,Hypoplastic Left Heart Syndrome,0.6138488
+2507054,"Mucopolysaccharidosis, MPS-IV-A",Phenylketonurias,0.72660714
+1532670,Proliferative diabetic retinopathy - high risk,Small bowel bacterial overgrowth syndrome,0.6501488
+1361519,Idiopathic Pulmonary Fibrosis,Chronic Kidney Diseases,0.7353726
+2335737,Dermatofibrosis lenticularis disseminata,Hypocortisolism secondary to another disorder,0.61763734
+2686423,Pancreatic Cyst,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME",0.68479264
+317131,Spondylarthritis,"Leukoencephalopathy, Progressive Multifocal",0.5856793
+2811002,RING DERMOID OF CORNEA,"Sleep Apnea, Mixed Central and Obstructive",0.5956933
+1709256,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",Communicable Diseases,0.7221942
+2229613,Potassium aggravated myotonia,gram negative sepsis,0.5781445
+1760659,Constipation - functional,Idiopathic fecal incontinence,0.63538027
+2648483,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY",Chlamydia trachomatis infection,0.7037051
+339593,"Uveitis, Posterior",Blood Vessel complications,0.63026726
+657551,Inflammatory disorder,"Secondary disease, NOS",0.7603538
+2354904,Bronchiolitis Obliterans,Systemic mycosis,0.6938292
+167135,Subacute Bacterial Endocarditis,Bladder neck obstruction,0.672596
+2306832,Systemic onset juvenile chronic arthritis,Short Bowel Syndrome,0.73198014
+1635604,Papulopustular Rosacea,Dehydration,0.6347361
+1066980,Progressive Disease,Child Malnutrition,0.4907913
+1949712,Bronchiectasis,Rheumatoid Arthritis,0.65353096
+1720062,Epstein-Barr Virus Infections,Erythema Chronicum Migrans,0.5865793
+1521185,Ketonuria,Sex Differentiation Disorders,0.67368877
+1595462,Hemolytic disorder,Candidiasis,0.5723485
+1948711,Respiration Disorders,Seborrheic dermatitis,0.72795594
+2947889,Renal vascular disorder,Retinal thickening,0.59981775
+10915,"Fibrosis, Liver",Genital infection,0.57812166
+2543686,Hyperimmunoglobulinemia D,Complications of Diabetes Mellitus,0.6674429
+372891,Palmar-plantar erythrodysesthesia syndrome,Mucosal ulcer,0.6143427
+2559868,Cerebral Edema,Hemodynamic instability,0.59227055
+1539278,Oral Ulcer,Varicosity,0.64481795
+854938,Cholangitis,Lennox-Gastaut syndrome,0.68149406
+709363,"Respiratory Distress Syndrome, Adult",Osteophyte,0.49745828
+1319840,Influenza,abortion in second trimester,0.6318626
+549209,Liver Cirrhosis,Maturity onset diabetes mellitus in young,0.6028865
+2059333,Kidney Calculi,Disorder of macula of retina,0.57481307
+1891421,Gilles de la Tourette syndrome,"Polycystic Kidney, Autosomal Dominant",0.64337784
+2856322,early disease onset,Widespread Disease,0.852536
+872818,Prurigo,Gastroparesis,0.53422093
+77428,Metabolic Syndrome X,Varicosity,0.60300624
+2266567,Hypotrichosis simplex,ST segment elevation myocardial infarction,0.55008435
+1715227,Iron Overload,Oliguria,0.7067618
+1843015,Major Depressive Disorder 1,Eosinophilia,0.45935446
+1963699,Macular retinal edema,Chronic lung disease,0.6566878
+1554066,Gastroparesis,Aortic Stiffness,0.5731817
+505663,Neuropathy,trachomatis,0.7006681
+2312915,Bladder Pain Syndrome,Ovarian Cysts,0.53301215
+883401,Chronic heart failure,Coronary Stenosis,0.67149836
+1845464,Hypertensive heart disease,Respiratory Syncytial Virus Infections,0.597336
+1084156,Alopecia,Inflammatory neuropathy,0.5760892
+799132,Diphtheria,Complex Regional Pain Syndromes,0.60808825
+1726585,Phrenic nerve lesion,Obesity,0.50337625
+440485,Hypoalbuminemia,Major Depressive Disorder 1,0.453561
+1777484,multiple pathologies,Residual proteinuria,0.5124967
+812566,Hepatic Encephalopathy,Dental caries extending into dentin,0.60457075
+2567523,Disorder of pregnancy,Vesico-Ureteral Reflux,0.62003523
+1801374,Cerebral Palsy,Hepatic impairment,0.66040325
+221376,Diabetic Ketoacidosis,Autoimmune Lymphoproliferative Syndrome,0.68933547
+1472086,Colitis,Corneal Infection,0.65412784
+66654,Hyperbilirubinemia,Septicemia,0.7525685
+1764501,Streptococcal sore throat,Epidemic disease,0.66051674
+2411238,Friedreich Ataxia,Cluster Headache,0.6106643
+1515891,"POLYDACTYLY, POSTAXIAL, WITH PROGRESSIVE MYOPIA",Parasitemia,0.61983657
+2381661,Deficiency of testosterone biosynthesis,"Arteriosclerotic cardiovascular disease, NOS",0.64360094
+1210062,Myasthenia Gravis,"Nephrogenic Diabetes Insipidus, Type I",0.6965138
+1911005,Acute miliary tuberculosis,Eye Infection,0.7930269
+1087250,Pleural effusion disorder,Eclampsia,0.65080315
+414455,Hepatitis B,Chronic atrial fibrillation,0.43819362
+1475720,Fish-Eye Disease,insulin resistance in diabetes,0.629765
+662225,Pressure Ulcer,Hyperammonemia,0.60804355
+777086,Lupus Erythematosus,Hepatitis C,0.41832715
+275265,Atherosclerotic lesion,Low Vision,0.45551544
+1813768,Steatohepatitis,disorder of aging,0.52590346
+1796750,Hemophilia A,Amyloid Neuropathies,0.6034058
+207139,Craniosynostosis,Drug-induced tardive dyskinesia,0.6508889
+409136,"Sleep Apnea, Obstructive",Hypertensive heart failure,0.506594
+1700279,infection induced,"HEMOCHROMATOSIS, TYPE 1",0.6371934
+2915476,Androgenetic Alopecia,Macula lutea edema,0.6814909
+904556,Paralytic Ileus,Novel H1N1 influenza,0.64362746
+1054618,Cytomegalovirus Infections,Steatohepatitis,0.5724721
+2581586,Lipid Metabolism Disorders,Macula lutea edema,0.5966062
+2507189,"Mucopolysaccharidosis, MPS-IV-A",Brain atrophy,0.67763424
+501939,Thrombosis of vena cava,Hepatitis B,0.45553672
+411094,Hypocortisolism secondary to another disorder,Bursitis,0.6034423
+1588152,"Malaria, Falciparum",Anemia,0.5272311
+552633,Endometriosis,Myopathy,0.6583496
+2476434,Vaginal Hemorrhage,Infectious Otitis Media,0.6161032
+2772620,Complex Regional Pain Syndromes,Cutaneous Candidiasis,0.645638
+1175507,Pituitary-dependent Cushing's disease,"Anemia, severe",0.65514064
+1505833,Brain Infarction,Transient Ischemic Attack,0.6260872
+877146,Barrett Esophagus,Hypoglycemia,0.5319357
+503507,Tumor Lysis Syndrome,Heart failure,0.77094203
+2877754,Aortic root dilation,Retinal Detachment,0.7287047
+2879640,Ischemic congestive cardiomyopathy,"Thrombotic thrombocytopenic purpura, acquired",0.7490071
+1401180,"AMYLOIDOSIS, HEREDITARY, TRANSTHYRETIN-RELATED",Cerebral dysfunction,0.6581583
+2128386,Exophthalmos,copd exacerbation,0.52866316
+2580806,"Leukodystrophy, Dysmyelinating, And Spastic Paraparesis With Or Without Dystonia",Deficiency of testosterone biosynthesis,0.7418527
+1391722,Infectious Otitis Media,"Stickler syndrome, type 1",0.595774
+1592222,"Thrombotic thrombocytopenic purpura, acquired",Lupus erythematosus tumidus,0.682124
+405483,Polycystic Ovary Syndrome,HYPOPLASTIC LEFT HEART SYNDROME 1,0.7663283
+1847803,Systemic disease,Urinary tract infection,0.62012213
+2276193,Cervix Diseases,Ulcerative colitis in remission,0.5519372
+100160,Diabetic macular edema,Silent cerebral infarct,0.6276423
+2218982,Lumbosacral radiculopathy,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",0.74247247
+1084747,Retinitis Pigmentosa,Pregnancy associated hypertension,0.5696014
+1430546,"Leishmaniasis, Cutaneous",Painful Bladder Syndrome,0.7210825
+2236632,Disease of mucous membrane,Impetigo,0.5817889
+1159425,Pityriasis Rubra Pilaris,Benign Prostatic Hyperplasia,0.5918311
+1896589,Connective Tissue Diseases,genital fungal infection,0.7265036
+453103,"Glycosuria, Renal",Mucopolysaccharidosis III,0.6741465
+399647,Chronic infectious disease,"Ventricular Fibrillation, Paroxysmal Familial, 1",0.6057877
+1669523,Corneal ectasia,Allergic rhinitis (disorder),0.6886181
+2606745,Speech Disorders,Hyperammonemia,0.7463255
+562252,Benign Prostatic Hyperplasia,Rheumatoid Arthritis,0.5147648
+474508,Toxic Shock Syndrome,Pediculus capitis infestation,0.7070084
+456407,carotid disease,Adult Rickets,0.614475
+520518,Ptosis,Hospital acquired pneumonia,0.5411762
+580215,Age related macular degeneration,MRSA - Methicillin resistant Staphylococcus aureus infection,0.5680337
+797485,Anemia due to infection,Androgenetic Alopecia,0.68958664
+1874606,Postoperative ileus,Fecal Incontinence,0.68147707
+2334017,Asteatosis cutis,"Hydrocephalus, Normal Pressure",0.66598547
+1321133,Myopathy,"Osteogenesis imperfecta, dominant perinatal lethal",0.7170238
+1760070,Constipation - functional,"Robinow syndrome, autosomal recessive",0.6187802
+2068948,Enamel caries,Diarrhea predominant Irritable bowel,0.5030081
+2424293,Congenital reticular ichthyosiform erythroderma,Hypothyroidism,0.7844012
+1561409,heart inflammation,Adrenal gland hypofunction,0.6658577
+2606804,Speech Disorders,Acute rhinosinusitis,0.66296107
+112852,Coronary Artery Disease,Candidiasis,0.61927736
+1098099,Abdominal Infection,HIV neutropenia,0.64313954
+268570,Kidney Failure,Klinefelter Syndrome,0.67464787
+622917,Primary dysmenorrhea,Amyotrophic Lateral Sclerosis,0.61082006
+1582988,Demyelinating Diseases,Hyperbilirubinemia,0.65434855
+273137,Infantile Neuroaxonal Dystrophy,Early childhood caries,0.6713802
+2471761,Thyrotoxicosis,Severe left ventricular systolic dysfunction,0.5374178
+762920,Dental caries,Surfactant Dysfunction,0.59694386
+2444557,Gilbert Disease (disorder),Cardiovascular morbidity,0.6019453
+2099277,cold symptoms,Idiopathic Pulmonary Fibrosis,0.57950294
+807986,Methemoglobinemia,Primary hypercholesterolemia,0.72714007
+396009,Barakat syndrome,Idiopathic disease,0.6184788
+1777605,multiple pathologies,Ventricular arrhythmia,0.52621853
+2809959,RING DERMOID OF CORNEA,Movement Disorders,0.68764675
+1366168,Osteosclerosis,Hemodynamic instability,0.6070472
+1519026,Ketonemia,Chronic idiopathic thrombocytopenic purpura,0.6722352
+2140922,Papillon-Lefevre Disease,ALZHEIMER DISEASE 2,0.57191193
+1678198,Urticaria,Conjunctival hyperemia,0.6929935
+1299008,Foot Drop,Mycotic corneal ulcer,0.5986608
+1601834,eye change,Secondarily generalized seizures,0.53471714
+2873216,Dupuytren Contracture,osteoporosis risk,0.6107606
+39932,Diabetes Mellitus,GATA2 Deficiency,0.67270505
+1930401,Acute Angioedema,"Uveitis, Intermediate",0.51651865
+1163958,Recurrent skin infections,knee pain chronic,0.62500894
+1137861,Influenza-like illness,Mucopolysaccharidosis II,0.5787905
+1328352,Hepatolenticular Degeneration,Central Core Myopathy (disorder),0.64287144
+871435,trachomatis,Asymptomatic Diseases,0.8209753
+1993040,Refractive Errors,Hyperemia,0.62139195
+2614098,Precocious Puberty,Chronic kidney disease stage 4,0.57372123
+1707099,Complex congenital heart disease,Primary Focal Segmental Glomerulosclerosis,0.65773
+2037276,Infection by site,Hypertensive heart disease,0.5259044
+1495094,Meibomian gland dysfunction,Systemic mycosis,0.5935092
+1641805,Adrenal gland hypofunction,Macrophage Activation Syndrome,0.6555449
+2452988,Adult Rickets,incurable diseases,0.5574816
+346099,"Alzheimer disease, familial, type 3","SYNOVITIS, GRANULOMATOUS, WITH UVEITIS AND CRANIAL NEUROPATHIES (disorder)",0.68937695
+2549357,Scabies <infestation>,"Infant, Very Low Birth Weight",0.6085098
+996426,Cerebellar decompression injury,Exacerbation of multiple sclerosis,0.680137
+1663080,Selenium deficiency,DIARRHEA 6,0.603874
+2885260,Little's Disease,Dermatofibrosis lenticularis disseminata,0.42671794
+2912856,Neuroleptic Malignant Syndrome,Akinesia,0.54294527
+292392,Sarcoidosis,Renal Insufficiency,0.58467036
+219907,Diabetic Ketoacidosis,Panuveitis,0.633016
+791049,Traveler's diarrhea,Movement Disorders,0.67657673
+328403,Pneumococcal Infections,Hemophilia B,0.54719114
+2814262,"Nephritis, Interstitial",Lumbosacral radiculopathy,0.6821174
+1412989,Thrombocytopenia 3,Sensorineural Hearing Loss (disorder),0.53015935
+34077,Acute Chest Syndrome,neutropenic infection,0.6902044
+672268,pregnancy related,Acute respiratory tract infection,0.69396466
+693228,Critical Illness,Benign Rolandic Epilepsy,0.604619
+2271405,B Virus Infection,Noncommunicable Diseases,0.6671525
+657148,Coinfection,Premature coronary artery atherosclerosis,0.45401007
+936157,"Leukoencephalopathy, Progressive Multifocal",Restless Legs Syndrome,0.56669986
+10991,"Fibrosis, Liver",Familial dilated cardiomyopathy,0.6288705
+2586265,Comedone,Noncommunicable Diseases,0.6512752
+247281,GATA2 Deficiency,Embolic Cerebral Ischemia,0.6233756
+1064181,Deglutition Disorders,Chronic infectious disease,0.5896581
+385076,Strudwick syndrome,Fecal Incontinence,0.42765868
+322362,Persistent infection,Hypocalcemia,0.5816497
+2461081,Endocrine System Diseases,Infectious cirrhosis,0.7172095
+566287,Left Bundle-Branch Block,Facial paralysis,0.517209
+593250,Mycoses,Apert-Crouzon Disease,0.63630104
+2192419,Infantile disease,genital fungal infection,0.74094033
+2526873,Paronychia Inflammation,Irritable bowel syndrome with constipation,0.59808
+974348,Hypothyroidism,Dysmenorrhea,0.70014304
+1589576,"Malaria, Falciparum",vascular ischemia,0.57321054
+2695807,Cholestasis,Methemoglobinemia,0.67360514
+1313181,Bacteremia due to Staphylococcus aureus,Hereditary Diseases,0.60371083
+529133,Hepatitis A,Vaginal Diseases,0.65057105
+287618,Rickets,Arteriopathic disease,0.5453666
+2956645,Muscular Dystrophy,Gastroenteritis,0.509828
+1700611,Gingival Diseases,Cerebrovascular accident,0.69475466
+2097357,Common Cold,Inflammatory abnormality of the eye,0.7191798
+958177,Ischemic cardiomyopathy,Aortic Rupture,0.48982078
+1298520,Foot Drop,Mouth Diseases,0.72245735
+2017955,von Willebrand Disease,type 2 Diabetic Kidney Disease,0.62500817
+245374,Retinopathy of Prematurity,Lower Limb HEMIPARESIS,0.63329273
+2560403,Nephrotic Syndrome,Tuberculosis,0.62321883
+2347816,Esophageal Varices,Terminal illness,0.5285907
+2804113,Small bowel bacterial overgrowth syndrome,Chronic active hepatitis,0.66292375
+267402,IGA Glomerulonephritis,infection induced,0.6157546
+2256705,Intrinsic Factor Deficiency,Gaucher Disease,0.69359773
+527923,Hepatitis A,Clostridium difficile infection,0.58308876
+2573622,Aortic Rupture,"MENTAL RETARDATION, X-LINKED, WITH SHORT STATURE, HYPOGONADISM, AND ABNORMAL GAIT",0.518183
+1836894,Invasive aspergillosis,"Urea Cycle Disorders, Inborn",0.7252832
+542241,Trichiasis,Sacroiliitis,0.6466654
+2496078,Central Core Myopathy (disorder),Intracranial Hypertension,0.65558565
+1857250,Irritable bowel syndrome with constipation,Intervertebral Disc Degeneration,0.6352666
+1249646,Neuromuscular Diseases,Complications of Diabetes Mellitus,0.72235835
+2307244,Systemic onset juvenile chronic arthritis,Congenital Hyperinsulinism,0.769827
+1676497,Ataxia Telangiectasia,Diabetic Ketoacidosis,0.6494185
+2104706,Oral Mucositis,Wolman Disease,0.62675905
+1104378,Retinal Vein Occlusion,Retinal Vein Occlusion,1.0000001
+2741877,Secondarily generalized seizures,Mucocutaneous Lymph Node Syndrome,0.6039451
+2676219,Chronic systolic heart failure,"Candidiasis, Vulvovaginal",0.48785254
+552557,Endometriosis,Apraxia of Phonation,0.71925694
+2864699,Acute Kidney Insufficiency,Migraine in children,0.61462563
+2580926,"Leukodystrophy, Dysmyelinating, And Spastic Paraparesis With Or Without Dystonia",Novel H1N1 influenza,0.62701833
+626494,Immune Reconstitution Inflammatory Syndrome,Polycystic Ovary Syndrome,0.6722527
+248689,Opportunistic Infections,Severe Acute Malnutrition,0.6309617
+881385,genital fungal infection,Insulin treated type 2 diabetes mellitus,0.6818249
+2411609,Friedreich Ataxia,Vaginitis,0.7140841
+2987888,Gastrointestinal irritation,Thrombocytopenia,0.60402524
+2782837,Keratitis caused by infection,Adrenoleukodystrophy,0.56755906
+2874999,Disease of capillaries,Myocarditis,0.62693924
+1024953,Gastrointestinal Diseases,Radiculopathy,0.4941915
+1904432,Malignant Carcinoid Syndrome,Severe Aplastic Anemia,0.64975834
+94700,Pallister-Hall syndrome,Sudden sensorineural hearing loss,0.6460055
+357458,Terminal illness,"Tuberculosis, Pulmonary",0.69288296
+521165,Familial cold urticaria,disabling disease,0.61829615
+444263,Chronic low back pain,"Hyperparathyroidism, Primary",0.5601116
+1237551,Poliomyelitis,Herpes encephalitis,0.8093908
+1599180,Congenital Hemidysplasia with Ichthyosiform Erythroderma and Limb Defects,"Robinow syndrome, autosomal recessive",0.7058835
+2832572,Xerosis,"Color Blindness, Blue",0.67325854
+1281474,Acute conjunctivitis,Severe Bronchopulmonary Dysplasia,0.6540593
+696342,Candidiasis,Abdominal Abscess,0.7426347
+367234,hepatobiliary disease,Hypoplastic Left Heart Syndrome,0.5854206
+162813,Steatitis,diabetes mellitus risk,0.6810271
+782896,"Skin Diseases, Infectious",Anovulation,0.54339665
+1020608,Polypoidal choroidal vasculopathy,Yellow Fever,0.57212377
+620385,Dysmenorrhea,Lupus Nephritis,0.71629137
+2430492,Pneumoperitoneum,Intrahepatic Cholestasis,0.6175157
+87030,Geographic Atrophy,Dry Eye Syndromes,0.5443185
+1404966,Chronic thromboembolic pulmonary hypertension,Terminal illness,0.5024611
+1815438,"Tuberculosis, Drug-Resistant","Hypoalphalipoproteinemia, Familial",0.5389666
+2416275,Hypogalactia,Enamel caries,0.43876785
+90398,"Diabetes Mellitus, Insulin-Dependent",Arteriopathic disease,0.6519308
+2080389,CULLER-JONES SYNDROME,Cluster headaches and other trigeminal autonomic cephalgias,0.6217086
+90252,"Diabetes Mellitus, Insulin-Dependent",Neuropathy,0.6182572
+613063,"Bronchitis, Chronic",Measurable Disease,0.49297687
+1809638,Globoid cell leukodystrophy,Upper Respiratory Infections,0.5944075
+404079,Hepatic Veno-Occlusive Disease,Cervical nerve root pain,0.5517926
+1405124,Chronic thromboembolic pulmonary hypertension,Chronic osteoarthritis,0.6119482
+1207969,"Myasthenia Gravis, Generalized",neonatal effect nos,0.5597522
+2858119,Drug Eruptions,Atherosclerotic lesion,0.5376551
+1258021,recurrent myocardial infarction,"Macular Edema, Cystoid",0.6879588
+1548435,Ventricular arrhythmia,Immune thrombocytopenic purpura,0.6769815
+2778226,Laryngospasm,"ECTODERMAL DYSPLASIA 10A, HYPOHIDROTIC/HAIR/NAIL TYPE, AUTOSOMAL DOMINANT",0.68177533
+559192,Ascites,Candidiasis,0.74435705
+2755741,Hemoglobinemia,"Multiple Sclerosis, Primary Progressive",0.5071371
+251987,Erosive esophagitis,Systemic Inflammatory Response Syndrome,0.52207375
+848116,"Hepatitis B, Chronic",Absence Epilepsy,0.48300347
+1263720,Otitis Media with Effusion,"Tuberculosis, Multidrug-Resistant",0.6025344
+1955250,Tricuspid Valve Insufficiency,Cryopyrin-Associated Periodic Syndromes,0.6455551
+1042013,Atrioventricular Block,Ischemic cardiomyopathy,0.61553615
+2460639,Endocrine System Diseases,"Anemia, Hemolytic",0.70940197
+1674293,Postherpetic neuralgia,"Hyperparathyroidism, Primary",0.70394146
+2274478,Posterior reversible encephalopathy syndrome,Gynecomastia,0.6177362
+2953279,Extension of cerebrovascular accident,Sarcoidosis,0.62529016
+567796,end organ damage,Chronic Obstructive Pulmonary Disease EXACERBATION,0.51006997
+1471029,Colitis,Virus Diseases,0.7240949
+237089,Prehypertension,Migraine Disorders,0.59736353
+1657292,Iron deficiency,Primary Lesion,0.5358062
+2840276,Chlamydia Infections,Skin Ulcer,0.6497716
+2685620,Pancreatic Cyst,"Robinow syndrome, autosomal recessive",0.6750378
+30151,"Ventricular Fibrillation, Paroxysmal Familial, 1","Glaucoma, Open-Angle",0.63579655
+2730266,incurable diseases,Glaucoma,0.5869611
+1899834,"Heart Failure, Systolic",Hematological Disease,0.7341127
+1109337,Peripheral motor neuropathy,Spondylo-ocular syndrome,0.6945595
+324639,cervical abnormality,Renal cyst,0.69259834
+2669811,Full thickness hole of macula lutea,Histiocytosis with joint contractures and sensorineural deafness,0.766701
+1898330,"Lung Diseases, Obstructive",Influenza in Birds,0.5934392
+2111142,Aspiration Pneumonia,Edema of bone marrow,0.637485
+2667541,Status Epilepticus,Severe uncontrolled persistent asthma,0.45634523
+1597430,Alport Syndrome,Venous retinal branch occlusion,0.56103426
+216398,Fatty Liver,Aortic Valve Stenosis,0.5534948
+1920025,Condylomata Acuminata,Varicose Ulcer,0.7185555
+1798742,Severe hereditary factor VIII deficiency disease,staph bacteremia,0.6781829
+2806440,Lipomucopolysaccharidosis,Inflammatory disorder,0.63059664
+2978968,Neonatal disorder,Yellow Fever,0.6836504
+2638150,Antiphospholipid Syndrome,Contact Dermatitis,0.71985954
+364461,Bronchiolitis,Gonadotropin-Resistant Ovary Syndrome,0.6539797
+2545895,TNF receptor-associated periodic fever syndrome (TRAPS),Major Depressive Disorder 1,0.7466711
+1432945,Postthrombotic Syndrome,Chronic hcv genotype 1,0.58547497
+1023171,Exocrine pancreatic insufficiency,"Glaucoma, Open-Angle",0.5520984
+64301,Pregnancy associated hypertension,Tumor Lysis Syndrome,0.6908757
+1685898,Polyarticular juvenile rheumatoid arthritis,Ketonemia,0.6182938
+44045,Lipodystrophy,Cervical disc disorder,0.46184894
+1525442,Left-Sided Heart Failure,B Virus Infection,0.5622956
+2866248,Acute HIV infection,Chronic hand eczema,0.60472333
+1062707,Waardenburg Anophthalmia Syndrome,Influenza A,0.5705878
+1541940,Hypophysitis,Chronic heart failure,0.51812494
+2180612,H5N1 Human Influenza,Chronic thromboembolic pulmonary hypertension,0.56082606
+1484904,Pulmonary Edema,Effects of heat,0.55957144
+1183736,Bacterial Vaginosis,Absence Epilepsy,0.7504727
+2542559,Myocarditis,Atherosclerotic heart disease RISK FACTORS,0.5877353
+167242,Subacute Bacterial Endocarditis,Fungal keratitis,0.7483893
+2015445,Familial Mediterranean Fever,Thalassemia Intermedia,0.68350595
+2166031,Asymptomatic human immunodeficiency virus infection,Chronic Obstructive Airway Disease,0.5488015
+1836898,Invasive aspergillosis,Chronic hand eczema,0.69049466
+2308700,Chronic heart disease,Arthropathy,0.5578401
+745182,Paresthesia,Lumbosacral radiculopathy,0.6069081
+338798,Low Vision,Mucopolysaccharidoses,0.4784113
+1360176,Metabolic Diseases,Idiopathic generalized epilepsy,0.59145546
+1849470,Myositis,Appendicitis,0.7492031
+1350837,ALZHEIMER DISEASE 4,Occlusive stroke,0.6284562
+2861459,Meckel syndrome type 1,Erythema Multiforme,0.6325194
+1057545,Familial dilated cardiomyopathy,Sex Differentiation Disorders,0.5951511
+304861,Primary Ciliary Dyskinesia,Malnutrition,0.5080691
+1870090,Chronic ulcerative rectosigmoiditis,Deep vein thrombosis of lower limb,0.69874734
+1875552,Bursitis,Pneumocystis jiroveci pneumonia,0.71864516
+1641546,Infection caused by Helicobacter pylori,Speech Disorders,0.57219136
+1521255,Ketonuria,Somatotropin deficiency,0.7581165
+1955315,Tricuspid Valve Insufficiency,Acute pancreatitis,0.60473365
+1957207,Premature Menopause,Facial paralysis,0.6768868
+342898,Infective uveitis,Dysmenorrhea,0.5047872
+579269,CNS disorder,"Mucopolysaccharidosis, MPS-IV-A",0.691857
+1566798,Renal carnitine transport defect,Amblyopia,0.5301955
+333001,Childhood asthma,Vitamin A Deficiency,0.6428302
+2794319,Pediatric human immunodeficiency virus infection,Chronic cerebrovascular accident,0.6357698
+976868,Effects of heat,Amblyopia,0.53710866
+2169340,Gray Platelet Syndrome,Atrophic acne scar,0.63892424
+1766809,Infectious cirrhosis,Myeloperoxidase Deficiency,0.6028457
+816290,Chronic liver disease,Paronychia Inflammation,0.66050005
+1805540,Adolescent Obesity,Anisometropic Amblyopia,0.5555277
+1705351,Chronic atrial fibrillation,Oral infection,0.5077915
+1572906,Hypertensive Episode,Disorder of eye,0.7259894
+1035259,Peripheral Vascular Diseases,Miscarriage,0.58077604
+2711429,Mucocutaneous leishmaniasis,Chronic inflammatory disorder,0.58522254
+2612141,Mobius Syndrome,primary infection nos,0.67621964
+1936747,Asymptomatic bacteriuria,Hematuria,0.59399426
+855369,Cholangitis,gout tophaceous,0.6881523
+2263112,Varicosity,"Lupus Erythematosus, Systemic",0.5097663
+1460540,Secondary Infections,Klinefelter Syndrome,0.6472212
+2011339,Fungal keratitis,Chronic ulcerative proctitis,0.73870826
+866877,THROMBOCYTOPENIA 1 (disorder),endothelial dysfunction,0.7241426
+2119765,HSAN Type IV,Sex Differentiation Disorders,0.6058817
+48382,Familial generalized lipodystrophy,Acute malaria,0.5776229
+950809,Axial spondyloarthritis,Severe hereditary factor VIII deficiency disease,0.53262407
+94706,Pallister-Hall syndrome,Chromosome 2q32-Q33 Deletion Syndrome,0.76504093
+1456170,Vitamin A Deficiency,Intraventricular hemorrhage of prematurity,0.5286113
+1041298,Herpes encephalitis,Chronic nonmalignant pain,0.5821529
+2901054,Exacerbation of multiple sclerosis,"Pregnancy Complications, Infectious",0.55093294
+1970281,Hereditary pancreatitis,Status Epilepticus,0.62909883
+925458,Hyperuricemia,Yellow Fever,0.6391928
+66305,Hyperbilirubinemia,Eosinophilia,0.5978663
+1838545,Pneumothorax,Myopia,0.62273496
+2502526,hypertensive nephropathy,PHOTOPAROXYSMAL RESPONSE 1,0.730482
+654227,HIV Coinfection,Early Rheumatoid Arthritis,0.32568422
+2508002,"Mucopolysaccharidosis, MPS-IV-A",Down Syndrome,0.69859606
+2838548,Endometrial Hyperplasia,Cluster Headache,0.5909184
+2826813,Joint-ill,Ileitis,0.6335353
+863820,Renal glomerular disease,DIARRHEA 6,0.4929732
+245616,Retinopathy of Prematurity,Supine hypertension,0.62859696
+1099860,Acute congestive heart failure,Hypotrichosis simplex,0.60797596
+2948081,ANOPHTHALMIA AND PULMONARY HYPOPLASIA,Hypoglycaemic episode,0.7752138
+2480610,Hemophilia B,Sinus Tachycardia,0.72327626
+1473067,Diabetes in youth,"Anemia, severe",0.6159467
+2781085,Raynaud Disease,Hyperopia,0.53429955
+133820,Heart failure,Immune System Diseases,0.67960167
+2803781,Small bowel bacterial overgrowth syndrome,"Arteriosclerotic cardiovascular disease, NOS",0.69564867
+974646,Hypothyroidism,"Infections, Hospital",0.5418161
+34854,Acute Coronary Syndrome,Hypoalbuminemia,0.5634435
+1782298,Nonalcoholic Steatohepatitis,"Malaria, Vivax",0.4870247
+267340,IGA Glomerulonephritis,"Thrombotic thrombocytopenic purpura, acquired",0.774991
+283576,Urinary tract infection,Corneal Infection,0.73998666
+523019,Extrapyramidal Disorders,HAIM-MUNK SYNDROME,0.6964209
+409858,"Sleep Apnea, Obstructive",incurable diseases,0.5654157
+727065,Klinefelter Syndrome,Acute infectious disease,0.69323164
+1092864,"Rhinitis, Allergic, Perennial",Convergence Insufficiency,0.39779425
+270459,Autoimmune Diseases,"Anemia, Hemolytic",0.6647904
+2151414,Ulcerative colitis in remission,arthritis symptoms,0.7282032
+754612,nervous system disorder,Diverticulitis,0.6123436
+1478101,Cardiovascular Infections,TUBEROUS SCLEROSIS 2 (disorder),0.62276345
+590330,vascular inflammations,Critical Illness,0.71568775
+2242986,"Infant, Extremely Low Birth Weight",Strabismus,0.40984288
+769178,Hepatic impairment,Plasmodium falciparum infection,0.4892098
+1206896,Recurrent disease,Diabetic Neuropathies,0.62404335
+2498223,Lower Limb HEMIPARESIS,Human immunodeficiency virus I infection,0.453104
+2095968,Overactive Detrusor,Fabry Disease,0.5684458
+385680,Strudwick syndrome,Small bowel bacterial overgrowth syndrome,0.71960145
+1835229,"Deafness, Sensorineural, And Male Infertility","Asthma, Exercise-Induced",0.67121315
+2559107,Cerebral Edema,Carotid Artery Diseases,0.70964974
+1873187,OROFACIAL CLEFT 1,Cerebral Vasospasm,0.6405712
+838389,Cyst,Myositis,0.6205515
+1109757,Peripheral motor neuropathy,Neglected Diseases,0.5945456
+2928080,Refractory heart failure,"Thrombotic thrombocytopenic purpura, acquired",0.5832942
+979799,Coffin-Siris syndrome,Genetic syndrome,0.76285404
+2754493,Hemoglobinemia,acute diverticulitis,0.6893428
+2131805,Down Syndrome,Transient Cerebral Ischemia,0.66549176
+2254909,Irritable bowel syndrome with diarrhea,Miscarriage,0.55382085
+550584,Lennox-Gastaut syndrome,Hepatic impairment,0.5499984
+1936639,Asymptomatic bacteriuria,Cellulitis and abscess NOS (disorder),0.7235184
+2291149,Asymptomatic Infections,Eczema,0.52740186
+2951326,Cystitis,Exacerbation of multiple sclerosis,0.6074084
+1278819,"PIGMENTARY DISORDER, RETICULATE, WITH SYSTEMIC MANIFESTATIONS",Huntington Disease,0.66534704
+1342198,type 2 Diabetic Kidney Disease,Mucopolysaccharidoses,0.58385986
+932936,Chronic Total Occlusion Vessel,malignant disease,0.6960915
+1390438,Camurati-Engelmann Syndrome,Hyaloideoretinal degeneration of Wagner,0.67632747
+2256717,Intrinsic Factor Deficiency,Oliguria,0.6302574
+2060756,Ischemic gangrene,Glaucoma,0.50805235
+209868,Cytokine Release Syndrome,Coronary Occlusion,0.5825924
+1161742,Proliferative diabetic retinopathy,ALZHEIMER DISEASE 2,0.6325356
+2325525,Granulomatosis with polyangiitis,Barber Say syndrome,0.6442753
+485146,Compensated cardiac failure,Sinusitis,0.48723626
+1987973,"Amblyopia, Suppression",Vesico-Ureteral Reflux,0.6148134
+2463991,Acute rhinosinusitis,Chronic liver disease,0.6107867
+74249,Cardiovascular Diseases,Cholestatic hepatitis,0.615379
+415900,Gigantism,Lower respiratory tract infection,0.52929944
+1162628,Recurrent skin infections,Chronic kidney disease stage 4,0.7215544
+1266937,Telangiectasis,Facial paralysis,0.5504228
+2768404,estrogen deficiency,Embolic stroke,0.62554294
+653691,Diabetic peripheral neuropathy,Membranous glomerulonephritis,0.6231549
+2274531,Posterior reversible encephalopathy syndrome,Occlusive vascular disease,0.7584632
+2881967,Lewy Body Disease,Meningoencephalitis,0.68710536
+2697117,Deficiency of glucose-6-phosphate dehydrogenase,Idiopathic pulmonary arterial hypertension,0.57984644
+536580,hemorrhage as a complication,Compensated cardiac failure,0.70437056
+920287,"Polycystic Kidney, Autosomal Dominant",Disorder characterized by fever,0.5735704
+508420,Cerebellar lesions,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY",0.60085917
+2786810,Cerebral dysfunction,Inflammatory acne,0.6899968
+2116377,Febrile Convulsions,anaphylaxis,0.6569919
+862636,Immunosuppression,Connective Tissue Diseases,0.5422518
+266926,IGA Glomerulonephritis,Psoriasis of nail,0.62916636
+239929,Coronary artery atherosclerosis progression,Atherosclerotic heart disease RISK FACTORS,0.9193422
+1719422,Acute gastroenteritis,Erythropoietic Protoporphyria,0.7145562
+2097533,Common Cold,Viral respiratory infection,0.7103472
+2005804,Dermatomyositis,Sustained ventricular tachycardia,0.62646204
+2574658,"Aortic Aneurysm, Thoracic",Lesion of brain,0.5515255
+298789,ERBB2 Gene Amplification,Thyroid associated opthalmopathies,0.621348
+680127,Enthesitis-Related Arthritis,Hypocortisolism secondary to another disorder,0.7299068
+2433635,alcohol effect,Acute hepatitis C,0.6502845
+493290,Liver diseases,Gigantism,0.5864435
+428623,"Hydrocephalus, Normal Pressure",Keratosis Follicularis,0.51428133
+1000493,Diabetic Angiopathies,Ischemic cardiomyopathy,0.7893348
+825236,Acne Vulgaris,Dyslipidemias,0.56848353
+587574,Osteoporotic Fractures,Acute miliary tuberculosis,0.5456985
+1554462,Gastroparesis,Hemolytic disorder,0.6983361
+2164739,Mucopolysaccharidosis II,genital fungal infection,0.63286436
+1005076,Encephalitis,Exacerbation of multiple sclerosis,0.5074583
+1453678,Typhoid Fever,Invasive Fungal Infections,0.6739597
+158674,Nerve Root Compression,Breast Fibrocystic Disease,0.5102796
+1410332,Insulin treated type 2 diabetes mellitus,Pressure Ulcer,0.485259
+108882,"Osteoarthritis, Knee",Lipomucopolysaccharidosis,0.5463844
+1564749,DIARRHEA 7,Obstructive sleep apnea hypopnea,0.59805554
+2911248,Primary Lesion,Arthralgia/arthritis,0.59003264
+1500311,Symptomatic carotid artery stenosis,poorly controlled diabetes mellitus,0.696648
+1912700,Acute Disease,Allergic asthma,0.79672784
+774246,"Hepatitis, Chronic",Anovulation,0.7132545
+1762401,Lung hyperinflation,Viral upper respiratory tract infection,0.58757347
+598228,Thalassemia,Portal Hypertension,0.72805387
+55328,Multiple Sclerosis,"Multiple Sclerosis, Secondary Progressive",0.94070023
+319725,Human papilloma virus infection,Superficial Thrombophlebitis,0.60112965
+2043440,"Arteriosclerotic cardiovascular disease, NOS",hemorrhage as a complication,0.68402714
+1938768,Inborn Errors of Metabolism,Low Tension Glaucoma,0.50091344
+2780295,Raynaud Disease,Pediatric Obesity,0.67664653
+1098406,Abdominal Infection,Corneal Infection,0.81799066
+1539272,Oral Ulcer,primary disorders,0.63793343
+2635146,Bronchial dysplasia,Chronic Obstructive Pulmonary Disease EXACERBATION,0.5771169
+2198221,gender disorders,Autosomal Dominant Disorder,0.7992366
+1909258,THROMBOCYTOPENIA 6,Systemic disease,0.66935784
+2593995,"Total Hypotrichosis, Mari type",Measles,0.5483991
+981280,Bronchopulmonary Dysplasia,Transformed migraine,0.48090178
+500731,Deep Vein Thrombosis,Rubella,0.49686876
+41670,Hypertensive disease,Burnett Schwartz Berberian syndrome,0.6181362
+254151,"Muscular Dystrophy, Facioscapulohumeral",primary infection nos,0.45668918
+2947284,Renal vascular disorder,Necrotizing Enterocolitis,0.5747291
+333228,Childhood asthma,Systemic disease,0.82288337
+2171438,Acute hepatitis C,"Angina, Unstable",0.43727762
+118547,Chronic kidney disease stage 4,Rabies (disorder),0.67841613
+865324,Gastrointestinal perforation,Primary Insomnia,0.57821226
+2306129,Systemic onset juvenile chronic arthritis,Erythema Multiforme,0.62966937
+1930136,Acute Angioedema,Esophageal Diseases,0.576173
+2504096,Pure Autonomic Failure,Metabolic Diseases,0.71602803
+623064,Primary dysmenorrhea,Limb ischemia,0.710388
+2360965,"Urea Cycle Disorders, Inborn",Asymptomatic Diseases,0.67863417
+1980263,Pulmonary Fibrosis,"Osteogenesis imperfecta, dominant perinatal lethal",0.627632
+2825364,Joint-ill,Toxic Shock Syndrome,0.6765576
+2213657,HIV neutropenia,Postural Orthostatic Tachycardia Syndrome,0.6090234
+960776,Epilepsy,Alopecia,0.63653433
+2520138,Central Serous Chorioretinopathy,Gynecomastia,0.64342177
+1920068,Condylomata Acuminata,Intestinal Obstruction,0.6089099
+249842,Severe malnutrition,Neuromuscular Diseases,0.5253924
+2868640,Infectious colitis,Ptosis,0.719754
+876020,Psoriasis of nail,Venous retinal branch occlusion,0.5533234
+225076,Ischemic stroke,Primary Ciliary Dyskinesia,0.6535996
+524788,Non-ST Elevated Myocardial Infarction,Peripheral Vascular Diseases,0.6170358
+1917113,HIV Disease Course,Clostridium difficile infection,0.55978006
+2750328,Cholestatic hepatitis,alpha 1-Antitrypsin Deficiency,0.71117747
+1048138,Encephalopathies,"Aortic Aneurysm, Thoracic",0.5579493
+2007520,Cutaneous Candidiasis,Diabetes progression,0.7115485
+1574821,Prieto X-linked mental retardation syndrome,Influenza A (H5N1),0.73711294
+655142,HIV Coinfection,CULLER-JONES SYNDROME,0.49127126
+742466,neonatal effect nos,"Arthritis, Psoriatic",0.41375774
+2959343,TUBEROUS SCLEROSIS 1 (disorder),Adolescent Obesity,0.68977934
+1472004,Colitis,Plasmodium vivax infection,0.6422185
+2665631,Cumulative Trauma Disorders,Vaginal Hemorrhage,0.6970247
+2016669,Complex partial seizures,Miosis disorder,0.7172958
+2283337,Primary Focal Segmental Glomerulosclerosis,Congenital cytomegalovirus infection,0.6723978
+2977534,Neonatal disorder,Recurrent urinary tract infection,0.74578637
+887773,Blood Vessel complications,Acquired aplastic anemia,0.6739126
+1575034,Prieto X-linked mental retardation syndrome,Sustained ventricular tachycardia,0.58188957
+2101254,"MALE PSEUDOHERMAPHRODITISM: DEFICIENCY OF TESTICULAR 17,20-DESMOLASE",Tension Headache,0.5979696
+2529568,Inflammatory disorder of immune system,Heart failure with normal ejection fraction,0.5680846
+2475477,Atherosclerotic renal artery stenosis,Benign foot rot,0.5279091
+188676,Dysautonomia,Multiple Chronic Conditions,0.50677085
+1493417,Unverricht-Lundborg Syndrome,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",0.64269155
+1789924,Tension Headache,Acute miliary tuberculosis,0.6269959
+130280,Gastroenteritis,Dry Eye Syndromes,0.73570323
+1199215,Hemoglobin SC Disease,Benign Prostatic Hyperplasia,0.6015522
+352041,Vesico-Ureteral Reflux,Diabetes in youth,0.5606506
+730006,Histiocytosis with joint contractures and sensorineural deafness,Exacerbation of multiple sclerosis,0.6746817
+2735826,"Multiple Sclerosis, Primary Progressive",Disorder of lymph node,0.45516697
+2479298,Hemophilia B,"Thrombocythemia, Essential",0.6763188
+670520,Sleep Apnea Syndromes,Amyloid Neuropathies,0.6707808
+103422,Crohn Disease,Lupus Flare,0.55938864
+1667177,Giant Cell Arteritis,Upper gastrointestinal disorders,0.57392263
+1801239,Cerebral Palsy,Cardiac fibrosis,0.5632683
+1609464,Uterine Perforation,Effects of heat,0.6244747
+2508217,"Mucopolysaccharidosis, MPS-IV-A",Pure Autonomic Failure,0.5985193
+706935,Sensory neuropathy,Chronic kidney disease stage 1,0.56906956
+2254125,primary disorders,Lewy Body Disease,0.69197714
+1860181,"Aortic Aneurysm, Abdominal",Pulmonary Eosinophilia,0.551573
+1793626,Dermatitis,Skin Ulcer,0.6829669
+249860,Severe malnutrition,Acute conjunctivitis,0.5426635
+221228,Diabetic Ketoacidosis,Hospital acquired pneumonia,0.5067328
+2343203,Esophageal Stricture,"DERMATITIS HERPETIFORMIS, FAMILIAL",0.7243735
+129775,Gastroenteritis,Lipodystrophy,0.5297037
+612345,Pharyngitis,Acute Kidney Insufficiency,0.53523076
+2744572,Corneal Infection,"Nephrogenic Diabetes Insipidus, Type I",0.63411105
+1783141,Nonalcoholic Steatohepatitis,Photoreceptor degeneration,0.6006753
+2609890,Mycotic corneal ulcer,Allergic asthma,0.6272574
+11267,"Fibrosis, Liver",Chorea,0.56714743
+429541,Comatose,THROMBOCYTOPENIA 1 (disorder),0.5988122
+1674462,Postherpetic neuralgia,Pancreatic Cyst,0.5858966
+2421247,Severe persistent asthma,Rhinitis,0.6707131
+2392157,Severe Acute Respiratory Syndrome,"Leukomalacia, Periventricular",0.61749744
+922511,Gout,Histiocytosis with joint contractures and sensorineural deafness,0.55610174
+1688194,Hyperopia,Lower Limb HEMIPARESIS,0.69467753
+648528,Systemic mycosis,Mycotic corneal ulcer,0.76791626
+726486,Brain atrophy,Atopic condition,0.61587346
+1543029,Hypophysitis,Osteogenesis Imperfecta,0.7265386
+741224,Neonatal Abstinence Syndrome,Dentin Sensitivity,0.5008066
+336881,Uveitis,Viral upper respiratory tract infection,0.5661477
+896278,Osteopenia,Coronary artery atherosclerosis progression,0.538526
+2138277,Near point convergence,Gastrointestinal irritation,0.5815254
+2260611,Hydrocephalus,Graves Disease,0.6065335
+52875,insulin resistance in diabetes,Hyperopia,0.674552
+940703,Old myocardial infarction,Keratosis Follicularis,0.5117353
+2842611,Coronary Aneurysm,Carotid Stenosis,0.61773884
+2882289,Autoimmune Lymphoproliferative Syndrome,Dysautonomia,0.70437014
+1888478,Sepsis due to urinary tract infection,Steatohepatitis,0.62692326
+59768,Hyperinsulinism,Infection caused by Helicobacter pylori,0.63623863
+216643,Fatty Liver,Enthesitis-Related Arthritis,0.5152826
+123264,Chronic Obstructive Airway Disease,Hepatitis C Virus Infection,0.4550504
+1360307,Metabolic Diseases,Amenorrhea,0.7401042
+2800504,Ureteral Calculi,"Urea Cycle Disorders, Inborn",0.6446942
+2315032,Toxic condition,Neuropathy,0.68789554
+2973134,progressive multiple sclerosis,Epstein-Barr Virus Infections,0.50951546
+2326515,Granulomatosis with polyangiitis,"ARTHRITIS, PERIPHERAL",0.7110623
+2205351,Severe Bronchopulmonary Dysplasia,Seasonal allergic conjunctivitis,0.6512072
+1085740,Retinitis Pigmentosa,Nonalcoholic Steatohepatitis,0.5836979
+2945420,triple vessel disease,Intervertebral Disc Degeneration,0.58313036
+952823,DIARRHEA 6,Sentinel node (disorder),0.5510583
+1926348,pulmonary involvement,Pulmonary Edema,0.7851265
+2926183,Central Nervous System Infection,Non-radiographic axial spondyloarthritis,0.53182423
+2350668,alpha 1-Antitrypsin Deficiency,Pseudomeningocele,0.6726947
+1827956,Osteonecrosis of Jaw,Mucopolysaccharidosis Type IIIA,0.807192
+163720,Steatitis,Malignant Carcinoid Syndrome,0.62068546
+1222800,Glucocorticoid-remediable aldosteronism,Atypical Hemolytic Uremic Syndrome,0.7524309
+2474925,Atherosclerotic renal artery stenosis,Severe Malaria,0.5402436
+45879,Dyslipidemias,Gastroparesis with diabetes mellitus,0.6766283
+2235620,Disease of mucous membrane,Anemia due to infection,0.65122205
+590885,vascular inflammations,Neurocysticercosis,0.7344214
+435183,Chronic graft-versus-host disease,Vitamin B 6 Deficiency,0.5409748
+1181642,Ileus,"Diabetes Mellitus, Insulin-Dependent",0.6170255
+2037371,Infection by site,Gonadotropin-Resistant Ovary Syndrome,0.5364982
+2717799,Chronic rejection of renal transplant,Retinal thickening,0.6073572
+2019188,Normal drug tolerance,Pseudomonas aeruginosa infection,0.5339518
+2580864,"Leukodystrophy, Dysmyelinating, And Spastic Paraparesis With Or Without Dystonia",Intracranial Aneurysm,0.7599642
+97981,Cardiac Arrest,Coronary Stenosis,0.675454
+299942,Primary biliary cirrhosis,Hyperphosphaturia,0.5989283
+1932448,Cardioembolic stroke,Hyperbilirubinemia,0.63133675
+2433271,alcohol effect,Hypophysitis,0.5400347
+782066,"Skin Diseases, Infectious",Multiple Chronic Conditions,0.6731352
+177957,cardiac event,Primary gout,0.7473247
+469605,Chronic Insomnia,type 2 Diabetic Kidney Disease,0.68104464
+2939053,"Multiple Sclerosis, Secondary Progressive",Chronic active hepatitis,0.600561
+2019726,Normal drug tolerance,Thrombocytopenia 3,0.6665672
+2630455,Sinus Tachycardia,Hypertriglyceridemia,0.6361755
+90552,"Diabetes Mellitus, Insulin-Dependent",Gastrointestinal Diseases,0.6399276
+1402795,Eclampsia,Tumor Immunity,0.5982864
+589247,"Hypotension, Orthostatic",Migraine with Aura,0.6169994
+2265893,Sensorineural Hearing Loss (disorder),Sentinel node (disorder),0.75757074
+1810694,Globoid cell leukodystrophy,prostatitis,0.5255824
+673372,Myoclonic dystonia,Candidiasis,0.6394202
+2198658,gender disorders,Cholestasis,0.6606538
+657022,Coinfection,Lupus Flare,0.5416231
+789669,Postmyocardial infarction syndrome,Osteosclerosis,0.56733036
+1942672,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",Free plasma hemoglobin (disorder),0.6936194
+1096803,Disorder of macula of retina,Deep thrombophlebitis,0.6914771
+2295154,Subarachnoid Hemorrhage,Symphysis Pubis Dysfunction,0.73167104
+1738654,Senile cardiac amyloidosis,Meningococcal Infections,0.5922378
+2393079,"Hyperparathyroidism, Primary",Severe persistent allergic asthma,0.6279098
+1312658,Bacteremia,Focal glomerulosclerosis,0.6180693
+1847702,Systemic disease,"Osteoarthritis, Knee",0.5270357
+410130,Hypocortisolism secondary to another disorder,Respiratory Failure,0.6402016
+678421,Zellweger Syndrome,"Glycosuria, Renal",0.57928956
+2848210,"SCLEROSING CHOLANGITIS, NEONATAL",Adult atopic dermatitis,0.7435178
+1448855,"Anemia, severe",Infestation,0.589696
+2599109,Trifunctional Protein Deficiency With Myopathy And Neuropathy,Infectious Lung Disorder,0.6857585
+251391,Erosive esophagitis,"Leukoencephalopathy, Progressive Multifocal",0.6388855
+750780,"Color Blindness, Red-Green",Deep vein thrombosis of lower limb,0.5067819
+643666,Hematochezia,Multiple Chronic Conditions,0.5895609
+346101,"Alzheimer disease, familial, type 3",Hypercholesterolemia,0.557569
+2256071,Intrinsic Factor Deficiency,"Secondary disease, NOS",0.70107347
+1500666,Symptomatic carotid artery stenosis,Airway Obstruction,0.6394018
+2619757,Cataplexy,Acute heart failure,0.53191394
+1376776,Cervical disc disorder,Sensory polyneuropathy,0.7260347
+2500764,Extensively Drug-Resistant Tuberculosis,Septicemia,0.55003035
+1139900,Severe chronic obstructive pulmonary disease,Sick Sinus Syndrome,0.6838915
+2244976,"Leukomalacia, Periventricular",von Willebrand Disease,0.67645913
+1517495,Hematuria,Liver diseases,0.68630457
+726394,Brain atrophy,Antiphospholipid Syndrome,0.6106969
+1521105,Ketonuria,disabling disease,0.5991552
+1148353,HYPOPLASTIC LEFT HEART SYNDROME 1,Osteomyelitis,0.60222435
+2044334,"Arteriosclerotic cardiovascular disease, NOS",Hypogammaglobulinemia,0.69467926
+2581461,Lipid Metabolism Disorders,Familial cold urticaria,0.530488
+903963,Paralytic Ileus,Chronic idiopathic constipation,0.66175616
+1627000,Influenza A (H3N2),Pseudotumor Cerebri,0.6910921
+466727,Compression of spinal cord,Esophageal Varices,0.49079704
+1696616,Toxic liver disease,Oral Mucositis,0.6573922
+1875221,Postoperative ileus,Epidemic disease,0.5321549
+1914804,"Macular Degeneration, Age-Related, 1",Acute rhinosinusitis,0.53629947
+38996,Renal Insufficiency,Anovulation,0.58061844
+1552964,Anemia of chronic renal failure,Congenital Hyperinsulinism,0.72095674
+1950974,Bronchiectasis,Postcapillary pulmonary hypertension,0.6317184
+2849876,Hyperandrogenism,Coffin-Siris syndrome,0.5829282
+2184236,Scalp psoriasis,Nance-Horan syndrome,0.60782325
+524265,Non-ST Elevated Myocardial Infarction,Gastroenteritis,0.51716954
+2758425,Metabolic Bone Disorder,"Heart Failure, Diastolic",0.5697702
+1127528,"Hypophosphatemic Rickets, X-Linked Dominant",Infectious disease of genitourinary system,0.67266184
+1433884,Postthrombotic Syndrome,Lower Limb HEMIPARESIS,0.6772246
+1886469,Nail-Patella Syndrome,Cellulitis and abscess NOS (disorder),0.71721023
+2090128,Chronic kidney disease stage 2,"Angina, Unstable",0.44553372
+946860,Coronary heart disease,DIARRHEA 6,0.5646678
+1715340,Iron Overload,Prieto X-linked mental retardation syndrome,0.6448226
+2723182,"Pregnancy Complications, Infectious",Leukopenia,0.6004292
+545814,Entropion,Meibomian gland dysfunction,0.5027174
+646150,Pediatric ulcerative colitis,Bacterial keratitis,0.60631865
+2356180,Bronchiolitis Obliterans,Atrophic acne scar,0.76622057
+2181702,Viral upper respiratory tract infection,ERBB2 Gene Amplification,0.5077671
+2903589,"Hepatitis, Alcoholic",Infectious Lung Disorder,0.7604794
+777712,Lupus Erythematosus,Excessive tearing,0.5367949
+1494015,Unverricht-Lundborg Syndrome,Severe Malaria,0.6263229
+2000355,"Pneumonia, Bacterial",Sepsis,0.76393425
+2621292,Stomach Diseases,Mycoses,0.7266917
+38739,Renal Insufficiency,Pituitary-dependent Cushing's disease,0.59430027
+462275,ST segment elevation myocardial infarction,Lumbar facet joint pain,0.52338696
+1523016,Arthropathy,Progressive Disease,0.5291009
+2119552,HSAN Type IV,Extrapyramidal Disorders,0.5289559
+2052120,Esophageal Diseases,"Hypotension, Orthostatic",0.59761184
+635482,Thrombocytosis,Bacterial Infections,0.6359758
+1280369,Acute conjunctivitis,Sarcoidosis,0.59487695
+1770844,Neonatal encephalopathy,Intestinal Perforation,0.6930663
+1957018,Premature Menopause,pregnancy related,0.7049903
+2763029,MUNGAN SYNDROME,Chronic kidney disease stage 5,0.6387581
+1837557,Pneumothorax,Systemic Scleroderma,0.6695924
+2658849,Primary bacterial peritonitis,Idiopathic disease,0.58323085
+1850866,Myositis,Novel H1N1 influenza,0.6246896
+2785366,Cerebral dysfunction,Left Ventricular Hypertrophy,0.7256785
+1817443,Allergic asthma,herpes,0.63715327
+141839,Heart Diseases,Muscular Dystrophy,0.6245925
+2009486,Gonadotropin-Resistant Ovary Syndrome,Pulmonary Cystic Fibrosis,0.5752069
+1263860,Otitis Media with Effusion,Intervertebral Disc Degeneration,0.71600884
+2358524,Osteomyelitis,Hyperuricemia,0.65295684
+353823,Recurrent urinary tract infection,Chronic idiopathic constipation,0.62504053
+2913106,Neuroleptic Malignant Syndrome,Viral meningitis,0.61689705
+857543,Obstruction of biliary tree,End stage heart failure,0.5759408
+11775,"Fibrosis, Liver","ARTHRITIS, PERIPHERAL",0.63339615
+2323080,Hantavirus Infections,Atypical Hemolytic Uremic Syndrome,0.48539433
+1794508,metabolic disturbance,Immunosuppression,0.57290167
+1114127,"Bone Cysts, Aneurysmal",Acquired Immunodeficiency Syndrome,0.6393403
+1627914,Influenza A (H3N2),Acute disease of cardiovascular system,0.6476078
+894093,Cardiomyopathies,Gilbert Disease (disorder),0.6703163
+589186,"Hypotension, Orthostatic",Complex congenital heart disease,0.67331684
+1333730,Cholecystitis,Contact Dermatitis,0.6038732
+897856,Osteopenia,Androgen-Insensitivity Syndrome,0.5787886
+2009438,Gonadotropin-Resistant Ovary Syndrome,NAVAJO NEUROHEPATOPATHY,0.7274533
+2318256,Polymyalgia Rheumatica,Cardiac Arrest,0.5484635
+2431578,Superficial Thrombophlebitis,Atrial Premature Complexes,0.6210205
+858062,Obstruction of biliary tree,Staphylococcus Aureus Pneumonia,0.55893075
+1971664,Dysentery,Infection of kidney,0.5812789
+2819128,"Glycogen storage disease due to acid maltase deficiency, late-onset",Left main coronary artery disease,0.67002195
+1472123,Colitis,Temporomandibular Joint Disorders,0.54480106
+2571417,Venous Insufficiency,infection as a complication,0.5125275
+2601629,Disorders of fatty acid oxidation,Renal Artery Stenosis,0.5379387
+1198100,Tardive Dyskinesia,Influenza A (H3N2),0.7078591
+2281977,Primary Focal Segmental Glomerulosclerosis,Shy-Drager Syndrome,0.73217654
+2426397,Allergy to peanuts,Cushing Syndrome,0.55261195
+64593,Pregnancy associated hypertension,"Hyperparathyroidism, Secondary",0.7177689
+1500888,Symptomatic carotid artery stenosis,Acute gout,0.6195534
+2397272,Acute decompensated Cardiac failure,Hydrothorax,0.5581553
+2054070,Upper gastrointestinal disorders,"HETEROTAXY, VISCERAL, 2, AUTOSOMAL",0.7013282
+1551515,Non-Sustained Ventricular Tachycardia by ECG Finding,"Aneurysm, Ruptured",0.6179117
+52630,insulin resistance in diabetes,Otitis Media with Effusion,0.5901444
+912391,Amenorrhea,TUBEROUS SCLEROSIS 2 (disorder),0.60325044
+1506285,Brain Infarction,Recurrent genital herpes simplex,0.45740834
+55246,Multiple Sclerosis,Atopic condition,0.50678056
+2225418,Chromosome 2q32-Q33 Deletion Syndrome,Retinal Vein Occlusion,0.60208374
+1254985,Measles,Asymptomatic carotid artery stenosis,0.54750675
+449919,Ocular Hypertension,Craniosynostosis,0.5426868
+920396,Ketosis,Hypoglycemia,0.5348112
+1906899,Toxemia of pregnancy,Movement Disorders,0.61412627
+2133723,Hypertension in children,Disorder of macula of retina,0.6472652
+1873989,Postoperative ileus,Liver Failure,0.5641875
+768610,Hepatic impairment,"Hepatitis B, Chronic",0.583617
+2518078,Varicose Ulcer,Atrial Premature Complexes,0.6080796
+2219367,Lumbosacral radiculopathy,"Polyneuropathy, Familial",0.7955689
+1865714,"Tuberculosis, Pulmonary",Residual proteinuria,0.57816046
+137124,Migraine Disorders,Paraplegia,0.69517356
+2737290,Antibiotic-associated diarrhea,Paresthesia,0.62828845
+927284,Disorder of ejaculation,Meningococcal Infections,0.6243706
+1966375,Hydronephrosis,Chronic kidney disease stage 1,0.6247173
+1808233,Lupus Nephritis,Periodontitis,0.7016902
+332136,Pneumonia,Intraoperative floppy iris syndrome,0.71035695
+860910,Gonorrhea,Malignant Carcinoid Syndrome,0.669336
+988753,Keratitis,Alport Syndrome,0.7010428
+2405151,Urinary Bladder Diseases,Lupus Vulgaris,0.591662
+1634461,Rosacea,Vitelliform Macular Dystrophy,0.5498177
+2660331,Pentalogy of Cantrell,Severe left ventricular systolic dysfunction,0.515775
+2740946,Secondarily generalized seizures,Alopecia,0.60095876
+1798983,Severe hereditary factor VIII deficiency disease,Chronic active hepatitis,0.69727445
+2158101,"Arthritis, Gouty",Congenital dyserythropoietic anemia,0.676236
+229019,cardiovascular risk factor,Hypotensive episode,0.58006376
+809333,Methemoglobinemia,Inflammatory disorder of the cardiovascular system,0.636416
+2039128,Reversible pulpitis,"Hyperlipidemia, Familial Combined",0.5475756
+977260,Effects of heat,Cumulative Trauma Disorders,0.6478359
+2119761,HSAN Type IV,Chronic gouty arthritis,0.5298449
+175061,Hypercholesterolemia,Dermatologic disorders,0.64696676
+1518971,Ketonemia,Multiple Sclerosis,0.6452467
+1423364,CCHS WITH HIRSCHSPRUNG DISEASE,Intrinsic Factor Deficiency,0.59016675
+221290,Diabetic Ketoacidosis,abortion in second trimester,0.5760481
+1416715,"Hypercholesterolemia, Familial","Cardiomyopathy, Familial Idiopathic",0.7497501
+2638738,"Ulcerative colitis, active moderate",Pediculus capitis infestation,0.66163474
+2513450,Sarcopenia,Refractory shock,0.55778855
+1729534,Lysosomal Storage Diseases,Postcapillary pulmonary hypertension,0.6860984
+685591,Idiopathic generalized epilepsy,Chronic gouty arthritis,0.6326516
+201940,Chronic pain syndrome,H5N1 Human Influenza,0.52565545
+553303,Endometriosis,Hemophilia B,0.6312033
+2973594,progressive multiple sclerosis,Cor pulmonale,0.53446156
+394642,Barakat syndrome,Vesicoureteral Reflux 1,0.6850648
+1431858,Neglected Diseases,Amblyopia,0.612064
+890560,exudative macular degeneration,Polymyalgia Rheumatica,0.6660677
+2917673,Supine hypertension,CAMPOMELIC DYSPLASIA,0.6384818
+2600528,Disorders of fatty acid oxidation,Stable angina,0.39206463
+443063,Chronic low back pain,Spondylarthritis,0.600982
+2522263,Prostatic Diseases,Mitral valve failure,0.61868376
+2415822,Hypogalactia,Short Bowel Syndrome,0.54038745
+97537,Cardiac Arrest,Influenza-like illness,0.6403345
+2848252,"SCLEROSING CHOLANGITIS, NEONATAL",Recurrent skin infections,0.64286125
+2812847,Carnevale syndrome,MUNGAN SYNDROME,0.8262047
+80358,Right Ventricular Hypertrophy,Rhinosinusitis,0.5343952
+2240652,Local disease,Extrapyramidal Disorders,0.6658143
+1872716,OROFACIAL CLEFT 1,Hypertensive heart failure,0.41481963
+1946135,Disorder of skeletal muscle,Pediatric human immunodeficiency virus infection,0.4843702
+2751992,Apert-Crouzon Disease,Disease of mucous membrane,0.678746
+2282958,Primary Focal Segmental Glomerulosclerosis,"Bronchiolitis, Viral",0.5808889
+1552821,Anemia of chronic renal failure,asthma chronic,0.71253896
+2311260,Interstitial Cystitis,TUBEROUS SCLEROSIS 1 (disorder),0.649112
+1230435,Chickenpox,Barber Say syndrome,0.6899255
+224841,Cerebral Infarction,Folliculitis,0.52151644
+2265964,Sensorineural Hearing Loss (disorder),Late onset asthma,0.650905
+56656,Clinically isolated syndrome,"Infant, Extremely Low Birth Weight",0.5392271
+2746588,SCHIZOPHRENIA 2 (disorder),"Tuberculosis, Pulmonary",0.6051295
+70543,Viremia,Microscopic Polyarteritis,0.47493932
+976243,Effects of heat,Retinal Diseases,0.64847475
+703188,Venoocclusive disease,Irritable Bowel Syndrome,0.67257416
+1802654,Cerebral Palsy,Corneal Neovascularization,0.52876955
+1352599,Bronchitis,Myocarditis,0.62658286
+367051,hepatobiliary disease,Tumor Lysis Syndrome,0.6088431
+2456354,"HEMOCHROMATOSIS, TYPE 1",Disorder of pregnancy,0.68150204
+2518841,Varicose Ulcer,Central Nervous System Infection,0.5418896
+2952791,Intraoperative floppy iris syndrome,SCHIZOPHRENIA 12,0.61832803
+2471917,Thyrotoxicosis,"Tachycardia, Atrioventricular Nodal Reentry",0.618376
+2613754,Inflammatory acne,Cor pulmonale,0.64455926
+2071529,Pneumonia due to methicillin resistant Staphylococcus aureus,Miscarriage,0.6031127
+2434809,Hypoglycemia of childhood,Myasthenia Gravis,0.60548264
+182829,Vascular Diseases,Irreversible pulpitis,0.5740749
+2898991,Peripheral arterial occlusive disease,Photoreceptor degeneration,0.6397751
+2958010,Muscular Dystrophy,Brain Edema,0.59143895
+1653554,Neurocysticercosis,Pneumoperitoneum,0.61644083
+2982774,Corneal Neovascularization,Hypoalbuminemia,0.44616607
+703421,Venoocclusive disease,Cerebral Palsy,0.44669923
+494553,Liver diseases,Disorders of fatty acid oxidation,0.69695336
+2039072,Reversible pulpitis,Aspergillosis,0.59288555
+2671559,Vitreoretinopathy,Movement Disorders,0.63934016
+1403222,diabetic foot infection,Childhood asthma,0.6927313
+1185395,Mandibulofacial Dysostosis,Thalassemia,0.69871336
+2322356,Hantavirus Infections,Disorder of lymph node,0.53810763
+2092218,Enzyme Deficiency,Brain Ischemia,0.67580456
+47399,Familial generalized lipodystrophy,Chronic idiopathic urticaria,0.5919563
+464410,Bone Diseases,Cholecystitis,0.6075799
+301336,Cone-Rod Dystrophy 2,Hepatitis C,0.49730927
+2135971,Convergence Insufficiency,Anisometropia,0.5586598
+1881032,Autonomic neuropathy,Paralytic Ileus,0.60402495
+2910468,Primary Lesion,Esophagitis,0.6214494
+2436320,Urolithiasis,latent infection,0.674933
+2569382,Infections specific to perinatal period,Diverticulitis,0.68617976
+2761321,Sickle Cell Trait,Aneurysm of internal carotid artery,0.6419484
+1669823,Corneal ectasia,Pediatric ulcerative colitis,0.66222656
+2647567,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY","Gaucher Disease, Type 1",0.592167
+166299,Subacute Bacterial Endocarditis,Chronic kidney disease stage 5,0.66558653
+376703,Nasal Polyps,Cardiac Tamponade,0.6852893
+1024299,Gastrointestinal Diseases,Neutropenia,0.62591666
+492918,Phenylketonurias,Diarrhea predominant Irritable bowel,0.5976213
+1709577,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",Zinc deficiency,0.61210763
+1425041,Nyctalopia,Mucopolysaccharidosis II,0.68495893
+2319553,Polymyalgia Rheumatica,Turner Syndrome,0.6786475
+1460418,Secondary Infections,"Lung Diseases, Interstitial",0.67262703
+867550,THROMBOCYTOPENIA 1 (disorder),"Tuberculosis, Multidrug-Resistant",0.6743785
+554110,Acute ST segment elevation myocardial infarction (disorder),Chronic heart failure,0.68152624
+305935,Primary Ciliary Dyskinesia,Varicose Ulcer,0.57812613
+2177757,Gynecomastia,Adult Rickets,0.5718326
+1540327,Genital ulcers,Retinitis Pigmentosa,0.68340904
+1562347,Chronic idiopathic constipation,Infantile Neuroaxonal Dystrophy,0.5730572
+1026261,Paroxysmal Nonkinesigenic Dyskinesia 1,"SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS SYNDROME",0.84443253
+1477695,Cardiovascular Infections,Synovitis,0.6518729
+2839041,Chlamydia Infections,Hereditary Diseases,0.6425876
+1474263,Fasting Hypoglycemia,Non-ST Elevated Myocardial Infarction,0.57791054
+219813,Diabetic Ketoacidosis,Human immunodeficiency virus I infection,0.4906334
+2626946,Hospital acquired pneumonia,Heart Block,0.59775233
+863448,Renal glomerular disease,Thrombocytopenia,0.5817912
+2629022,Menkes Kinky Hair Syndrome,Refractive Errors,0.49425602
+2920778,Partial hypopituitarism,Coronary Occlusion,0.6228166
+2467997,Sensory polyneuropathy,Constipation - functional,0.7003182
+547801,Hepatitis C,Autosomal Dominant Disorder,0.44249472
+414974,Hepatitis B,Plasmodium vivax infection,0.6582234
+303516,Chorioamnionitis,Chronic central serous chorioretinopathy,0.7975298
+2687769,Swine Vesicular Disease,Chronic ulcerative proctitis,0.7365764
+2309594,Interstitial Cystitis,Metabolic Syndrome X,0.67826676
+922730,Gout,Venous retinal branch occlusion,0.4930796
+1460311,Secondary Infections,Pneumonia,0.83017725
+1895464,Chronic kidney disease stage 1,prostatitis,0.5861608
+832582,Chronic disease of cardiovascular system,"Skin Diseases, Infectious",0.7198657
+1764324,Streptococcal sore throat,Cor pulmonale,0.6551982
+1006828,Epileptic encephalopathy,"Multiple Sclerosis, Secondary Progressive",0.49364004
+2910077,Primary Lesion,Nasal Polyps,0.5998504
+834240,Osteoporosis,Inflammatory disorder,0.5202627
+847765,"Hepatitis B, Chronic",Coronary Artery Disease,0.49485743
+2664353,Cumulative Trauma Disorders,Pelvic Organ Prolapse,0.57058746
+2240824,Local disease,Hypoplastic Left Heart Syndrome,0.6328275
+1512984,Cat eye syndrome,Keratoconus,0.70021844
+1866986,Chronic ulcerative proctitis,Hepatitis C,0.5819477
+869189,non-gonococcal urethritis (NGU),Otitis Media,0.65952915
+2805367,Embolic Cerebral Ischemia,metabolic disturbance,0.6936167
+2491419,Brain Edema,Chronic kidney disease stage 5,0.6285833
+2804575,Embolic Cerebral Ischemia,Erectile dysfunction,0.61998963
+400901,Chronic infectious disease,Roberts-SC phocomelia syndrome,0.71889454
+2645866,Bronchospasm,Disorder of lymph node,0.5843821
+676586,Equine viral rhinopneumonitis,Autoimmune Diseases,0.71030563
+1230914,Chickenpox,Vitreous Detachment,0.5883349
+1740270,Senile cardiac amyloidosis,Small bowel bacterial overgrowth syndrome,0.63693154
+700742,Barber Say syndrome,Widespread Disease,0.74883956
+1369009,Congenital dyserythropoietic anemia,"Anemia, Hemolytic",0.8268376
+1779592,Acute respiratory tract infection,Refractive Errors,0.5806583
+2312227,Bladder Pain Syndrome,Chronic disease of skin,0.82079124
+774469,"Hepatitis, Chronic",Dermatomyositis,0.64232415
+1032271,Dysequilibrium syndrome,Ischemic gangrene,0.59335506
+253513,"Muscular Dystrophy, Facioscapulohumeral",Specific viral infections,0.42956865
+306627,Lymphopenia,Harlequin Fetus,0.48004824
+192305,Hereditary Diseases,Synovitis,0.6324603
+903210,Paralytic Ileus,Burnett Schwartz Berberian syndrome,0.67199135
+2265534,Sensorineural Hearing Loss (disorder),Keratoconus,0.52308273
+950061,Axial spondyloarthritis,Tumor Lysis Syndrome,0.4802297
+1760344,Constipation - functional,Pancreatitis,0.5044337
+1939164,Inborn Errors of Metabolism,Conn Syndrome,0.64751387
+909555,Compensated liver disease,Infection by Cryptococcus neoformans,0.70396453
+2497897,Foot Ulcer,"Polyneuropathy, Familial",0.58116245
+2022492,Disorder of vein,Persistent asthma,0.6846715
+2124656,Benign Rolandic Epilepsy,Stomatitis,0.69176716
+2976095,Surfactant Dysfunction,Obstruction of biliary tree,0.47529563
+932783,Chronic Total Occlusion Vessel,Trichiasis,0.5853844
+1594122,THROMBOCYTOPENIA 5,"Nephrogenic Diabetes Insipidus, Type I",0.65094054
+1137092,Influenza-like illness,Osteoporosis,0.51376045
+1331913,Cellulitis and abscess NOS (disorder),Full thickness hole of macula lutea,0.69487
+593536,Sudden infant death syndrome,"Muscular Dystrophy, Facioscapulohumeral",0.5191123
+534450,Heart failure with normal ejection fraction,Cerebral dysfunction,0.66944647
+2435160,Hypoglycemia of childhood,Allergic asthma,0.6704452
+1649992,Vitamin B 6 Deficiency,primary disorders,0.62935406
+2722571,Mucopolysaccharidosis III,Muckle-Wells Syndrome,0.7126944
+1277854,Hypersomnia,prostatitis,0.62314117
+1479583,Hypertriglyceridemia,"Color Blindness, Red-Green",0.40243173
+1990377,Anisometropic Amblyopia,Hematuria,0.580052
+2280163,Focal glomerulosclerosis,Diabetes Mellitus,0.6474607
+1545933,CAMPOMELIC DYSPLASIA,Adolescent Obesity,0.6153358
+2422192,Pericarditis,Childhood asthma,0.6055155
+560288,Ascites,Intestinal Obstruction,0.608813
+2187733,Postcapillary pulmonary hypertension,Posterior subcapsular cataract,0.7086896
+2046837,"Arthritis, Reactive","Hydrocephalus, Normal Pressure",0.55913484
+424814,Erectile dysfunction,Keratoconus,0.6425455
+2129445,Exophthalmos,Vitreo-retinal adhesion,0.526327
+1069262,Immunologic Deficiency Syndromes,Persistent asthma,0.67928785
+1572381,NAVAJO NEUROHEPATOPATHY,Status Epilepticus,0.61017054
+743630,neonatal effect nos,Paronychia Inflammation,0.5790877
+335911,Uveitis,Tumor Lysis Syndrome,0.554492
+256285,Aortic Valve Stenosis,Erectile dysfunction,0.6067907
+16679,Chronic Kidney Diseases,Condylomata Acuminata,0.59655863
+2716117,Chronic rejection of renal transplant,"Ventricular Fibrillation, Paroxysmal Familial, 1",0.69589037
+98137,Cardiac Arrest,Idiopathic osteoporosis,0.5771669
+2418118,Chronic myocardial ischemia,Varicosity,0.5006845
+2162638,Osteopenia/osteoporosis,Coronary artery atherosclerosis progression,0.6371435
+2260463,Hydrocephalus,Postoperative ileus,0.7270842
+2567937,Disorder of pregnancy,Endophthalmitis,0.5314732
+1414719,Thrombocytopenia 4,Sensorineural Hearing Loss (disorder),0.5297257
+1302765,Non-radiographic axial spondyloarthritis,Gastroenteritis,0.68550766
+721979,Harlequin Fetus,Aortic valve calcification,0.5576347
+1675811,Vasculitis,Gastroschisis,0.7142775
+418345,Aneurysm of internal carotid artery,Hypervitaminosis D,0.61129564
+1026282,Paroxysmal Nonkinesigenic Dyskinesia 1,Zellweger Syndrome,0.6257864
+2746886,SCHIZOPHRENIA 2 (disorder),Deficiency of testosterone biosynthesis,0.6248913
+2532061,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME",Chronic urticaria,0.62714714
+1805862,Adolescent Obesity,Impetigo,0.6086008
+1011583,Hyperparathyroidism,Chronic disease of respiratory system,0.5424864
+2754837,Hemoglobinemia,Infection due to resistant organism,0.57633656
+2594928,"Total Hypotrichosis, Mari type",Infectious colitis,0.597987
+1654496,Pulmonary Cystic Fibrosis,Progressive Disease,0.7235112
+2955728,Erysipelas,Hyperkinesia,0.7127202
+1056148,Immune System Diseases,Vascular calcification,0.5867066
+548486,Liver Cirrhosis,Primary hypercholesterolemia,0.5567452
+2879728,Ischemic congestive cardiomyopathy,Gross' disease,0.6175849
+547708,Hepatitis C,Acute respiratory tract infection,0.5844723
+685590,Idiopathic generalized epilepsy,Chronic heart failure,0.4976284
+2486231,Occlusive stroke,Carotid Stenosis,0.68903494
+1531451,Proliferative diabetic retinopathy - high risk,poorly controlled diabetes mellitus,0.62377477
+510166,Hematological Disease,Chronic systolic heart failure,0.7332284
+1849528,Myositis,Dysglycemia,0.62076926
+2294260,Subarachnoid Hemorrhage,Compensated cardiac failure,0.6249286
+377924,Hyperphosphatemia (disorder),Dentin Sensitivity,0.58463985
+1366063,Osteosclerosis,Gilles de la Tourette syndrome,0.533024
+2007067,Cutaneous Candidiasis,ST segment elevation myocardial infarction,0.5127078
+2336836,Dermatofibrosis lenticularis disseminata,Bladder Pain Syndrome,0.60267985
+1294437,Enteritis due to specified virus,Tonic - clonic seizures,0.6225893
+2205220,Severe Bronchopulmonary Dysplasia,"Hyalinosis, Systemic",0.70564014
+232711,Carotid Atherosclerosis,Hypophysitis,0.7454527
+1791114,"MACULAR DEGENERATION, AGE-RELATED, 5",Effects of heat,0.5800186
+714130,Clinical malaria,Refractory anemia with excess blasts in transformation (clinical),0.6730989
+686288,Idiopathic generalized epilepsy,Chronic kidney disease stage 2,0.56790525
+929425,Acute heart failure,Acute pancreatitis,0.5919386
+1804772,Adolescent Obesity,Pressure Ulcer,0.58231187
+1587633,Influenza due to Influenza A virus subtype H1N1,Febrile Convulsions,0.6976468
+1920532,Pelizaeus-Merzbacher Disease,Pneumocystis jiroveci pneumonia,0.7012651
+2746773,SCHIZOPHRENIA 2 (disorder),Chronic disease of respiratory system,0.6906178
+1680406,Human immunodeficiency virus II infection,Viral gastroenteritis due to Rotavirus,0.63810956
+1692757,Acute gout,Thrombocytopenia 4,0.6268893
+642558,"SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS SYNDROME",disorder of aging,0.67005986
+915793,Virus Diseases,Herpesvirus 5 infection,0.8031011
+1091012,Adult atopic dermatitis,"MENTAL RETARDATION, X-LINKED, WITH SHORT STATURE, HYPOGONADISM, AND ABNORMAL GAIT",0.68070304
+2677964,Endocarditis,Meckel syndrome type 1,0.6287998
+1447648,Allergic Conjunctivitis,Chronic hand eczema,0.54731023
+2667402,Status Epilepticus,Impetigo,0.49872667
+461107,"Seizures, Focal",Spondylolisthesis,0.5768928
+1996444,Congenital Hyperinsulinism,Hypertensive disease,0.8221016
+654890,HIV Coinfection,Psoriasis vulgaris,0.53704387
+1404716,diabetic foot infection,Supine hypertension,0.5943409
+246747,GATA2 Deficiency,Autonomic neuropathy,0.6156408
+1136057,"Infections, Hospital",Infection by site,0.8351624
+1066653,Progressive Disease,Hyperuricemia without signs of inflammatory arthritis and tophaceous disease,0.7107141
+2826345,Joint-ill,Acute hepatitis C,0.6453299
+1935180,Ocular Hypotension,Hyponatremia,0.7906727
+2432917,alcohol effect,Acute heart failure,0.5862937
+2688645,Cerebral Small Vessel Diseases,Chronic small plaque psoriasis,0.6604244
+428250,"Hydrocephalus, Normal Pressure",Influenza A (H3N2),0.68003243
+1154861,"Gaucher Disease, Type 1",Diastolic hypertension,0.6033963
+36474,Cerebrovascular accident,Severe malnutrition,0.5585222
+1016512,anaphylaxis,Nocturia,0.53756493
+2216739,Muckle-Wells Syndrome,Cytomegalovirus Infections,0.61477035
+2766329,Osteogenesis Imperfecta,Crohn Disease,0.7243807
+2514352,Vasovagal syncope,Failure to Thrive,0.6357519
+227356,Vascular occlusion,"PARKINSON DISEASE, LATE-ONSET",0.63346654
+274584,Dysglycemia,Breast Fibrocystic Disease,0.71292377
+1888837,Sepsis due to urinary tract infection,Hypoglycemia of childhood,0.78873223
+1293172,Nervous diarrhea,Sphincter of Oddi Dysfunction,0.5895634
+2556769,"Tachycardia, Atrioventricular Nodal Reentry",Deficiency of glucose-6-phosphate dehydrogenase,0.49961537
+1517493,Hematuria,Acquired aplastic anemia,0.6483159
+2099998,cold symptoms,Mycotic corneal ulcer,0.69142324
+1078641,Herpesvirus 5 infection,Diabetes in youth,0.63515663
+1688766,Nance-Horan syndrome,Advanced cirrhosis,0.47831592
+2131356,Graves Disease,"Hyperbilirubinemia, Neonatal",0.5706931
+1840542,AL-RAQAD SYNDROME,Pancreatic Cyst,0.5838155
+1152561,Soft Tissue Infection,Malnutrition,0.61212075
+994155,Intussusception,Macular retinal edema,0.6356865
+312702,"POLYARTERITIS NODOSA, CHILDHOOD-ONSET",primary disorders,0.6473299
+1087859,Pleural effusion disorder,"HEMOCHROMATOSIS, TYPE 1",0.68177015
+1382343,Maturity onset diabetes mellitus in young,Allergic rhinitis (disorder),0.7080023
+13619,Acquired Immunodeficiency Syndrome,Mobius Syndrome,0.61827797
+872322,Prurigo,Candidiasis,0.7158217
+2715740,Idiopathic disease,Refractory anemia with excess blasts in transformation (clinical),0.6776428
+863160,Immunosuppression,Small bowel bacterial overgrowth syndrome,0.6221046
+1739161,Senile cardiac amyloidosis,Chronic gouty arthritis,0.6328463
+2777696,Laryngospasm,Globoid cell leukodystrophy,0.5877446
+1514236,Inflammatory dermatosis,copd exacerbation,0.6301723
+2559809,Cerebral Edema,Dysentery,0.53457797
+797699,Diphtheria,Sarcoidosis,0.66214657
+2385660,Portal Hypertension,Surfactant Dysfunction,0.6936496
+239325,Coronary artery atherosclerosis progression,Somatotropin deficiency,0.602459
+1598749,Congenital Hemidysplasia with Ichthyosiform Erythroderma and Limb Defects,Cystic Fibrosis,0.6947409
+2730326,incurable diseases,"Sleep Apnea, Central",0.60886973
+645668,Pediatric ulcerative colitis,HIV Coinfection,0.43650132
+1527339,Abdominal Abscess,Cerebral Edema,0.5739266
+1140285,Hypotensive episode,Palmar-plantar erythrodysesthesia syndrome,0.6135554
+1452113,Cystic fibrosis in children,Measurable Disease,0.7011954
+1201932,Pseudohyperkalemia Cardiff,B Virus Infection,0.5950181
+1557291,Diamond-Blackfan Anemia 1,Tumor Lysis Syndrome,0.6442019
+693523,Critical Illness,Bronchial dysplasia,0.56785655
+2666295,Status Epilepticus,Lumbar facet joint pain,0.61206335
+1224848,Familial hypercholesterolemia - heterozygous,Cirrhosis,0.53143644
+1460802,Secondary Infections,Chronic diseases in children,0.698314
+1884602,Anovulatory (finding),Acute asthma,0.6114506
+1234573,Pemphigus Vulgaris,Postoperative ileus,0.59640276
+2752784,Paroxysmal nocturnal hemoglobinuria,"Bronchitis, Chronic",0.7096359
+1811556,Migraine with Aura,Multiple Sulfatase Deficiency Disease,0.62105834
+773648,"Hepatitis, Chronic",Stable angina,0.47867692
+2312663,Bladder Pain Syndrome,"Hyperparathyroidism, Primary",0.6735858
+1819236,Acute Migraine headaches,Lattice corneal dystrophy Type I,0.45859453
+385003,Strudwick syndrome,herpes,0.63594866
+987955,Keratitis,Fatty Liver,0.5989907
+2111927,Aspiration Pneumonia,Cerebral Vasospasm,0.7324956
+1741776,Lattice corneal dystrophy Type I,Hypogalactia,0.59331673
+1753533,Posterior subcapsular cataract,Adolescent Obesity,0.4889059
+1515980,"POLYDACTYLY, POSTAXIAL, WITH PROGRESSIVE MYOPIA",Gastrointestinal perforation,0.7061386
+1740576,Lattice corneal dystrophy Type I,"Uveitis, Posterior",0.5245068
+2710207,Painful Bladder Syndrome,multiple pathologies,0.6263092
+426292,Multiple Sulfatase Deficiency Disease,Chronic prostatitis,0.68613344
+342434,Panuveitis,RING DERMOID OF CORNEA,0.7425449
+1355639,"DERMATITIS HERPETIFORMIS, FAMILIAL","Tuberculosis, Drug-Resistant",0.5372639
+2646166,Bronchospasm,Epstein,0.5352439
+126682,Allergic rhinitis (disorder),Zellweger Syndrome,0.68212986
+1138846,Severe chronic obstructive pulmonary disease,Psoriasis of nail,0.6562664
+1272186,Asymptomatic carotid artery stenosis,Clostridium difficile colitis,0.66483724
+2184708,Scalp psoriasis,Mucopolysaccharidoses,0.68459505
+2719534,primary infection nos,ANOPHTHALMIA AND PULMONARY HYPOPLASIA,0.6175119
+111930,Disease,Fetal valproate syndrome,0.62239265
+192491,Hereditary Diseases,Diphtheria,0.6101719
+918697,"Polycystic Kidney, Autosomal Dominant",Cardiovascular morbidity,0.66656286
+138950,Hyperemia,DIARRHEA 6,0.73932195
+2130273,Graves Disease,Measurable Disease,0.7980459
+1268490,Transient Ischemic Attack,Critical Illness,0.7252092
+881750,genital fungal infection,Cavitated caries,0.702668
+709090,Acne,Sinus Tachycardia,0.5758703
+2325051,Microscopic Polyarteritis,Disease of capillaries,0.74889266
+1240183,Tetanus,Disorders of fatty acid oxidation,0.48965564
+1021899,Malabsorption Syndrome,Primary sclerosing cholangitis,0.6745341
+466147,Compression of spinal cord,Obstructive Ureterocele,0.5681439
+1021743,Malabsorption Syndrome,Adolescent Obesity,0.5538897
+1731726,Cholelithiasis,"Hyperbilirubinemia, Neonatal",0.6066073
+92171,Juvenile arthritis,Chronic disease of cardiovascular system,0.5795266
+548288,Hepatitis C,Keratitis caused by infection,0.5731819
+1644489,Psoriasis vulgaris,Cervical nerve root pain,0.57128686
+1530602,Vitreous Detachment,Lumbosacral radiculopathy,0.7007078
+2438621,Mild visual impairment,Acute Migraine headaches,0.6734151
+818810,Pulmonary Emphysema,Influenza in Birds,0.6550641
+2026474,Gastroschisis,"Bone Cysts, Aneurysmal",0.63341683
+2870057,Infectious colitis,Mitral Valve Stenosis,0.5513962
+1266127,Seborrheic dermatitis,Primary gout,0.6281838
+355234,Intestinal Diseases,Hyperparathyroidism,0.524149
+1695236,Intestinal metaplasia,Painful Bladder Syndrome,0.6444156
+410888,Hypocortisolism secondary to another disorder,Ketonemia,0.67317164
+2298519,Pseudomeningocele,Chronic ulcerative proctitis,0.6384826
+2753628,Paroxysmal nocturnal hemoglobinuria,Hemodynamic instability,0.75929594
+2755321,Hemoglobinemia,Gonadotropin-Resistant Ovary Syndrome,0.6644489
+1495027,Meibomian gland dysfunction,Urinary Stress Incontinence,0.62933314
+240923,Neutropenia,Quadriplegia,0.64201885
+1510901,Hypercalcemia,Familial dilated cardiomyopathy,0.6202588
+1898329,"Lung Diseases, Obstructive",Chronic inflammatory disorder,0.6536986
+2435331,Hypoglycemia of childhood,Decompensated cirrhosis of liver,0.6420615
+1329299,Abscess,Hypotensive episode,0.5992654
+2478499,Severe Aplastic Anemia,Dysentery,0.6326883
+1780877,Fragile X Syndrome,"Hyperaldosteronism, Familial, Type II",0.59419036
+2820841,Contact Dermatitis,Mucosal ulcer,0.68043345
+2707740,Hyperaldosteronism,Thrombosis of vena cava,0.590095
+2013834,Familial Mediterranean Fever,Peptic Ulcer,0.6489939
+1844869,Hypertensive heart disease,Chronic idiopathic urticaria,0.6879504
+1784822,Fatty Liver Disease,Thoracic facet joint pain,0.5456846
+1087976,Pleural effusion disorder,Primary bacterial peritonitis,0.5720994
+760348,Movement Disorders,Ketonemia,0.7011431
+1179837,TUBEROUS SCLEROSIS 2 (disorder),Extension of cerebrovascular accident,0.6017829
+1953933,Renal cyst,Myopathy,0.6327469
+2456700,Atypical Hemolytic Uremic Syndrome,Appendicitis,0.55549556
+917965,Dry Eye Syndromes,Major Depressive Disorder 1,0.6480774
+1107006,Central retinal vein occlusion,Primary bacterial peritonitis,0.64882684
+1916674,Atrophic retina,Conn Syndrome,0.61059904
+171086,Conjunctival hyperemia,Chronic systolic heart failure,0.57040435
+1277950,Hypersomnia,Fetal valproate syndrome,0.73072416
+306457,Lymphopenia,"Hydrocephalus, Normal Pressure",0.70820504
+1329671,Abscess,Fatty Liver Disease,0.59477174
+1368654,Congenital dyserythropoietic anemia,Psoriasis,0.60145843
+777056,Lupus Erythematosus,Advanced cirrhosis,0.4461864
+10281,Invasive meningococcal disease,Epidemic disease,0.7380961
+1950597,Bronchiectasis,Chorea,0.666924
+2210322,Rotavirus Infections,"MENTAL RETARDATION, X-LINKED, WITH SHORT STATURE, HYPOGONADISM, AND ABNORMAL GAIT",0.52654517
+395423,Barakat syndrome,Gingival Diseases,0.56861615
+1278749,"PIGMENTARY DISORDER, RETICULATE, WITH SYSTEMIC MANIFESTATIONS",Myocardial Ischemia,0.5851879
+1987457,Amblyopia,Adult Rickets,0.57172406
+1029735,seizure disorder complex,Chronic Periodontitis,0.6148342
+2508969,Carotid artery occlusion,Hepatic Encephalopathy,0.65908414
+323501,Persistent infection,Neonatal disorder,0.7496514
+2764357,MUNGAN SYNDROME,Endocarditis,0.6339311
+516419,"Lung Diseases, Interstitial",Ketonuria,0.6015828
+2451672,Adult Rickets,Peripheral Arterial Diseases,0.5728482
+324260,cervical abnormality,Foot Drop,0.59995276
+1689457,Nance-Horan syndrome,Rhinitis,0.5895
+2427089,Allergy to peanuts,"Glycogen storage disease due to acid maltase deficiency, late-onset",0.680237
+2090113,Chronic kidney disease stage 2,Clostridium difficile infection,0.4745888
+47062,Familial generalized lipodystrophy,Aortic Valve Insufficiency,0.62747246
+1442063,Anal infection,Hyperuricemia without signs of inflammatory arthritis and tophaceous disease,0.6176633
+972415,"Color Blindness, Blue",Kidney Failure,0.46436575
+999179,Facial paralysis,Ataxia Telangiectasia,0.55887496
+329423,Invasive Streptococcus pneumoniae disease,Duodenal Ulcer,0.6561971
+2552932,Swelling at injection site,Atrophoderma maculatum,0.6454149
+932034,Coronary Occlusion,physical illness,0.50483775
+1972276,Shigella Infections,Primary hypercholesterolemia,0.6687996
+2449943,osteoporosis risk,carotid disease,0.7006869
+1736652,Primary amyloidosis,Inflammatory disorder of immune system,0.5759385
+2159080,Hyaloideoretinal degeneration of Wagner,Viremia,0.58724564
+2504764,Pure Autonomic Failure,Cor pulmonale,0.64001167
+1353209,Hyperlipidemia,Huntington Disease,0.6916402
+1011458,Hyperparathyroidism,Hereditary pancreatitis,0.6273014
+2839929,Chlamydia Infections,Lysosomal Storage Diseases,0.80444074
+2454277,Intracranial Hypertension,Systemic Inflammatory Response Syndrome,0.6701409
+1521850,Ketonuria,Cavitated caries,0.71166945
+1837566,Pneumothorax,"Anemia, Sickle Cell",0.5518441
+2137502,Near point convergence,Vitamin B 12 Deficiency,0.34557202
+359680,Dengue Fever,Chronic rejection of renal transplant,0.48426282
+802891,Acute otitis media,SARCOIDOSIS CHRONIC PULMONARY,0.75020695
+1209666,Myasthenia Gravis,Idiopathic generalized epilepsy,0.6609829
+24029,Coronary Arteriosclerosis,Rheumatism,0.52924454
+2742257,Punctate keratitis,Dengue Fever,0.58578455
+399825,Chronic infectious disease,Low Vision,0.6600712
+97415,Cardiac Arrest,Genital infection,0.63220406
+1088563,Eczema,Enthesitis-Related Arthritis,0.49046788
+1834143,"Deafness, Sensorineural, And Male Infertility",Sudden infant death syndrome,0.59518015
+273429,Dysglycemia,LAURIN-SANDROW SYNDROME,0.55434465
+1985431,Alopecia totalis,Autosomal Dominant Disorder,0.58233833
+2053503,Esophageal Diseases,Ileitis,0.7000777
+503484,Tumor Lysis Syndrome,Pallister-Hall syndrome,0.6963892
+1141647,Hypotensive episode,Benign foot rot,0.4281926
+2983388,Corneal Neovascularization,growth hormone treatment,0.55549926
+279035,Hypoglycaemic episode,Chronic hcv genotype 1,0.58718306
+1822812,Onychomycosis of toenails,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",0.752885
+187822,Parkinsonian Disorders,infection induced,0.6112179
+1158144,Pneumonia in children,Residual proteinuria,0.6239411
+927382,Disorder of ejaculation,cardiac event,0.5647946
+2132075,Down Syndrome,Poliomyelitis,0.5851796
+933006,Chronic Total Occlusion Vessel,Disorder of ejaculation,0.55058825
+691947,Liver Failure,"Leishmaniasis, Visceral",0.51567173
+524023,Extrapyramidal Disorders,Microvascular Angina,0.61576736
+2948818,ANOPHTHALMIA AND PULMONARY HYPOPLASIA,Gastroparesis,0.66815966
+2251262,Oral infection,Ketosis,0.6826994
+2532266,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME","Heart Failure, Right-Sided",0.47292382
+2291513,Asymptomatic Infections,Acute gastroenteritis,0.66300535
+1300965,Spinal Diseases,Invasive meningococcal disease,0.70971274
+1652031,LEPTIN DEFICIENCY OR DYSFUNCTION,Severe uncontrolled persistent asthma,0.5017213
+1118831,obstructive disease,Mucopolysaccharidosis II,0.64527494
+1917580,HIV Disease Course,Acute conjunctivitis,0.59350246
+1124656,Cerebral Embolism,Autoimmune Diseases,0.68338454
+2327017,Granulomatosis,Prediabetes syndrome,0.6386075
+150062,Chronic idiopathic thrombocytopenic purpura,Lumbosacral radiculopathy,0.7959873
+2583732,Trichomonas Infections,Severe Sepsis,0.71112984
+1603854,Spondylolisthesis,Severe malnutrition,0.60138476
+792528,Freeman-Sheldon syndrome,Community acquired pneumonia,0.60004574
+1685228,Polyarticular juvenile rheumatoid arthritis,"Thrombocythemia, Essential",0.5579098
+2770581,Chronic anemia,Diabetes in youth,0.66776675
+2728435,Benign foot rot,Chronic small plaque psoriasis,0.68422544
+2792461,Guillain-Barre Syndrome,Aneurysm of internal carotid artery,0.5990807
+350188,Vesicoureteral Reflux 1,disorder of aging,0.667418
+810384,Vaso-Occlusive Crisis,Supraventricular tachycardia,0.75023377
+1148502,HYPOPLASTIC LEFT HEART SYNDROME 1,Congenital adrenal hyperplasia,0.73689085
+1552034,Anemia of chronic renal failure,Psoriasis,0.6128824
+1644089,Psoriasis vulgaris,Polypoidal choroidal vasculopathy,0.62099165
+2590077,Primary gout,ST segment elevation myocardial infarction,0.48735175
+1429578,"Leishmaniasis, Cutaneous",Peripheral Vascular Diseases,0.59583807
+56143,Clinically isolated syndrome,"DERMATITIS HERPETIFORMIS, FAMILIAL",0.660917
+951956,DIARRHEA 6,Postmyocardial infarction syndrome,0.5689692
+603300,Neurodegenerative Disorders,H5N1 Human Influenza,0.6530433
+2715777,Idiopathic disease,Hypoglycemia of childhood,0.6802563
+825400,Acne Vulgaris,Invasive Streptococcus pneumoniae disease,0.6608785
+866891,THROMBOCYTOPENIA 1 (disorder),Hypoglycaemic episode,0.75597197
+1097300,Abdominal Infection,latent infection,0.87835425
+2865848,Acute HIV infection,Vasculitis,0.6956814
+2554847,Staphylococcus aureus infection,Cervical Disc Degenerative Disorder,0.58008134
+1648782,Vitamin B 6 Deficiency,Widespread Disease,0.6112127
+2582961,Trichomonas Infections,Chronic Obstructive Airway Disease,0.6062492
+1172581,Infection due to resistant organism,Enteritis,0.59688944
+1292132,Sinusitis,Pancreatic Cyst,0.56541824
+2054736,Upper gastrointestinal disorders,Torsades de Pointes,0.6142298
+2137123,Near point convergence,Non-erosive gastro-esophageal reflux disease,0.53928775
+2516973,Cor pulmonale,Swine Vesicular Disease,0.7136286
+999648,Facial paralysis,Dissection of renal artery,0.5417086
+1127867,"Hypophosphatemic Rickets, X-Linked Dominant",Xerosis,0.6805354
+2602081,Plasmodium vivax infection,Hypoglycaemic episode,0.5686446
+486879,Aplastic Anemia,gout tophaceous,0.6723295
+1125649,Cerebral Embolism,"Amblyopia, Suppression",0.65205026
+2354157,Type 2 obese diabetic,Esophageal Varices,0.568248
+1906364,Coronary Stenosis,Peripheral spondyloarthritis,0.529498
+1110208,Peripheral motor neuropathy,Hematological abnormality,0.7421241
+1000270,Diabetic Angiopathies,Isovaleryl-CoA dehydrogenase deficiency,0.56589293
+2450901,osteoporosis risk,Decompensated cirrhosis of liver,0.51927584
+2749732,Cholestatic hepatitis,Influenza,0.62669134
+658027,Inflammatory disorder,Retinitis Pigmentosa,0.6200418
+2828903,Ovarian Cysts,Pharyngitis,0.5521274
+1436813,early pregnancy,"Mycobacterium Infections, Nontuberculous",0.5356956
+399565,Respiratory Tract Infections,Lewy Body Disease,0.687844
+2256579,Intrinsic Factor Deficiency,Hypotensive episode,0.54632604
+1791400,"MACULAR DEGENERATION, AGE-RELATED, 5",Colitis,0.4945535
+894426,Hyperlipasaemia,Communicable Diseases,0.6483618
+1898720,"Lung Diseases, Obstructive",Prieto X-linked mental retardation syndrome,0.6775952
+1251107,Duodenal Ulcer,Liver Cirrhosis,0.5158398
+2018386,von Willebrand Disease,anemia deficiency iron treatment,0.60729074
+1220763,Blood Coagulation Disorders,pulmonary involvement,0.68939614
+499657,"Angina, Unstable",Adult Rickets,0.5236586
+2548840,Scabies <infestation>,DIARRHEA 6,0.5924466
+697288,Weaver syndrome,Conjunctival hyperemia,0.6262973
+230213,Dental Plaque,Drug withdrawal syndrome,0.5907235
+211677,Persistent asthma,Endophthalmitis,0.60526764
+2035006,Inflammatory neuropathy,Aortic Stiffness,0.5356405
+181433,hiv-3,Chronic active hepatitis,0.71536475
+508383,Cerebellar lesions,Trichomonas Infections,0.5760565
+1685136,Polyarticular juvenile rheumatoid arthritis,Chronic pain syndrome,0.653956
+1767533,Infectious cirrhosis,Severe periodontitis,0.56645584
+898267,Chronic inflammatory disorder,Tonic - clonic seizures,0.67637366
+689019,"Malaria, Vivax",Myeloperoxidase Deficiency,0.59274983
+2486177,Occlusive stroke,Prediabetes syndrome,0.7232666
+1439166,Pulmonary congestion,Primary bacterial peritonitis,0.629566
+2689593,Cerebral Small Vessel Diseases,Retinal Pigment Epithelial Detachment,0.6458348
+1977071,insulin hypoglycemia,SCHIZOPHRENIA 12,0.6297658
+995808,Cerebellar decompression injury,Plasmodium falciparum infection,0.6839945
+2583605,Trichomonas Infections,Poliomyelitis,0.7387421
+2632954,Pulseless ventricular tachycardia,RING DERMOID OF CORNEA,0.65200627
+1744730,Gross' disease,Genital ulcers,0.5808271
+1612344,Degenerative disorder,Acute disease of cardiovascular system,0.6365025
+81127,Right Ventricular Hypertrophy,Endocarditis,0.6476504
+2338036,Nephritis,Heart Block,0.6478229
+1520154,Ketonemia,"MALE PSEUDOHERMAPHRODITISM: DEFICIENCY OF TESTICULAR 17,20-DESMOLASE",0.73016167
+1279340,"PIGMENTARY DISORDER, RETICULATE, WITH SYSTEMIC MANIFESTATIONS",Brain Infarction,0.62406003
+2367503,Chronic hand eczema,Unverricht-Lundborg Syndrome,0.59541094
+1403129,diabetic foot infection,"SYNOVITIS, GRANULOMATOUS, WITH UVEITIS AND CRANIAL NEUROPATHIES (disorder)",0.70036787
+2109581,Miosis disorder,Chickenpox,0.5709416
+2677941,Endocarditis,Epidemic disease,0.6474847
+2812580,Carnevale syndrome,Bundle-Branch Block,0.5026715
+621467,"Dermatitis, Atopic",Tonic - clonic seizures,0.6118149
+1238986,Tetanus,"Anemia, Sickle Cell",0.42778945
+2649113,Central sleep apnea syndrome,Hypogonadism,0.60317445
+2612498,Inflammatory acne,Infective uveitis,0.61024064
+2163955,Osteopenia/osteoporosis,Varicose Ulcer,0.64392424
+2218976,Lumbosacral radiculopathy,reproductive system disorder,0.53938
+870151,non-gonococcal urethritis (NGU),Central Nervous System Infection,0.58941936
+2299535,Mild persistent asthma,Lumbar facet joint pain,0.60676837
+2590146,Primary gout,Disorder of eye,0.6535669
+1044180,Herpesviridae Infections,Cerebellar Ataxia,0.5961032
+2440645,Lower urinary tract infectious disease,Granulomatosis,0.64643425
+367249,hepatobiliary disease,Severe persistent allergic asthma,0.5998362
+1627888,Influenza A (H3N2),Partial hypopituitarism,0.75318784
+23520,Coronary Arteriosclerosis,Nonalcoholic Steatohepatitis,0.7158323
+1839646,AL-RAQAD SYNDROME,"Infections, Hospital",0.5855827
+204784,"Lymphohistiocytosis, Hemophagocytic","Bone Cysts, Aneurysmal",0.81248295
+1298315,Foot Drop,Insulin treated type 2 diabetes mellitus,0.42288777
+1243374,"Abortion, Habitual",Convergence Insufficiency,0.6960171
+2037363,Infection by site,Anisometropic,0.61974484
+2289268,Sentinel node (disorder),Invasive Fungal Infections,0.6123687
+1961062,X-linked agammaglobulinemia,Acute ischemic heart disease,0.62636966
+2499650,Lower Limb HEMIPARESIS,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY",0.69549793
+1974927,"Acidosis, Lactic",Adrenoleukodystrophy,0.6206806
+2789091,Free plasma hemoglobin (disorder),Dermatologic disorders,0.7031331
+1173123,Acromegaly,Spondylarthritis,0.6320321
+87503,Geographic Atrophy,Primary amyloidosis,0.52108335
+198984,Chronic disease,Hyperinsulinism,0.6731318
+2105047,Oral Mucositis,Cervical Disc Degenerative Disorder,0.53720856
+1377663,"Kidney Failure, Acute","Hyperparathyroidism, Secondary",0.6008126
+2064929,End stage heart failure,Severe hereditary factor VIII deficiency disease,0.74276906
+1823334,Onychomycosis of toenails,Thyroid Diseases,0.64424336
+1351645,Bronchitis,Sex Differentiation Disorders,0.5457523
+1818453,Acute Migraine headaches,Ovarian Hyperstimulation Syndrome,0.72750694
+80783,Right Ventricular Hypertrophy,Severe periodontitis,0.50217897
+2920651,Partial hypopituitarism,Parasitemia,0.64728695
+1961958,Ocular hyperemia,Coronary artery atherosclerosis progression,0.70674735
+1562394,Chronic idiopathic constipation,Recurrent urinary tract infection,0.62504053
+2935800,Cardiac arrest in children,Surfactant Dysfunction,0.6682249
+2943135,Chronic total occlusion of coronary artery,Barber Say syndrome,0.5609487
+1887068,Nail-Patella Syndrome,Chronic hand eczema,0.6862888
+1992813,Anisometropia,Chlamydia trachomatis infection,0.7558218
+911143,Aortic Stiffness,"Dystonia, Dopa-Responsive, due to Sepiapterin Reductase Deficiency",0.60712427
+2799138,PSORIASIS 2,Perforation of colon,0.59286296
+538298,"Macular Edema, Cystoid",Bone Diseases,0.67090726
+2773694,Chronic postoperative pain,Prurigo,0.5902857
+252419,Erosive esophagitis,Idiopathic disease,0.49753848
+2532400,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME",Lower urinary tract infectious disease,0.7728033
+486757,Aplastic Anemia,Retinitis Pigmentosa,0.6200181
+2749821,Cholestatic hepatitis,Diabetes in youth,0.6082384
+1899225,"Lung Diseases, Obstructive",Hypervitaminosis D,0.5486775
+1812855,Migraine with Aura,Vitreo-retinal adhesion,0.6820717
+394327,Restless Legs Syndrome,PSORIASIS 2,0.6586231
+2157515,"Arthritis, Gouty",Intestinal Diseases,0.6637
+1846614,"Infant, Very Low Birth Weight","Pneumonia, Ventilator-Associated",0.54822165
+1181896,Ileus,"Anemia, Sickle Cell",0.57674134
+993305,Intussusception,Liver diseases,0.52686
+1193100,Chronic idiopathic urticaria,Tricuspid Valve Insufficiency,0.50157946
+2971980,Mitral Valve Stenosis,Chronic rejection of renal transplant,0.62071186
+2852110,Mucopolysaccharidosis I,Pure Red-Cell Aplasia,0.6790521
+603472,Neurodegenerative Disorders,Severe Aplastic Anemia,0.58628076
+997548,Viral gastroenteritis due to Rotavirus,Systemic disease,0.604697
+906714,abortion in first trimester,Uveitis,0.41471466
+742352,neonatal effect nos,Ankylosing spondylitis,0.50851744
+1417368,"Hemorrhagic Fever, Ebola",Immunosuppression,0.6484834
+2561013,Nephrotic Syndrome,Gastric ulcer,0.6266754
+2350181,alpha 1-Antitrypsin Deficiency,Vitamin A Deficiency,0.754995
+452988,"Glycosuria, Renal",Cardio-Renal Syndrome,0.7172282
+2346171,Observation of Neuromuscular Block,Tumor Lysis Syndrome,0.6302918
+921251,Ketosis,Hypophysitis,0.6080671
+1344437,Obstructive Ureterocele,Restless Legs Syndrome,0.62351847
+2464912,Acute rhinosinusitis,Zollinger-Ellison syndrome,0.6026434
+1615224,Specific viral infections,Ocular hyperemia,0.62395304
+327819,Pneumococcal Infections,Hypothalamic amenorrhea,0.6367157
+1797350,Hemophilia A,Cerebral dysfunction,0.6756482
+2900758,Exacerbation of multiple sclerosis,Hematological abnormality,0.5108918
+2955670,Erysipelas,early pregnancy,0.59209454
+1580673,"Mycobacterium Infections, Nontuberculous","Arthritis, Reactive",0.5318454
+469067,Chronic Insomnia,Hypocortisolism secondary to another disorder,0.6719491
+588702,"Hypotension, Orthostatic",non-gonococcal urethritis (NGU),0.70269567
+1969932,Hereditary pancreatitis,Thoracic facet joint pain,0.599688
+223416,Cerebral Infarction,Multiple Sulfatase Deficiency Disease,0.6533011
+2166531,Asymptomatic human immunodeficiency virus infection,Keratitis,0.56454396
+2232590,Tracheobronchitis,Genital ulcers,0.6725947
+575653,Diverticulitis,Cardiac Tamponade,0.6110127
+888876,Blood Vessel complications,Lower limb ischemia,0.7075896
+1402566,Eclampsia,Akinesia,0.7459141
+434848,Chronic graft-versus-host disease,Immunologic Deficiency Syndromes,0.65736055
+1964942,Macular retinal edema,Zollinger-Ellison syndrome,0.54542667
+347680,"Alzheimer disease, familial, type 3",Christ-Siemens-Touraine syndrome,0.617025
+840482,Vitreomacular traction,Severe Aplastic Anemia,0.5084314
+2732334,Secondary gout,Hypomagnesemia,0.6032062
+1641635,Infection caused by Helicobacter pylori,Gastroenteritis in children,0.7214793
+1734341,Nocturia,Left-Sided Heart Failure,0.48605865
+2091131,Chronic kidney disease stage 2,Relative anemia,0.55073327
+1303553,Non-radiographic axial spondyloarthritis,Unverricht-Lundborg Syndrome,0.63404363
+512696,"Arthritis, Psoriatic",Progressive Disease,0.75175685
+589088,"Hypotension, Orthostatic",Hyperkinesia,0.65541965
+1328444,Hepatolenticular Degeneration,Chronic diarrhea,0.58746535
+2674190,Vitreo-retinal adhesion,Polymyalgia Rheumatica,0.6395617
+2598122,Sinus Node Dysfunction (disorder),Zollinger-Ellison syndrome,0.6118285
+2887412,Analgesic Overuse Headache,Cardiovascular Diseases,0.5879181
+991087,Bacterial Infections,Early childhood caries,0.6943604
+2667552,Status Epilepticus,Lipomucopolysaccharidosis,0.64292663
+354965,Intestinal Diseases,Entropion,0.6628011
+2846986,Noncommunicable Diseases,Hydronephrosis,0.6170379
+2509052,Carotid artery occlusion,Nonischemic congestive cardiomyopathy,0.5949207
+1699724,infection induced,Meibomian gland dysfunction,0.51105183
+786064,Paraplegia,"Bone Cysts, Aneurysmal",0.62843895
+1039887,Herpes encephalitis,Infantile Neuroaxonal Dystrophy,0.61194015
+2083560,Hypogammaglobulinemia,Venous retinal branch occlusion,0.5463346
+282092,Urinary tract infection,cardiac event,0.62863773
+2132224,Down Syndrome,Meibomian gland dysfunction,0.62556577
+486066,Compensated cardiac failure,Autoimmune Lymphoproliferative Syndrome,0.6055391
+197968,Peptic Ulcer,Enteritis due to specified virus,0.6620025
+1864845,Hereditary Factor XIII Deficiency,Ovarian Cysts,0.71071154
+2430059,Pneumoperitoneum,Dysentery,0.60113406
+231392,Dental Plaque,primary disorders,0.72437966
+41992,Hypertensive disease,Steroid Refractory Graft Versus Host Disease,0.72042304
+1513407,Cat eye syndrome,Pancytopenia,0.7106466
+2835090,Yellow Fever,Dermatofibrosis lenticularis disseminata,0.5378415
+1664908,iliac disease,Brain Ischemia,0.70802385
+1700773,Gingival Diseases,Spondylarthritis,0.6149304
+2235465,Disease of mucous membrane,Hepatitis A,0.5450706
+1868984,Chronic ulcerative rectosigmoiditis,Hyperparathyroidism,0.69426745
+186678,Shy-Drager Syndrome,Chronic nonmalignant pain,0.72454995
+1125691,Cerebral Embolism,Ischemic gangrene,0.6244132
+1543637,"ALZHEIMER DISEASE 6, LATE-ONSET",Acne Vulgaris,0.4916138
+131836,Primary hypercholesterolemia,Chronic Obstructive Pulmonary Disease EXACERBATION,0.6102411
+2842786,Coronary Aneurysm,Idiopathic generalized epilepsy,0.67029864
+2804815,Embolic Cerebral Ischemia,Vitreomacular traction,0.6562073
+2241729,Local disease,Acute cerebral ischemia,0.62425697
+2203018,Acute respiratory failure,disorder of aging,0.622053
+2625734,Meningoencephalitis,Asymptomatic Infections,0.7905502
+1923545,Amyloidosis cutis dyschromia,Stomach Diseases,0.5993585
+1971072,Dysentery,Atrioventricular Block,0.6180545
+1364463,Progeria,Febrile Convulsions,0.6733981
+2927503,Refractory heart failure,Sudden infant death syndrome,0.6798895
+2032250,Symphysis Pubis Dysfunction,Exophthalmos,0.6348204
+279838,Hypoglycaemic episode,Varicosity,0.5222168
+2834773,Yellow Fever,Anti-Neutrophil Cytoplasmic Antibody-Associated Vasculitis,0.56445795
+1573317,Hypertensive Episode,Nervous diarrhea,0.68374634
+348863,Alzheimer's Disease,X-linked agammaglobulinemia,0.5821378
+1397251,Clostridium difficile diarrhea,"Acidosis, Lactic",0.64986575
+1853487,Chronic urticaria,Influenza-like illness,0.5731112
+1210855,Myasthenia Gravis,Punctate keratitis,0.6680963
+1012757,Somatotropin deficiency,"Hyperaldosteronism, Familial, Type II",0.62620026
+2126478,Thyroid associated opthalmopathies,Heart failure with normal ejection fraction,0.55842936
+578055,CNS disorder,AIDS defining illness,0.7294121
+169844,Conjunctival hyperemia,Non ST elevation acute coronary syndrome,0.6161495
+1037661,Isolated somatotropin deficiency,herpes 2,0.5821174
+2312845,Bladder Pain Syndrome,Hyperaldosteronism,0.5624086
+2380997,Deficiency of testosterone biosynthesis,Hyperlipasaemia,0.6926265
+272302,Infantile Neuroaxonal Dystrophy,Tardive Dyskinesia,0.66667837
+2895346,Epilepsy in children,Osteonecrosis of Jaw,0.69990915
+1646676,Diastolic hypertension,hypertensive nephropathy,0.71984357
+1129878,Acute GVH disease,Community acquired pneumonia,0.7609964
+2287059,Severe left ventricular systolic dysfunction,Flap necrosis,0.5077076
+1757053,"Aortic Aneurysm, Thoracoabdominal",THROMBOCYTOPENIA 6,0.6271964
+1556337,Gastroparesis with diabetes mellitus,"Infant, Very Low Birth Weight",0.5610159
+73309,Cardiovascular Diseases,Infectious Lung Disorder,0.84394145
+42097,Hypertensive disease,Facial paralysis,0.54794717
+547720,Hepatitis C,Hyponatremia,0.3847072
+247410,Opportunistic Infections,Acute Coronary Syndrome,0.534911
+634185,Japanese Encephalitis,Senile cardiac amyloidosis,0.603893
+707793,Acne,Ovarian Hyperstimulation Syndrome,0.6251368
+1254311,Measles,Degenerative polyarthritis,0.6182598
+594072,Sudden infant death syndrome,Chronic diseases in children,0.66598886
+2676890,Endocarditis,Encephalitis,0.72477794
+2321112,Vitelliform Macular Dystrophy,Atrophoderma maculatum,0.8149153
+657689,Inflammatory disorder,Deep Vein Thrombosis,0.624883
+1771726,arthritis symptoms,Terminal illness,0.8045859
+2809529,RING DERMOID OF CORNEA,Chronic Kidney Diseases,0.620136
+1613769,Paroxysmal atrial fibrillation,Mild visual impairment,0.5595028
+1744706,Gross' disease,"Epilepsies, Partial",0.6113453
+746647,Pulmonary Eosinophilia,Constipation - functional,0.5407448
+2032772,Polyneuropathy,Renal Insufficiency,0.54327655
+21474,Anemia,Skin lesion,0.60998577
+339764,"Uveitis, Posterior",Bacterial Vaginosis,0.6471427
+2578236,Refractory shock,Disorder of ejaculation,0.6501805
+1994934,Anisometropic,Overactive Bladder,0.60057735
+838571,Cyst,Mucopolysaccharidosis II,0.6966372
+1216973,Optic Neuritis,"DERMATITIS HERPETIFORMIS, FAMILIAL",0.746003
+2129361,Exophthalmos,Pleurisy,0.6247564
+1050957,Peptic Esophagitis,immunoglobulin disease,0.57045996
+1203077,Diffuse Scleroderma,recurrent myocardial infarction,0.6428264
+1929574,Acute Angioedema,Healthcare associated pneumonia,0.60520786
+2121086,Torsades de Pointes,Multiple Chronic Conditions,0.5216954
+757490,Carotid Artery Diseases,Nephrotic Syndrome,0.75938296
+1303172,Non-radiographic axial spondyloarthritis,Osteoporosis,0.70771396
+2375601,gram negative sepsis,"Macular Edema, Cystoid",0.5528963
+1174546,Acromegaly,Croup,0.61131936
+2318896,Polymyalgia Rheumatica,Disorder of lymph node,0.5915697
+1865197,"Tuberculosis, Pulmonary",Infection in children,0.7584897
+541419,Mucormycosis,Dupuytren's Disease,0.60558575
+2851975,Mucopolysaccharidosis I,Thoracic Outlet Syndrome,0.8366001
+580248,Age related macular degeneration,"Myasthenia Gravis, Generalized",0.65750176
+864019,Renal glomerular disease,gout tophaceous,0.5514374
+305212,Primary Ciliary Dyskinesia,Telangiectasis,0.71782243
+1536674,Hyperkinesia,Hepatitis C Virus Infection,0.52164227
+2831953,asthma adult onset,Epilepsy in children,0.7273741
+1462249,Infestation,Liver Failure,0.7477777
+2415005,"ARTHRITIS, PERIPHERAL",Acute Kidney Insufficiency,0.52544993
+36290,Acute Coronary Syndrome,Deep vein thrombosis of lower limb,0.6305549
+1324802,Latent Tuberculosis,Lupus Flare,0.6780006
+2784417,Anemia in chronic kidney disease,immunoglobulin disease,0.6659716
+1810375,Globoid cell leukodystrophy,Cervical disc disorder,0.48677838
+1105063,Retinal Vein Occlusion,Sentinel node (disorder),0.66104996
+2721405,Mucopolysaccharidosis III,Chronic disease,0.6568703
+2580611,"Leukodystrophy, Dysmyelinating, And Spastic Paraparesis With Or Without Dystonia","Arteriosclerotic cardiovascular disease, NOS",0.7482676
+2851312,Mucopolysaccharidosis I,"Lupus Erythematosus, Systemic",0.705632
+2985,Macular Holes,Acute hepatitis C,0.52802795
+2474387,Atherosclerotic renal artery stenosis,Influenza A,0.39213532
+2430267,Pneumoperitoneum,Ulcer of artery,0.5726143
+504446,Tumor Lysis Syndrome,Fecal Incontinence,0.4142869
+1481721,Hypertensive heart failure,Vitamin A Deficiency,0.5615324
+297724,ERBB2 Gene Amplification,Bacteriuria,0.5743891
+2949158,ANOPHTHALMIA AND PULMONARY HYPOPLASIA,Noonan Syndrome 1,0.6204856
+762953,Sialorrhea,Diabetes Mellitus,0.6069277
+1143597,Peyronie Disease,Cardiovascular morbidity,0.5832602
+505462,Neuropathy,Extrapyramidal Disorders,0.7784572
+1400389,"AMYLOIDOSIS, HEREDITARY, TRANSTHYRETIN-RELATED","Hemorrhagic Fever, Ebola",0.6899549
+2733812,abortion in second trimester,Clinical malaria,0.652763
+1717037,Diabetes in children,Hematuria,0.65675765
+878205,Barrett Esophagus,Chronic kidney disease stage 1,0.47655874
+73759,Cardiovascular Diseases,Child attention deficit disorder,0.6533246
+427265,Multiple Sulfatase Deficiency Disease,Androgenetic Alopecia,0.68973035
+582993,Disorder of eye,Deep thrombophlebitis,0.7040207
+1063704,Waardenburg Anophthalmia Syndrome,Disorder of pregnancy,0.63760775
+2550225,Valvular disease,Intestinal Diseases,0.47697818
+1995860,Anisometropic,atrial fibrillation recurrent,0.57522714
+2577490,Primary Autoimmune Thrombocytopenic Purpura,Sinus Tachycardia,0.5679963
+2609625,Mycotic corneal ulcer,Gaucher Disease,0.63435024
+1468751,Vascular calcification,Premenstrual Tension,0.5460392
+1044425,Herpesviridae Infections,Near point convergence,0.41125923
+2846550,Noncommunicable Diseases,Lower respiratory tract infection,0.61027807
+61813,Macrophage Activation Syndrome,Chronic disease of respiratory system,0.69951385
+514433,Systemic Scleroderma,Herpesvirus 5 infection,0.50539577
+1428956,Candidemia,Intraoperative floppy iris syndrome,0.7340982
+2900044,Exacerbation of multiple sclerosis,Effects of heat,0.549607
+1265194,Seborrheic dermatitis,Effects of heat,0.62928355
+1969290,Hereditary pancreatitis,DIARRHEA 6,0.5975451
+1188006,Cystic Disease Of Lung,Torsades de Pointes,0.50039005
+851686,Choroidal Neovascularization,Aortic Stiffness,0.51808554
+2990678,Perforation of colon,Noonan Syndrome 1,0.74606776
+2784886,Anemia in chronic kidney disease,Vulvar Diseases,0.69533646
+1797769,Severe hereditary factor VIII deficiency disease,Lung disease with systemic sclerosis,0.72577167
+847943,"Hepatitis B, Chronic",Bacterial Endocarditis,0.60862553
+2668648,Recurrent seizures,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",0.7310093
+2185984,Chronic disease of respiratory system,Epstein-Barr Virus Infections,0.67017883
+2609088,Mycotic corneal ulcer,Comatose,0.6342326
+1418483,"Hemorrhagic Fever, Ebola",Neonatal Jaundice,0.74085987
+1206437,Recurrent disease,Retinitis Pigmentosa,0.6202768
+437475,Hemolytic-Uremic Syndrome,Stomach Diseases,0.64072007
+2415973,Hypogalactia,CAMPOMELIC DYSPLASIA,0.6261779
+92432,Juvenile arthritis,Short Bowel Syndrome,0.7112938
+2976326,Surfactant Dysfunction,"PARKINSON DISEASE, LATE-ONSET",0.6832395
+1364721,Progeria,Membranous glomerulonephritis,0.67293584
+1633512,Rosacea,Zellweger Syndrome,0.5340393
+1611710,Degenerative disorder,Chronic ulcerative rectosigmoiditis,0.5946076
+1226183,Familial hypercholesterolemia - heterozygous,Microscopic Polyarteritis,0.56538224
+1846050,"Infant, Very Low Birth Weight",Febrile Neutropenia,0.58771366
+32568,Syndrome,Thyrotoxicosis,0.6903683
+1769864,Neonatal encephalopathy,Gastroesophageal reflux disease,0.6510867
+950169,Axial spondyloarthritis,Liver Failure,0.4774166
+2887878,Analgesic Overuse Headache,Acute respiratory infections,0.67207414
+555814,Erythema,Cyst,0.7350437
+1476256,Fish-Eye Disease,Coffin-Siris syndrome,0.8160857
+1585248,Episodic Kinesigenic Dyskinesia 1,Post-Concussion Syndrome,0.584401
+1840803,"Muscular Dystrophy, Duchenne","BESTROPHINOPATHY, AUTOSOMAL RECESSIVE",0.7452304
+1934120,Cardioembolic stroke,TUBEROUS SCLEROSIS 1 (disorder),0.56372404
+109159,Osteophyte,Sarcoidosis,0.63865525
+1341726,type 2 Diabetic Kidney Disease,Nance-Horan syndrome,0.5328949
+323672,cervical abnormality,Leukopenia,0.56669724
+2741899,Secondarily generalized seizures,Secondary gout,0.55595165
+2840679,Posterior Vitreous Detachment,Acute Chest Syndrome,0.65982676
+1924618,"MENTAL RETARDATION, X-LINKED, WITH SHORT STATURE, HYPOGONADISM, AND ABNORMAL GAIT",Pulmonary Edema,0.6352393
+1928794,prostatitis,"Pregnancy Complications, Infectious",0.61205554
+2808316,Temporomandibular Joint Disorders,Aortic Stiffness,0.6954873
+1174298,Acromegaly,alpha 1-Antitrypsin Deficiency,0.59827673
+643369,"SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS SYNDROME",Rheumatism,0.5532436
+1835131,"Deafness, Sensorineural, And Male Infertility",Seasonal allergic conjunctivitis,0.6774554
+494341,Liver diseases,Relative anemia,0.59205776
+1021677,Malabsorption Syndrome,Rhinitis,0.54941046
+2858012,Drug Eruptions,"Diabetes Mellitus, Insulin-Dependent",0.5149732
+2697896,Deficiency of glucose-6-phosphate dehydrogenase,"Leishmaniasis, Cutaneous",0.5338022
+471990,"Lupus Erythematosus, Systemic",Atherosclerotic renal artery stenosis,0.6716893
+1213814,Cerebrovascular Disorders,Bursitis,0.62314284
+295163,Cutaneous sarcoidosis,AL-RAQAD SYNDROME,0.63440925
+1575980,Prieto X-linked mental retardation syndrome,Christ-Siemens-Touraine syndrome,0.77946764
+2276923,Vulvar Diseases,Bacterial Endocarditis,0.6916323
+80235,Right Ventricular Hypertrophy,Acute hepatitis,0.57431024
+1535640,Chorea,Tricuspid Valve Insufficiency,0.51774687
+351659,Vesico-Ureteral Reflux,Hepatic Encephalopathy,0.54699904
+2649365,Central sleep apnea syndrome,Asymptomatic carotid artery stenosis,0.674654
+869442,non-gonococcal urethritis (NGU),infection induced,0.61642796
+1404122,diabetic foot infection,Clinical infection,0.8025864
+1676381,Ataxia Telangiectasia,Myocardial Infarction,0.4489055
+2718561,primary infection nos,Seborrheic dermatitis,0.6849386
+616671,Chronic Obstructive Pulmonary Disease EXACERBATION,Congenital dyserythropoietic anemia,0.6418584
+2896157,Endometritis,Prehypertension,0.6523806
+177404,cardiac event,Rosacea,0.53702676
+349051,Alzheimer's Disease,Severe left ventricular systolic dysfunction,0.40390697
+549052,Liver Cirrhosis,Deformity of eyelid,0.53447026
+943892,Secondary Parkinson Disease,"Cholestasis-edema syndrome, Norwegian type",0.6571176
+1652943,Neurocysticercosis,Radiculopathy,0.74433273
+1256918,"PARKINSON DISEASE, LATE-ONSET",Fabry Disease,0.71506464
+189814,Dysautonomia,Breast Fibrocystic Disease,0.59698576
+1551975,Anemia of chronic renal failure,Incontinence,0.4510419
+929624,Acute heart failure,Waardenburg Anophthalmia Syndrome,0.5474163
+1578055,ALZHEIMER DISEASE 2,Equine Infectious Anemia,0.657183
+792762,Freeman-Sheldon syndrome,End Stage Liver Disease,0.6721741
+838827,Cyst,"Polyneuropathy, Familial",0.60780454
+1080264,Healthcare associated pneumonia,Supraventricular tachycardia,0.56399006
+1068535,Endophthalmitis,Heart valve disease,0.4187809
+1538863,Oral Ulcer,CAMPOMELIC DYSPLASIA,0.55004984
+451700,"Glycosuria, Renal",Cutaneous sarcoidosis,0.69377744
+1994424,Refractive Errors,Curb,0.6570123
+456693,carotid disease,Renal vascular disorder,0.78106797
+1328927,Abscess,Early Rheumatoid Arthritis,0.48226815
+2949856,Cystitis,Terminal illness,0.6150114
+1490434,Bacterial corneal ulcer,DIARRHEA 7,0.67096907
+857355,Obstruction of biliary tree,Senile cardiac amyloidosis,0.6020044
+2542522,Myocarditis,Refractive Errors,0.56065154
+1050998,Peptic Esophagitis,Hyperkinesia,0.69742155
+13332,Acquired Immunodeficiency Syndrome,Hydrothorax,0.5945759
+1688405,Hyperopia,Acute Kidney Insufficiency,0.5942942
+2380979,Deficiency of testosterone biosynthesis,Renal glomerular disease,0.6096023
+997467,Viral gastroenteritis due to Rotavirus,Postural Orthostatic Tachycardia Syndrome,0.72642654
+1025292,Gastrointestinal Diseases,Aspergillosis,0.48528072
+943904,Secondary Parkinson Disease,Intestinal Perforation,0.543886
+1745553,Gross' disease,Deep thrombophlebitis,0.61299324
+682220,Arthritis,Chronic kidney disease stage 3,0.56172836
+1977037,insulin hypoglycemia,Aortic Aneurysm,0.6641127
+1523132,Arthropathy,Telangiectasis,0.65263945
+504861,Tumor Lysis Syndrome,Vaginal Hemorrhage,0.6708586
+1845991,"Infant, Very Low Birth Weight",Heart Diseases,0.50276065
+1976682,insulin hypoglycemia,Alcohol withdrawal syndrome,0.7128099
+1654948,Pulmonary Cystic Fibrosis,Systemic disease,0.74932116
+2080297,CULLER-JONES SYNDROME,"Anemia, severe",0.7154286
+1740749,Lattice corneal dystrophy Type I,Chronic cerebrovascular accident,0.6406013
+28461,Communicable Diseases,Bronchitis,0.62749505
+276734,Atherosclerotic lesion,Ischemic congestive cardiomyopathy,0.64207333
+1650017,Vitamin B 6 Deficiency,Cerebral Vasospasm,0.55222064
+2867198,Disorder characterized by fever,Infectious Canine Hepatitis,0.7046912
+1761730,Lung hyperinflation,Malabsorption Syndrome,0.64907944
+1625359,Drug Hypersensitivity Syndrome,Oral Ulcer,0.6094873
+151045,Asthma,Genital infection,0.6698175
+2652379,Widespread Chronic Pain,Deep Vein Thrombosis,0.63866425
+1626375,Influenza A (H3N2),Chorioamnionitis,0.5985011
+981838,Bronchopulmonary Dysplasia,Atrial Premature Complexes,0.59310037
+312299,"POLYARTERITIS NODOSA, CHILDHOOD-ONSET",Gastroparesis with diabetes mellitus,0.8095131
+1649859,Vitamin B 6 Deficiency,Disorder of vein,0.5340731
+1027147,Paroxysmal Nonkinesigenic Dyskinesia 1,Idiopathic osteoporosis,0.75591505
+2700831,Epileptic drop attack,Familial cold urticaria,0.67521864
+759764,Movement Disorders,Hematological Disease,0.6477224
+589226,"Hypotension, Orthostatic",Wolman Disease,0.54474366
+1209781,Myasthenia Gravis,Chronic gouty arthritis,0.63781446
+1047400,Encephalopathies,Foot Drop,0.58302355
+51126,Kidney Diseases,Pulmonary Cystic Fibrosis,0.7540611
+1134517,Acute hepatitis,Cervical Disc Degenerative Disorder,0.6249846
+808028,Methemoglobinemia,"Lymphohistiocytosis, Hemophagocytic",0.7284048
+2070212,Dental caries extending into dentin,Aspergillosis,0.7369822
+2695850,Cholestasis,Chronic heart failure,0.39381355
+2341694,Turner Syndrome,Amyloidosis,0.66413957
+2899553,Exacerbation of multiple sclerosis,Allergic rhinitis (disorder),0.59364873
+391482,"Osteoporosis, Postmenopausal",non-gonococcal urethritis (NGU),0.72775453
+889023,Blood Vessel complications,Widespread Chronic Pain,0.6381676
+2265963,Sensorineural Hearing Loss (disorder),Friedreich Ataxia,0.64978075
+1028283,Glomerulonephritis,HYPOPLASTIC LEFT HEART SYNDROME 1,0.72565246
+2296836,Cerebral Vasospasm,Respiration Disorders,0.7149924
+248962,Opportunistic Infections,Intrahepatic Cholestasis,0.6194219
+1786934,Cystic Fibrosis Pulmonary Exacerbation,"Pregnancy Complications, Infectious",0.6621678
+432711,Atrial Fibrillation,HIV Infections,0.5103997
+247374,GATA2 Deficiency,Acute disease of cardiovascular system,0.5752759
+1579347,ALZHEIMER DISEASE 2,SCHIZOPHRENIA 2 (disorder),0.7802506
+137703,Migraine Disorders,Anti-Neutrophil Cytoplasmic Antibody-Associated Vasculitis,0.6160666
+626188,"Meningitis, Cryptococcal",Infectious colitis,0.6682966
+2103734,Oral Mucositis,Pallister-Hall syndrome,0.56421673
+2292869,Edentulism NOS,Genetic syndrome,0.6338572
+572161,Isovaleryl-CoA dehydrogenase deficiency,Viral upper respiratory tract infection,0.45305464
+1550687,Non-Sustained Ventricular Tachycardia by ECG Finding,Peptic Esophagitis,0.66130024
+2673910,Vitreo-retinal adhesion,"Deafness, Sensorineural, And Male Infertility",0.652554
+1871832,Disorder of skeletal system,triple vessel disease,0.66850275
+1840231,AL-RAQAD SYNDROME,Photoreceptor degeneration,0.5697326
+1006729,Epileptic encephalopathy,Osteogenesis Imperfecta,0.6757404
+2204409,Severe Bronchopulmonary Dysplasia,Myoclonic dystonia,0.74130607
+1437722,Pulmonary congestion,Widespread Disease,0.79982114
+2305112,"Hepatitis D, Chronic",Spinal Diseases,0.70725256
+202765,Amyotrophic Lateral Sclerosis,Acute exacerbation of chronic obstructive airways disease,0.6750462
+1464000,Mucolipidosis Type IV,Klinefelter Syndrome,0.6675642
+576023,Diverticulitis,Aortic root dilation,0.61148256
+681078,Enthesitis-Related Arthritis,"Hyperlipidemia, Familial Combined",0.5861436
+163764,Steatitis,Pulmonary Fibrosis,0.6992179
+2742652,Punctate keratitis,Atrioventricular Block,0.5572551
+172732,"SYNOVITIS, GRANULOMATOUS, WITH UVEITIS AND CRANIAL NEUROPATHIES (disorder)",Inflammatory disorder of immune system,0.71360964
+398347,Respiratory Tract Infections,"Hepatitis, Chronic",0.7310011
+454228,Peripheral Arterial Diseases,Vasculitis,0.62383837
+1572951,Hypertensive Episode,Malnutrition,0.7210229
+2204911,Severe Bronchopulmonary Dysplasia,Hypophysitis,0.79991007
+1636896,PHOTOPAROXYSMAL RESPONSE 1,Hepatitis C,0.54495764
+788412,Ocular Cicatricial Pemphigoid,Scalp psoriasis,0.61454177
+588759,"Hypotension, Orthostatic",HAIM-MUNK SYNDROME,0.5930313
+917992,Dry Eye Syndromes,Clinical infection,0.73043346
+2853278,HMN (Hereditary Motor Neuropathy) Proximal Type I,Acute respiratory infections,0.5221378
+2442871,Pyelonephritis,Hereditary Diseases,0.6738185
+187278,Parkinsonian Disorders,Arteriopathic disease,0.65109015
+1455261,Vitamin A Deficiency,Dermatologic disorders,0.53525907
+650929,Diabetic Neuralgia,Lupus Erythematosus,0.62436503
+1147323,HYPOPLASTIC LEFT HEART SYNDROME 1,acute diverticulitis,0.717613
+1146644,Failure to Thrive,Clinical Chorioamnionitis,0.5589053
+1050919,Peptic Esophagitis,"AMYLOIDOSIS, HEREDITARY, TRANSTHYRETIN-RELATED",0.6081189
+767912,Collagen Diseases,Hyperhomocysteinemia,0.55485624
+2633815,Hyperhomocysteinemia,Peripheral Vascular Insufficiency,0.6498124
+915218,Virus Diseases,"Tachycardia, Ventricular",0.5153146
+756358,Carotid Artery Diseases,Neurodegenerative Disorders,0.7329013
+1048208,Encephalopathies,Cholestasis,0.6716852
+2042921,Cavitated caries,Pulseless ventricular tachycardia,0.6054118
+558394,Uncomplicated Hypertension,Chronic heart disease,0.54458666
+335492,diabetes mellitus risk,Complex Regional Pain Syndromes,0.5526604
+1260879,disorder of aging,Renal Artery Stenosis,0.6043123
+1866242,"Tuberculosis, Pulmonary",primary disorders,0.62408876
+1275983,Acute pyelonephritis,Hyperuricemia without signs of inflammatory arthritis and tophaceous disease,0.7909625
+640043,Chronic cerebrovascular accident,Epilepsy in children,0.60088754
+2787764,Severe uncontrolled persistent asthma,Sustained ventricular tachycardia,0.66319615
+1127096,"Hypophosphatemic Rickets, X-Linked Dominant","Epilepsies, Partial",0.5871056
+1800985,Cerebral Palsy,Diabetic Retinopathy,0.5366544
+2620895,Cataplexy,Peripheral arterial occlusive disease,0.6673265
+1693824,Intestinal metaplasia,IGA Glomerulonephritis,0.6577699
+2007300,Cutaneous Candidiasis,Gastrointestinal perforation,0.68291533
+1250854,Duodenal Ulcer,Disease,0.63249093
+304044,Chorioamnionitis,physical illness,0.5740285
+1077887,Herpesvirus 5 infection,Bacterial conjunctivitis,0.64071393
+1785019,Fatty Liver Disease,Cervical dysplasia,0.6261891
+162043,Spinal stenosis of lumbar region,Anisometropic,0.55457366
+1745279,Gross' disease,Renal Artery Stenosis,0.6528651
+975058,Hypothyroidism,Systemic disease,0.6246224
+1487800,Bacterial keratitis,Hydranencephaly with Renal Aplasia-Dysplasia,0.63879204
+228864,cardiovascular risk factor,Prurigo,0.59766644
+95383,Diabetic Retinopathy,Hepatic Veno-Occlusive Disease,0.6455208
+1577113,Facial Hemiatrophy,Postoperative ileus,0.5706419
+2899640,Exacerbation of multiple sclerosis,Juvenile Chronic Polyarthritis,0.63906
+2191035,Akinesia,Hypertriglyceridemia,0.58848417
+2734113,abortion in second trimester,Pemphigus Vulgaris,0.47243047
+1844678,Hypertensive heart disease,Immunosuppression,0.56691885
+1494801,Meibomian gland dysfunction,Heart Diseases,0.5765921
+434251,Chronic graft-versus-host disease,Cerebrovascular accident,0.5880615
+2432406,alcohol effect,Dyslipidemias,0.5740339
+2873351,Dupuytren Contracture,Dermatitis acneiform,0.6847716
+131279,Gastroenteritis,Bronchospasm,0.66785264
+2738905,Chlamydia trachomatis infection,Entropion,0.7043035
+1484005,CARDIAC causes,"ARTHRITIS, PERIPHERAL",0.67572784
+149097,Chronic idiopathic thrombocytopenic purpura,Liver Cirrhosis,0.6170533
+2851115,Mucopolysaccharidosis I,Gastroenteritis,0.63110554
+2894665,Epilepsy in children,Anterior myocardial infarction,0.45862678
+1157715,Pneumonia in children,Thalassemia,0.76430327
+1180744,Chronic diseases in children,Vitreous Detachment,0.5771911
+2991584,Flap necrosis,Diabetic Nephropathy,0.6279625
+1147474,HYPOPLASTIC LEFT HEART SYNDROME 1,Cyst,0.6367863
+41899,Hypertensive disease,Coinfection,0.6279696
+391018,"Osteoporosis, Postmenopausal",Hyperbilirubinemia,0.55995804
+1791762,"MACULAR DEGENERATION, AGE-RELATED, 5",Common Cold,0.5867037
+1342790,Pelvic Inflammatory Disease,hemorrhage as a complication,0.5511764
+2440860,Lower urinary tract infectious disease,Sick Sinus Syndrome,0.73880154
+2629027,Menkes Kinky Hair Syndrome,Pericardial effusion,0.48999307
+815289,Chronic liver disease,Recurrent Cerebral Ischemia,0.7033505
+1805488,Adolescent Obesity,"Heart Failure, Systolic",0.5020835
+2049457,Adult Fanconi syndrome,Systemic Inflammatory Response Syndrome,0.6624163
+2245289,"Leukomalacia, Periventricular",Cerebral Edema,0.60300153
+565381,Glaucoma,Congenital reticular ichthyosiform erythroderma,0.60069627
+485254,Compensated cardiac failure,Cardiovascular Infections,0.79220325
+2626767,Hospital acquired pneumonia,Retinitis Pigmentosa,0.46190664
+2575967,"Aortic Aneurysm, Thoracic",Gastrointestinal irritation,0.52416825
+2733542,abortion in second trimester,GATA2 Deficiency,0.62103075
+1533007,Subclinical hypothyroidism,Restless Legs Syndrome,0.6305272
+1507477,Internal Carotid Artery Stenosis,Hypoparathyroidism,0.61160696
+1592935,"Thrombotic thrombocytopenic purpura, acquired",Interstitial Cystitis,0.65145946
+1618213,Thoracic Outlet Syndrome,HYPOPLASTIC LEFT HEART SYNDROME 1,0.70412105
+1872479,OROFACIAL CLEFT 1,Genetic syndrome,0.6134295
+2784539,Anemia in chronic kidney disease,Ataxia Telangiectasia,0.5253072
+605345,Huntington Disease,"Cardiomyopathy, Familial Idiopathic",0.59188503
+727147,Klinefelter Syndrome,Coronary heart disease,0.6967748
+582986,Disorder of eye,Intraoperative floppy iris syndrome,0.7827392
+589386,"Hypotension, Orthostatic",Esophageal Diseases,0.59761184
+1939253,Inborn Errors of Metabolism,Mitral valve failure,0.5224211
+2876736,Trigger Finger Disorder,Staphylococcus aureus infection,0.5030921
+1912325,Acute Disease,Vitamin D Deficiency,0.61235404
+2657708,Primary bacterial peritonitis,Neonatal Abstinence Syndrome,0.666351
+1636289,Papulopustular Rosacea,Renal Artery Stenosis,0.47648
+2939467,Retinal thickening,Panuveitis,0.5835722
+2718007,primary infection nos,Lymphopenia,0.6478741
+50677,Kidney Diseases,Barrett Esophagus,0.5302999
+1018183,Infectious Canine Hepatitis,herpes,0.696297
+371936,NOONAN SYNDROME 3,Androgen-Insensitivity Syndrome,0.72224087
+1570786,Rabies (disorder),Exacerbation of multiple sclerosis,0.5917063
+668990,"Sleep Apnea, Central",Fetal valproate syndrome,0.6341968
+1500643,Symptomatic carotid artery stenosis,Transient Ischemic Attack,0.70448035
+787787,Ocular Cicatricial Pemphigoid,infection as a complication,0.62732106
+2505442,Mucopolysaccharidoses,Candidiasis,0.6845125
+2560349,Cerebral Edema,Nystagmus,0.62744653
+1993664,Refractive Errors,"Pneumonia, Ventilator-Associated",0.6174638
+1939831,Autosomal Dominant Disorder,THROMBOCYTOPENIA 1 (disorder),0.7389018
+2086619,anemia deficiency iron treatment,Hepatitis B,0.5527187
+1331104,Cellulitis and abscess NOS (disorder),Sustained ventricular tachycardia,0.64140064
+1014679,Complications of Diabetes Mellitus,Gastroparesis with diabetes mellitus,0.88970864
+2114864,Hydrothorax,Infectious Otitis Media,0.63892615
+1141890,"Robinow syndrome, autosomal recessive",Intermittent Claudication,0.54925823
+2229683,Potassium aggravated myotonia,Foot Ulcer,0.52962494
+1228902,Herpes Simplex Infections,Atrioventricular Block,0.54034495
+366343,HIV Infections,Keratosis Follicularis,0.48933727
+668766,"Sleep Apnea, Central",Complex congenital heart disease,0.61073095
+778527,Pediatric Disorder,Familial generalized lipodystrophy,0.5618452
+696270,Candidiasis,Eclampsia,0.6281869
+535631,Cardiac fibrosis,Invasive aspergillosis,0.7027602
+715308,Gingivitis,"Hypercholesterolemia, Familial",0.5012332
+2505094,Mucopolysaccharidoses,Pallister-Hall syndrome,0.6687062
+704147,Spondylo-ocular syndrome,Pregnancy associated hypertension,0.63935506
+766810,Collagen Diseases,Klinefelter Syndrome,0.6276765
+1667921,Keratoconus,Alzheimer's Disease,0.5500435
+107939,"Osteoarthritis, Knee",Pituitary-dependent Cushing's disease,0.47628623
+860299,Gonorrhea,Severe persistent allergic asthma,0.5433717
+2918621,Chronically Ill,Hereditary Diseases,0.6578641
+515025,Systemic Scleroderma,Infantile hypophosphatasia,0.54047644
+746790,Pulmonary Eosinophilia,Cutaneous Candidiasis,0.59913796
+1008962,"Hyperparathyroidism, Secondary",Hematochezia,0.6402809
+2536087,THROMBOCYTOPENIA 2 (disorder),Xerosis,0.64099276
+118546,Chronic kidney disease stage 4,Strabismus,0.52939934
+1495414,Meibomian gland dysfunction,Pseudohyperkalemia Cardiff,0.71947414
+2098961,cold symptoms,Chronic liver disease,0.7062779
+2148621,Photoreceptor degeneration,Central Nervous System Infection,0.59370226
+170014,Conjunctival hyperemia,Hypoplastic Left Heart Syndrome,0.6282132
+609724,Aortic Valve Insufficiency,Retinal Detachment,0.63235736
+1044297,Herpesviridae Infections,Atrophic retina,0.48538533
+113145,Coronary Artery Disease,Diffuse Scleroderma,0.5621914
+1264185,Otitis Media with Effusion,Myopia,0.71240324
+828559,Invasive Fungal Infections,Anterior uveitis,0.63158506
+1465876,immunoglobulin disease,Coffin-Siris syndrome,0.65580344
+995392,Cerebellar decompression injury,Deformity of eyelid,0.72588855
+184036,Multiple Chronic Conditions,"Infections, Hospital",0.6807596
+2619696,Cataplexy,Hemoglobinopathies,0.5520807
+15114,Cirrhosis,Severe Bronchopulmonary Dysplasia,0.57129145
+935145,Cyclical vomiting syndrome (disorder),Papulopustular Rosacea,0.5636376
+2374099,Immune dysfunction with T-cell inactivation due to calcium entry defect 1,Chronic Total Occlusion Vessel,0.66750675
+1775529,Wolman Disease,Axial spondyloarthritis,0.62842065
+663506,Periodontitis,Episodic Kinesigenic Dyskinesia 1,0.6003709
+1837428,Pneumothorax,"Sarcoidosis, Pulmonary",0.62874097
+1361841,Idiopathic Pulmonary Fibrosis,Dermatologic disorders,0.6737939
+1522114,Ketonuria,Lower Limb HEMIPARESIS,0.61473215
+185203,Shy-Drager Syndrome,Spinal stenosis of lumbar region,0.65586525
+1301814,Spinal Diseases,Cardiovascular Infections,0.8525366
+2014906,Familial Mediterranean Fever,Esophageal Diseases,0.61377555
+2567887,Disorder of pregnancy,Bronchopulmonary Dysplasia,0.6242238
+361244,"Thrombocythemia, Essential",Pneumoperitoneum,0.5311873
+1605823,Atrial Premature Complexes,Periodontitis,0.518442
+1719313,Acute gastroenteritis,Inflammatory disorder of the cardiovascular system,0.6289738
+577499,acute diverticulitis,Mild visual impairment,0.65784717
+2370120,Refractory anemia with excess blasts in transformation (clinical),Acute Coronary Syndrome,0.7620082
+1176880,Drug Resistant Epilepsy,latent infection,0.6878009
+1071052,Genetic syndrome,Ankylosing spondylitis,0.5987058
+1611082,Degenerative disorder,"Skin Diseases, Infectious",0.61368513
+1489371,Bacterial keratitis,primary infection nos,0.69881094
+2005571,Dermatomyositis,THROMBOCYTOPENIA 1 (disorder),0.6877826
+1111248,Deformity of eyelid,Infectious Canine Hepatitis,0.6166674
+2925339,Deep vein thrombosis of lower limb,"Candidiasis, Vulvovaginal",0.4807163
+2170430,Structural disorder of heart,Amyloid Neuropathies,0.65880156
+2539147,Congenital cytomegalovirus infection,Papillon-Lefevre Disease,0.53510845
+2450473,osteoporosis risk,Radiculopathy,0.5438572
+1833888,"Deafness, Sensorineural, And Male Infertility",Oral candidiasis,0.5395614
+2361660,Hyperammonemia,Bronchiolitis,0.6889026
+2912238,Neuroleptic Malignant Syndrome,Brain Ischemia,0.7169036
+1062064,Gastric ulcer,"Pregnancy Complications, Infectious",0.70632964
+1640711,Infection caused by Helicobacter pylori,Proliferative diabetic retinopathy,0.629398
+1227712,Secondary diabetes mellitus,insulin hypoglycemia,0.7014047
+1205773,Disorder of lymph node,Refractory angina,0.4899088
+1294805,Enteritis due to specified virus,Latent Tuberculosis,0.7134494
+1213373,Cerebrovascular Disorders,Measurable Disease,0.5622932
+2406747,herpes 2,Liver Cirrhosis,0.57722646
+1767000,Infectious cirrhosis,Pityriasis Rubra Pilaris,0.546581
+2244507,"Leukomalacia, Periventricular",Recurrent disease,0.6643557
+1915767,Atrophic retina,Influenza-like illness,0.54655504
+1770752,Neonatal encephalopathy,iliac disease,0.5743049
+313160,Hyperglycemia,insulin resistance in diabetes,0.67634875
+881457,genital fungal infection,Chorea,0.5951827
+2251546,Oral infection,Thrombocytopenia 3,0.5499908
+2344200,Rheumatic Fever,Geographic Atrophy,0.57078993
+2549396,Scabies <infestation>,"Macular Degeneration, Age-Related, 1",0.6843556
+2836482,"Candidiasis, Vulvovaginal",Acute bronchiolitis,0.4759038
+2701675,Epileptic drop attack,Sclerosis of the skin,0.6671939
+445125,Infection in children,Sex Differentiation Disorders,0.624232
+2443413,Pyelonephritis,Acute GVH disease,0.6980536
+1817598,Allergic asthma,"Heart Failure, Systolic",0.6362215
+1547889,Premature ventricular contractions,Drug-induced tardive dyskinesia,0.5734955
+2694566,Mucocutaneous Lymph Node Syndrome,Pulmonary Cystic Fibrosis,0.68155295
+2272748,Keratosis Follicularis,Gynecomastia,0.5248903
+2469335,Hyperthyroidism,Carpal Tunnel Syndrome,0.60838485
+2585849,Comedone,Thyroid associated opthalmopathies,0.62920505
+923703,Gout,Neonatal Jaundice,0.5457958
+25001,anemia hemoglobin,Bronchitis,0.6834836
+1561585,heart inflammation,Heart valve disease,0.799056
+1858822,Type 2 diabetes mellitus in obese,"Stickler syndrome, type 1",0.70967424
+2401965,Arthralgia/arthritis,Measles,0.6357092
+2608617,"Polyneuropathy, Familial","Polyneuropathy, Familial",1.0000001
+2444169,Pyelonephritis,Mild visual impairment,0.580415
+316446,Ankylosing spondylitis,Corneal Infection,0.644334
+1151050,MRSA - Methicillin resistant Staphylococcus aureus infection,Chronic kidney disease stage 3,0.5830292
+1781384,Fragile X Syndrome,"MALE PSEUDOHERMAPHRODITISM: DEFICIENCY OF TESTICULAR 17,20-DESMOLASE",0.62371147
+1108674,Venous retinal branch occlusion,Valvular disease,0.6841887
+709070,Acne,Central Precocious Puberty,0.6548198
+1829623,AICARDI-GOUTIERES SYNDROME,Posterior subcapsular cataract,0.6505033
+2056058,"Hyperlipidemia, Familial Combined","Hypercholesterolemia, Familial",0.88948774
+2450520,osteoporosis risk,Typhoid Fever,0.54014885
+622036,"Dermatitis, Atopic",hearing impairment,0.58063436
+930807,Coronary Occlusion,Cardiovascular morbidity,0.5475134
+1894404,Chronic kidney disease stage 1,Pallister-Hall syndrome,0.61084145
+1205376,Disorder of lymph node,"Infant, Extremely Low Birth Weight",0.31365287
+1524400,Left-Sided Heart Failure,Bone lesion,0.65064436
+1656965,Iron deficiency,Rheumatic Fever,0.5986555
+1654098,Pulmonary Cystic Fibrosis,Hyperphosphatemia (disorder),0.7045514
+7891,Meningococcal Infections,Human immunodeficiency virus II infection,0.6351644
+2147063,Photoreceptor degeneration,Dental Plaque,0.5009013
+969697,"HETEROTAXY, VISCERAL, 2, AUTOSOMAL",Anemia of chronic renal failure,0.57224554
+72379,SCHIZOPHRENIA 6 (disorder),"Mucopolysaccharidosis, MPS-IV-A",0.6972995
+2189590,Leukocytosis,Shigella Infections,0.6017572
+901246,Influenza in Birds,"SCLEROSING CHOLANGITIS, NEONATAL",0.58685774
+1049303,Acute encephalopathy,Alport Syndrome,0.6384147
+2623607,Viral meningitis,Spondylolisthesis,0.66140497
+2234535,Relative anemia,Acute Disease,0.73128474
+2419796,knee pain chronic,Premenopausal idiopathic osteoporosis,0.67081076
+526462,Non ST elevation acute coronary syndrome,Edema of bone marrow,0.48604771
+1689933,Nance-Horan syndrome,Vasovagal syncope,0.5883367
+2642729,Early childhood caries,Streptococcal sore throat,0.611659
+1635002,Papulopustular Rosacea,Lichen Sclerosus et Atrophicus,0.6068233
+2625266,Meningoencephalitis,Hypertensive heart failure,0.5491726
+1975383,"Acidosis, Lactic",Vasovagal syncope,0.5483982
+2784709,Anemia in chronic kidney disease,Dysentery,0.57826483
+2164311,Mucopolysaccharidosis II,Heart Diseases,0.58469164
+794051,Freeman-Sheldon syndrome,Premenstrual Tension,0.60649884
+2094575,Fetal valproate syndrome,Sleep-Disordered Breathing,0.58343667
+2578532,Refractory shock,Hypernatremia,0.60022706
+592180,Mycoses,Influenza in Birds,0.71881175
+861546,Immunosuppression,"Fibrosis, Liver",0.45970353
+1708118,Postural Orthostatic Tachycardia Syndrome,Esophagitis,0.67900777
+1521488,Ketonuria,"Hypercholesterolemia, Familial",0.5957479
+1792741,Dermatitis,Diphtheria,0.6869571
+63427,Hypoglycemia,Alopecia totalis,0.6686806
+869825,non-gonococcal urethritis (NGU),Hyperammonemia,0.7065018
+1439817,Hypernatremia,Traveler's diarrhea,0.53586954
+363017,Fibromyalgia,Pure Autonomic Failure,0.67933375
+138856,Hyperemia,Postmyocardial infarction syndrome,0.6538497
+999538,Facial paralysis,Pseudomeningocele,0.6013306
+1790099,Tension Headache,HIV neutropenia,0.5834802
+874933,Chronic hcv genotype 1,Withdrawal bleeding,0.46649367
+36468,Cerebrovascular accident,Coronary artery atherosclerosis progression,0.6311945
+606629,Cryopyrin-Associated Periodic Syndromes,Renal cyst,0.68282086
+1488715,Bacterial keratitis,Demyelinating Diseases,0.70334613
+2483957,"Aneurysm, Ruptured",Hypoglycemia of childhood,0.6269266
+691963,Liver Failure,Refractory angina,0.5922612
+547443,Hepatitis C,Myopathy,0.50215644
+2709946,Painful Bladder Syndrome,Chronic central serous chorioretinopathy,0.64437115
+115527,Left Ventricular Hypertrophy,Ulcer of artery,0.64674413
+1740280,Senile cardiac amyloidosis,Contact Dermatitis,0.6328634
+2292349,Edentulism NOS,"SYNOVITIS, GRANULOMATOUS, WITH UVEITIS AND CRANIAL NEUROPATHIES (disorder)",0.593848
+473552,Clostridium difficile infection,Scalp psoriasis,0.58222723
+963383,Heparin-induced thrombocytopenia,Disorders of fatty acid oxidation,0.60133123
+280156,Hypoglycaemic episode,"Nephritis, Interstitial",0.62648064
+1948254,Respiration Disorders,Toxic Shock Syndrome,0.74526495
+1792181,"MACULAR DEGENERATION, AGE-RELATED, 5",Epidemic disease,0.6356445
+2961696,Premenstrual Tension,Autoimmune Lymphoproliferative Syndrome,0.6566243
+1361276,Metabolic Diseases,Novel H1N1 influenza,0.63465106
+2358627,Osteomyelitis,infection as a complication,0.547722
+1610414,Uterine Perforation,Cataplexy,0.5607099
+1321261,Myopathy,Roberts-SC phocomelia syndrome,0.6676962
+2852590,Mucopolysaccharidosis I,Silent cerebral infarct,0.5318958
+44386,Lipodystrophy,Hydronephrosis,0.61748135
+2161986,Idiopathic fecal incontinence,Oral Mucositis,0.6958915
+921859,Ketosis,"Total Hypotrichosis, Mari type",0.604893
+1598562,Congenital Hemidysplasia with Ichthyosiform Erythroderma and Limb Defects,Cardiovascular Diseases,0.65300196
+1919656,Condylomata Acuminata,Diabetic Neuropathies,0.5955427
+349753,Vesicoureteral Reflux 1,Cerebellar lesions,0.7189154
+2326342,Granulomatosis with polyangiitis,Hydrothorax,0.6884974
+546963,Hepatitis C,Acquired aplastic anemia,0.62158275
+627490,Immune Reconstitution Inflammatory Syndrome,Exophthalmos,0.5513397
+1374063,Bone Marrow Diseases,Collagen Diseases,0.7255183
+1901452,Child attention deficit disorder,Ankylosing spondylitis,0.5401699
+1221180,Blood Coagulation Disorders,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY",0.6467958
+1738527,Amyloidosis,Raynaud Disease,0.6414561
+1643199,Adrenal gland hypofunction,"Asthma, Exercise-Induced",0.6037897
+1638937,Chronic disease of skin,Retinitis Pigmentosa,0.66882545
+1611371,Degenerative disorder,"Glaucoma, Open-Angle",0.5953287
+945104,Synovial Hypertrophy,abortion in first trimester,0.47012374
+2811287,Carnevale syndrome,Pregnancy associated hypertension,0.6726851
+2412170,Late onset asthma,DIARRHEA 6,0.7066823
+2084053,Hypogammaglobulinemia,X-linked agammaglobulinemia,0.87061536
+420587,Bacterial Endocarditis,Panuveitis,0.7173809
+1187338,Cystic Disease Of Lung,Lymphadenopathy,0.5697679
+264494,Lichen Sclerosus et Atrophicus,Chronic diarrhea,0.53548026
+410294,Hypocortisolism secondary to another disorder,Phenylketonurias,0.69775426
+1172182,Infection due to resistant organism,Acute ischemic heart disease,0.63832253
+1604063,Spondylolisthesis,Pharyngitis,0.7083574
+2446981,Spinal instability,Rubella,0.42713422
+764128,Sialorrhea,Hemodynamic instability,0.48744804
+2515017,Vasovagal syncope,Cerebral Vasospasm,0.79177046
+2888451,Analgesic Overuse Headache,Disorder of skeletal system,0.60303813
+2183259,Viral upper respiratory tract infection,Flap necrosis,0.62390256
+493225,Liver diseases,Chorioamnionitis,0.6176788
+1627069,Influenza A (H3N2),post mi,0.6385539
+1768571,Alcohol withdrawal syndrome,Chronic gouty arthritis,0.65942365
+2323948,Microscopic Polyarteritis,Lymphadenopathy,0.5860101
+889141,Blood Vessel complications,early disease onset,0.7231176
+44299,Lipodystrophy,"Tuberculosis, Drug-Resistant",0.53858835
+1442799,Anal infection,Muscular Dystrophy,0.47184578
+1970091,Hereditary pancreatitis,Nephritis,0.69372636
+2463408,Inflammatory disorder of the cardiovascular system,Ureteral Calculi,0.52862746
+1456922,Severe Sepsis,Peripheral Arterial Diseases,0.68365675
+197459,Peptic Ulcer,Hepatitis B,0.61331755
+2952466,Intraoperative floppy iris syndrome,Diabetic Neuropathies,0.71877617
+222303,Acute Cerebrovascular Accidents,Unverricht-Lundborg Syndrome,0.6091044
+1792390,Dermatitis,"Angioedemas, Hereditary",0.50562054
+2419559,knee pain chronic,Streptococcal sore throat,0.583995
+245448,Retinopathy of Prematurity,Hospital acquired pneumonia,0.5565328
+520926,Familial cold urticaria,"Uveitis, Posterior",0.50977206
+2515875,Cor pulmonale,Ocular Cicatricial Pemphigoid,0.7322622
+561002,Primary Insomnia,Osteoporosis,0.5592664
+1226412,Familial hypercholesterolemia - heterozygous,Intrahepatic Cholestasis,0.716658
+1152730,Soft Tissue Infection,DIARRHEA 6,0.5587557
+568422,end organ damage,infection induced,0.68456376
+1499349,"Epilepsies, Partial",Disorder of vein,0.56553763
+2759777,Gastroenteritis in children,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",0.601695
+870275,trachomatis,Immune thrombocytopenic purpura,0.65651476
+1995146,Anisometropic,Postmyocardial infarction syndrome,0.6063366
+1008067,Hypocalcemia,neutropenic infection,0.70284826
+647831,Systemic mycosis,diabetic foot infection,0.67949134
+1798689,Severe hereditary factor VIII deficiency disease,Miosis disorder,0.65257335
+679249,Zellweger Syndrome,Anovulatory (finding),0.70676994
+2151702,Ulcerative colitis in remission,B Virus Infection,0.5819566
+2800799,Ureteral Calculi,Dupuytren's Disease,0.6207479
+298194,ERBB2 Gene Amplification,Abdominal Infection,0.5233209
+545749,Entropion,Maturity onset diabetes mellitus in young,0.5270331
+2869130,Infectious colitis,Premature aging syndrome,0.66310763
+651776,Diabetic Neuralgia,"Infant, Extremely Low Birth Weight",0.46616802
+1775479,Wolman Disease,Renal glomerular disease,0.66834825
+1335817,Viral Respiratory Tract Infection,Infection in children,0.838344
+2123777,Syphilis,"Infant, Very Low Birth Weight",0.5309425
+1893292,Necrotizing Enterocolitis,Recurrent skin infections,0.7124345
+1443975,hemorrhage symptom,Spinal Muscular Atrophy,0.5625621
+2534517,THROMBOCYTOPENIA 2 (disorder),Cardiovascular morbidity,0.60526484
+815825,Chronic liver disease,Genital Herpes,0.5611468
+1317789,Rubella,"Hepatitis, Autoimmune",0.51822186
+2806631,Lipomucopolysaccharidosis,Keratitis,0.7169116
+1603489,Acquired disease,Mobius Syndrome,0.66699934
+923763,Gout,Epilepsy in children,0.60632795
+1203444,Diffuse Scleroderma,Necrotizing Enterocolitis,0.5797414
+388633,Psoriasis,pulmonary involvement,0.70021707
+2204736,Severe Bronchopulmonary Dysplasia,Tetanus,0.5299594
+1665999,Giant Cell Arteritis,Chronic Kidney Diseases,0.6847831
+1732900,"Obesity, Morbid",atrial fibrillation recurrent,0.53970957
+218089,Hepatitis,Dysautonomia,0.47566745
+2268796,Occlusive vascular disease,Chronic central serous chorioretinopathy,0.68172187
+1066059,Progressive Disease,Coinfection,0.41721863
+1210577,Myasthenia Gravis,Gram-Negative Bacterial Infections,0.53471524
+600255,Cooley's anemia,Peripheral arterial occlusive disease,0.60139245
+1264150,Otitis Media with Effusion,Osteopenia/osteoporosis,0.6484649
+2812175,Carnevale syndrome,eye change,0.6054898
+349497,Vesicoureteral Reflux 1,Pregnancy associated hypertension,0.62242985
+1061222,Gastric ulcer,Telangiectasis,0.63116455
+2008306,Cutaneous Candidiasis,Speech Disorders,0.61235785
+851936,Choroidal Neovascularization,Pelvic Inflammatory Disease,0.55458486
+2871325,Dupuytren's Disease,Acute hepatitis C,0.6432515
+177844,cardiac event,Clinical Chorioamnionitis,0.58546275
+1396060,Heart Block,Christ-Siemens-Touraine syndrome,0.724768
+1394992,Heart Block,Impaired glucose tolerance,0.68684274
+513043,"Arthritis, Psoriatic",Giant Cell Arteritis,0.57391196
+938968,Edema of bone marrow,Varicosity,0.5665319
+645881,Pediatric ulcerative colitis,Exocrine pancreatic insufficiency,0.5236852
+288646,Rickets,Nonproliferative diabetic retinopathy,0.45961452
+349129,Alzheimer's Disease,Severe persistent asthma,0.5808558
+1869334,Chronic ulcerative rectosigmoiditis,Pancreatitis,0.6751806
+2948474,ANOPHTHALMIA AND PULMONARY HYPOPLASIA,Infection of ear,0.5462657
+2504897,Pure Autonomic Failure,SCHIZOPHRENIA 2 (disorder),0.63611746
+2759132,Metabolic Bone Disorder,Congenital adrenal hyperplasia,0.64614064
+557881,Uncomplicated Hypertension,Oculocutaneous albinism type 1A,0.59652364
+2430161,Pneumoperitoneum,Photoreceptor degeneration,0.5879888
+1317065,Rubella,Genital infection,0.6978773
+550526,Lennox-Gastaut syndrome,"Sleep Apnea, Central",0.6358504
+1479533,Hypertriglyceridemia,Periodontitis,0.6476491
+1786217,Cystic Fibrosis Pulmonary Exacerbation,CARDIAC causes,0.6372147
+506825,Neuropathy,Lewy Body Disease,0.68613887
+1935565,Ocular Hypotension,Recurrent transient cerebral ischemic attack,0.5923173
+577536,acute diverticulitis,hypertensive nephropathy,0.6644928
+2521332,Prostatic Diseases,Neuromuscular Diseases,0.70858437
+1297251,gout tophaceous,Membranous glomerulonephritis,0.6552315
+769945,Transient Cerebral Ischemia,Evaluable Disease,0.58553654
+1254039,Mumps,Menkes Kinky Hair Syndrome,0.6117537
+2408206,Zollinger-Ellison syndrome,Right Ventricular Hypertrophy,0.46994662
+1301444,Spinal Diseases,Cyst,0.72089976
+925725,Genital infection,Chorioamnionitis,0.5877934
+350556,Vesicoureteral Reflux 1,Connective Tissue Diseases,0.6092329
+1292840,Nervous diarrhea,Dry Eye Syndromes,0.7268219
+2901241,"Leishmaniasis, Visceral",Multiple Sclerosis,0.622173
+2701157,Epileptic drop attack,Retinitis Pigmentosa,0.65477866
+859243,Sexually Transmitted Diseases,"Dystonia, Dopa-Responsive, due to Sepiapterin Reductase Deficiency",0.6427163
+2663216,Rheumatism,Sinusitis,0.6070956
+1601519,eye change,Drug-induced tardive dyskinesia,0.63254064
+1774107,Severe Malaria,CARDIAC causes,0.7319388
+1318351,Influenza,Nerve Root Compression,0.39551064
+398691,Respiratory Tract Infections,Congenital dyserythropoietic anemia,0.6135849
+1555180,Gastroparesis,Endometrial Hyperplasia,0.68468326
+2021159,Low Tension Glaucoma,Chronic inflammatory disorder,0.5148446
+1008621,"Hyperparathyroidism, Secondary",Multiple Sclerosis,0.56489503
+1023129,Exocrine pancreatic insufficiency,Myasthenia Gravis,0.6007623
+1199651,Hemoglobin SC Disease,Rubella,0.42830613
+1755006,Shoulder Impingement Syndrome,Metabolic Diseases,0.64384794
+584918,Stable angina,Thrombocytopenia,0.5807308
+2722656,Mucopolysaccharidosis III,Acquired generalized lipodystrophy,0.5789832
+953548,"Cardiomyopathy, Dilated",Lennox-Gastaut syndrome,0.64063257
+1217036,Optic Neuritis,Mucolipidosis Type IV,0.72994703
+410058,Hypocortisolism secondary to another disorder,"Tachycardia, Ventricular",0.59851223
+664996,Periodontal Diseases,"Leukodystrophy, Metachromatic",0.5646691
+2006451,Dermatomyositis,Chronic Fatigue Syndrome,0.597013
+402307,Pneumocystis jiroveci pneumonia,Chronic disease of skin,0.60603845
+2724692,"Pregnancy Complications, Infectious",Acute malaria,0.86625904
+712879,Clinical malaria,Craniosynostosis,0.535261
+1071986,Genetic syndrome,reproductive system disorder,0.8003472
+1387982,"Stickler syndrome, type 1",Paralytic Ileus,0.65286595
+739509,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",Maturity onset diabetes mellitus in young,0.57730895
+173170,Appendicitis,Cutaneous sarcoidosis,0.68485826
+669579,Sleep Apnea Syndromes,"Respiratory Distress Syndrome, Newborn",0.78496075
+1807541,Dactylitis,Extravascular Hemolysis,0.6104566
+2753297,Paroxysmal nocturnal hemoglobinuria,Symptomatic carotid artery stenosis,0.6967207
+910312,Aortic Stiffness,Diverticulitis,0.51505655
+1884384,Anovulatory (finding),Diabetic Nephropathy,0.5749005
+2385720,Acute cerebral ischemia,Geographic Atrophy,0.5722333
+1638427,Chronic disease of skin,Amyotrophic Lateral Sclerosis,0.5302363
+813099,Hepatic Encephalopathy,Flap necrosis,0.5815556
+2375259,Immune dysfunction with T-cell inactivation due to calcium entry defect 1,Retinal thickening,0.6593282
+2471762,Thyrotoxicosis,Genital Infantilism,0.6222648
+1517541,Hematuria,Dermatologic disorders,0.6481485
+2655000,Chronic diarrhea,Cavitated caries,0.60086966
+2306002,"Hepatitis D, Chronic",Posterior Vitreous Detachment,0.5658489
+1480793,Hypertriglyceridemia,Coronary Aneurysm,0.6537434
+2765261,Diarrhea predominant Irritable bowel,Papilledema,0.6595734
+1844615,Hypertensive heart disease,disabling disease,0.73185873
+668977,"Sleep Apnea, Central",Pneumonia due to methicillin resistant Staphylococcus aureus,0.5250589
+1967437,Systemic Inflammatory Response Syndrome,"CEREBELLAR ATAXIA, NEUROPATHY, AND VESTIBULAR AREFLEXIA SYNDROME",0.6691945
+929517,Acute heart failure,Barrett Esophagus,0.4057342
+398243,Respiratory Tract Infections,Sudden infant death syndrome,0.7128338
+1579579,"Mycobacterium Infections, Nontuberculous",LAURIN-SANDROW SYNDROME,0.656802
+1802058,Cerebral Palsy,Primary chronic pain,0.60359204
+98104,Cardiac Arrest,Methylenetetrahydrofolate reductase Genetic Polymorphisms,0.42941788
+1336889,Viral Respiratory Tract Infection,Mild persistent asthma,0.70564955
+2280689,Focal glomerulosclerosis,Axial spondyloarthritis,0.739458
+1057090,Familial dilated cardiomyopathy,Inflammatory Bowel Diseases,0.58535784
+1389500,Camurati-Engelmann Syndrome,hemorrhage as a complication,0.56825
+1656728,Iron deficiency,Ocular Hypotension,0.56066656
+2752968,Paroxysmal nocturnal hemoglobinuria,Coronary Occlusion,0.4985108
+34430,Acute Chest Syndrome,Sick Sinus Syndrome,0.79510367
+2168217,Gray Platelet Syndrome,Amenorrhea,0.5417248
+2966711,Acute disease of cardiovascular system,"Leukodystrophy, Dysmyelinating, And Spastic Paraparesis With Or Without Dystonia",0.6169445
+848956,"Hepatitis B, Chronic",Premenopausal idiopathic osteoporosis,0.5989728
+2141459,Papillon-Lefevre Disease,"Mucopolysaccharidosis, MPS-IV-A",0.73663455
+398588,Respiratory Tract Infections,Adams-Oliver syndrome 1,0.65866226
+1223170,"Hyperaldosteronism, Familial, Type II",Inflammatory Bowel Diseases,0.55797553
+1232327,Chronic prostatitis,Bronchopulmonary Dysplasia,0.5394989
+1545071,CAMPOMELIC DYSPLASIA,Hyperglycemia,0.6511552
+2796442,Atopic condition,Influenza,0.72575015
+1960441,X-linked agammaglobulinemia,Hypoxic-Ischemic Encephalopathy,0.71404123
+2190224,Akinesia,Metabolic Syndrome X,0.6288198
+505516,Neuropathy,Chronic Obstructive Pulmonary Disease EXACERBATION,0.5740927
+551272,Lennox-Gastaut syndrome,Aspergillosis,0.59308016
+1743389,Hyperprolactinemia,HIV neutropenia,0.68148917
+2683929,Dermatitis acneiform,Myasthenia Gravis,0.6721799
+2490761,Renal Artery Stenosis,Relative anemia,0.5946633
+1294676,Enteritis due to specified virus,Clostridium difficile colitis,0.7019602
+1679355,Urticaria,Acute hepatitis C,0.4789963
+934739,Cyclical vomiting syndrome (disorder),Chronic Total Occlusion Vessel,0.5776875
+1490942,Bacterial corneal ulcer,Pyelonephritis,0.7172563
+1662418,Intervertebral Disc Degeneration,Ureteral Calculi,0.50962746
+2250031,Child Malnutrition,Fatty Liver Disease,0.6176174
+2027209,Gastroschisis,Acute cerebral ischemia,0.5540401
+862614,Immunosuppression,Type 2 diabetes mellitus in obese,0.46246284
+1355906,"DERMATITIS HERPETIFORMIS, FAMILIAL",Vulvar Diseases,0.6294585
+633174,Lumbar facet joint pain,Corneal Neovascularization,0.54504454
+1791448,"MACULAR DEGENERATION, AGE-RELATED, 5",Gastroparesis,0.62973547
+2344680,Rheumatic Fever,Dry Eye Syndromes,0.7022031
+1418372,"Hemorrhagic Fever, Ebola",Trifunctional Protein Deficiency With Myopathy And Neuropathy,0.71555495
+2619866,Cataplexy,obstructive disease,0.5276538
+2600645,Disorders of fatty acid oxidation,Ocular Cicatricial Pemphigoid,0.55802333
+841904,copd exacerbation,Disorder of skeletal muscle,0.45390046
+351143,Vesicoureteral Reflux 1,Neuroleptic Malignant Syndrome,0.68403375
+246542,GATA2 Deficiency,Abdominal Abscess,0.6027807
+1963833,Macular retinal edema,Acquired aplastic anemia,0.5476915
+1296942,gout tophaceous,"SCLERODERMA, PULMONARY",0.61046106
+727381,Klinefelter Syndrome,Bronchitis,0.5978607
+1555942,Gastroparesis with diabetes mellitus,Recurrent skin infections,0.6811208
+2163536,Osteopenia/osteoporosis,Dermatitis,0.56588715
+1478881,Cardiovascular Infections,Pleurisy,0.65887934
+1877012,Bursitis,Refractory heart failure,0.50893307
+491172,Acquired aplastic anemia,Antibiotic-associated diarrhea,0.655861
+608368,Hypoxic-Ischemic Encephalopathy,Hereditary pancreatitis,0.67231214
+1606995,Atrial Premature Complexes,Sensory Disorders,0.59222907
+2042791,Cavitated caries,herpes 2,0.6541367
+665733,Periodontal Diseases,Gilbert Disease (disorder),0.71810055
+1864751,Hereditary Factor XIII Deficiency,Status Epilepticus,0.6107818
+1833027,MYOTONIC DYSTROPHY 1,Iron deficiency,0.6029777
+2314965,Toxic condition,Chronic small plaque psoriasis,0.51993513
+1384033,Pseudotumor Cerebri,Gestational Diabetes,0.53766173
+2854041,HMN (Hereditary Motor Neuropathy) Proximal Type I,Roberts-SC phocomelia syndrome,0.70896083
+1091557,Adult atopic dermatitis,Disorder characterized by fever,0.6866463
+1311817,Bacteremia,Acne Vulgaris,0.72058547
+1200199,Hemoglobin SC Disease,Sensorineural Hearing Loss (disorder),0.6060118
+2932637,Primary infertility,Early Rheumatoid Arthritis,0.66439426
+2690442,Sensory Disorders,Neuropathy,0.7985575
+301451,Cone-Rod Dystrophy 2,Pulmonary Eosinophilia,0.5449727
+145779,Early infantile epileptic encephalopathy with suppression bursts,Recurrent Cerebral Ischemia,0.595304
+1437187,early pregnancy,Astigmatism,0.58490944
+1297459,gout tophaceous,Central Nervous System Sensitization,0.56619024
+11644,"Fibrosis, Liver",Postcapillary pulmonary hypertension,0.7055547
+1493129,Unverricht-Lundborg Syndrome,Neutropenia,0.5720217
+2065596,End stage heart failure,Intraoperative floppy iris syndrome,0.6689852
+425861,Multiple Sulfatase Deficiency Disease,Aplastic Anemia,0.713685
+1993392,Refractive Errors,Headache Disorders,0.6263545
+1740672,Lattice corneal dystrophy Type I,Neuropathy,0.6728387
+822747,Sepsis,Adrenoleukodystrophy,0.44434917
+91264,"Diabetes Mellitus, Insulin-Dependent",Intrinsic Factor Deficiency,0.6579319
+1390756,Camurati-Engelmann Syndrome,Painful Bladder Syndrome,0.67671716
+1128077,Hyperphosphaturia,Amyotrophic Lateral Sclerosis,0.39952672
+437100,Hemolytic-Uremic Syndrome,Shigella Infections,0.6494159
+1702604,Hypertrophic Cardiomyopathy,Phenylketonurias,0.5083835
+2116872,Febrile Convulsions,OROFACIAL CLEFT 1,0.5723517
+822941,Sepsis,Ischemic gangrene,0.50577056
+867534,THROMBOCYTOPENIA 1 (disorder),Infectious Otitis Media,0.6502661
+1749444,asthma chronic,Diabetic Nephropathy,0.6231602
+1362688,Idiopathic Pulmonary Fibrosis,Reversible pulpitis,0.636124
+2507508,"Mucopolysaccharidosis, MPS-IV-A",Hypersomnia,0.6163645
+1991281,Anisometropia,Drusen,0.5763768
+1266757,Telangiectasis,Tonic - clonic seizures,0.58161044
+2127242,Thyroid associated opthalmopathies,Irritable bowel syndrome characterized by constipation,0.608059
+1639574,Chronic disease of skin,Postcapillary pulmonary hypertension,0.6031511
+2051145,Recurrent genital herpes simplex,Chronic kidney disease stage 1,0.6284168
+1510466,Hypercalcemia,Primary Ciliary Dyskinesia,0.72626555
+492419,Phenylketonurias,Child attention deficit disorder,0.60941625
+1949048,Respiration Disorders,Systemic disease,0.7280362
+1281508,Acute conjunctivitis,Varicosity,0.687252
+483549,Myocardial Ischemia,Ketonuria,0.54665667
+605654,Cryopyrin-Associated Periodic Syndromes,IGA Glomerulonephritis,0.75944316
+2752643,Paroxysmal nocturnal hemoglobinuria,"Hepatitis C, Chronic",0.4660552
+173255,Appendicitis,Capillary Leak Syndrome,0.58322006
+884871,Chronic gouty arthritis,Vitamin A Deficiency,0.5464419
+466347,Compression of spinal cord,Rhinitis,0.5404605
+2340424,Lupus Flare,Curb,0.5643172
+126930,Allergic rhinitis (disorder),Venous retinal branch occlusion,0.5902695
+2191310,Akinesia,Tricuspid Valve Insufficiency,0.55669
+2149869,Intravenous bisphosphonates,Enzyme Deficiency,0.6079308
+1731811,"Obesity, Morbid",Heart Diseases,0.72516185
+1417899,"Hemorrhagic Fever, Ebola",Fragile X Syndrome,0.5341186
+667853,"Sleep Apnea, Central",Allergic rhinitis (disorder),0.5781954
+655698,Coinfection,Rare Diseases,0.5599921
+1156171,"Hypoalphalipoproteinemia, Familial","Polycystic Kidney, Autosomal Dominant",0.58892363
+903720,Paralytic Ileus,"Robinow syndrome, autosomal recessive",0.66684705
+1057096,Familial dilated cardiomyopathy,Left Ventricular Hypertrophy,0.6460107
+1331406,Cellulitis and abscess NOS (disorder),Dermatitis,0.68015337
+1859096,Type 2 diabetes mellitus in obese,Mucopolysaccharidosis Type IIIA,0.6592037
+2070446,Dental caries extending into dentin,Acquired generalized lipodystrophy,0.58165914
+2155999,Agranulocytosis,Brain atrophy,0.6450521
+405992,Polycystic Ovary Syndrome,"SCLERODERMA, PULMONARY",0.6121652
+530536,"Anemia, Sickle Cell","Pneumonia, Bacterial",0.73531467
+1088013,Pleural effusion disorder,Mucopolysaccharidosis III,0.7156701
+2344295,Rheumatic Fever,Erosive esophagitis,0.5652438
+1235154,Pemphigus Vulgaris,Ischemic congestive cardiomyopathy,0.58901805
+1231088,Chickenpox,Plasmodium falciparum infection,0.64537716
+159689,Widespread Disease,Virus Diseases,0.84866107
+897523,Osteopenia,"Hyperparathyroidism, Primary",0.64039326
+2246407,Infectious disease of genitourinary system,Symptomatic carotid artery stenosis,0.72152466
+2368355,Chronic hand eczema,Clinically significant macular edema,0.61334854
+128316,Gastroesophageal reflux disease,"Arthritis, Psoriatic",0.61795944
+1262883,Otitis Media,Deep thrombophlebitis,0.73598635
+2505681,Mucopolysaccharidoses,Peripheral motor neuropathy,0.5457746
+2157910,"Arthritis, Gouty",Chronic kidney disease stage 3,0.5889969
+2452266,Adult Rickets,Hypertensive heart failure,0.5155557
+1895547,Chronic kidney disease stage 1,Pneumonia due to methicillin resistant Staphylococcus aureus,0.5129052
+1102758,infection as a complication,Enteritis due to specified virus,0.7631465
+2354090,Type 2 obese diabetic,Tracheobronchitis,0.50554657
+2259776,Hydrocephalus,Idiopathic generalized epilepsy,0.6613933
+2451834,Adult Rickets,Wolf-Hirschhorn Syndrome,0.69492406
+1171831,Infection due to resistant organism,Acute pulmonary embolism,0.5997414
+750839,Hepatitis C Virus Infection,Acute Chest Syndrome,0.56585336
+906332,Retinal Diseases,Recurrent seizures,0.73699796
+1835119,"Deafness, Sensorineural, And Male Infertility",Primary Focal Segmental Glomerulosclerosis,0.70265806
+986472,Cardiac Arrhythmia,Hematochezia,0.671864
+1628360,Mucosal ulcer,Paresthesia,0.5441853
+649610,Anterior myocardial infarction,Bacterial keratitis,0.45051047
+318541,Human papilloma virus infection,Carotid Stenosis,0.50158215
+950138,Axial spondyloarthritis,Tinnitus,0.6083221
+384539,Strudwick syndrome,Myeloperoxidase Deficiency,0.6344783
+1791081,"MACULAR DEGENERATION, AGE-RELATED, 5","Polycystic Kidney, Autosomal Dominant",0.7360251
+2947625,Renal vascular disorder,"Aneurysm, Ruptured",0.54543513
+939097,Edema of bone marrow,Occlusive stroke,0.6266036
+2119562,HSAN Type IV,Mucormycosis,0.4404313
+1270629,Sustained ventricular tachycardia,"AMYLOIDOSIS, HEREDITARY, TRANSTHYRETIN-RELATED",0.53111595
+2726710,"ECTODERMAL DYSPLASIA 10A, HYPOHIDROTIC/HAIR/NAIL TYPE, AUTOSOMAL DOMINANT",Respiratory Tract Infections,0.58928686
+1962681,Ocular hyperemia,Bacterial corneal ulcer,0.63994825
+1383789,Maturity onset diabetes mellitus in young,Menkes Kinky Hair Syndrome,0.6630911
+1905236,Coronary Stenosis,Psoriasis of nail,0.57419246
+854526,Choroidal retinal neovascularization,asthma adult onset,0.546254
+2581332,Lipid Metabolism Disorders,ERBB2 Gene Amplification,0.6033356
+807347,malignant disease,Normal drug tolerance,0.5720992
+17944,"Diabetes Mellitus, Non-Insulin-Dependent","Bone Cysts, Aneurysmal",0.57408965
+829011,Myeloperoxidase Deficiency,vascular inflammations,0.64568657
+1199945,Hemoglobin SC Disease,Bladder neck obstruction,0.5256388
+1607852,Cluster headaches and other trigeminal autonomic cephalgias,Chronic diseases in children,0.6965478
+1718123,Acute gastroenteritis,Hepatic Veno-Occlusive Disease,0.6621405
+2987104,"Hyperbilirubinemia, Neonatal",Disorder of skeletal muscle,0.52319485
+2355210,Bronchiolitis Obliterans,Drug Resistant Epilepsy,0.6134587
+2865793,Acute HIV infection,"Mycobacterium Infections, Nontuberculous",0.6034851
+618471,"Multiple Sclerosis, Relapsing-Remitting",Bacterial corneal ulcer,0.47022724
+2888117,Analgesic Overuse Headache,Nervous diarrhea,0.6968684
+1536930,Hyperkinesia,temporal pain,0.5925437
+667590,Chronic Periodontitis,Cumulative Trauma Disorders,0.7481015
+521224,Familial cold urticaria,Cholangitis,0.5906657
+1132641,Graft-vs-Host Disease,Decompensated cirrhosis of liver,0.6442344
+2975871,Surfactant Dysfunction,Chronic Insomnia,0.7130029
+484297,Myocardial Ischemia,Amelogenesis imperfecta nephrocalcinosis,0.7675255
+2029224,"SCLERODERMA, PULMONARY",Ischemic congestive cardiomyopathy,0.55861235
+1728920,Lysosomal Storage Diseases,Cerebral Embolism,0.61672723
+425692,Multiple Sulfatase Deficiency Disease,Atrophy of vagina,0.581362
+1194129,temporal pain,neonatal effect nos,0.6100298
+1611267,Degenerative disorder,infection as a complication,0.67987335
+1188436,Cystic Disease Of Lung,Acute HIV infection,0.6244524
+2097258,Common Cold,Immunosuppression,0.57958233
+2096455,Overactive Detrusor,Recurrent transient cerebral ischemic attack,0.56975496
+905143,Retinal Diseases,Pharyngitis,0.6012988
+460100,Benign Paroxysmal Positional Vertigo,Atrophic acne scar,0.7367316
+1982324,Sclerosis of the skin,Valvular disease,0.48218763
+2493505,awaiting Transplantation,Cerebellar decompression injury,0.6583123
+1350359,ALZHEIMER DISEASE 4,dowling-degos disease,0.72576815
+2540247,Latent Autoimmune Diabetes in Adults,Peptic Esophagitis,0.57901895
+1972181,Dysentery,Premenstrual Tension,0.51223695
+284308,Bacteriuria,Infectious Canine Hepatitis,0.6446947
+2913797,Hypopituitarism,Acne Vulgaris,0.6212012
+1845802,Hypertensive heart disease,Lipomucopolysaccharidosis,0.6294807
+177114,cardiac event,Graft-vs-Host Disease,0.66355765
+1093748,Acute asthma,pregnancy related,0.7627016
+2389188,Chronic Fatigue Syndrome,Upper Respiratory Infections,0.7525021
+2853215,HMN (Hereditary Motor Neuropathy) Proximal Type I,Transient Cerebral Ischemia,0.60189587
+1509996,Gastrointestinal infection,vascular ischemia,0.5976425
+2860199,Mitral valve failure,genital fungal infection,0.5857257
+207931,Respiratory Failure,Dermatologic disorders,0.6642903
+1486634,Corneal Ulcer,Effects of heat,0.6320453
+1550637,Non-Sustained Ventricular Tachycardia by ECG Finding,"Macular dystrophy, corneal type 1",0.68777364
+2881256,Lewy Body Disease,Heart Block,0.6536056
+1553970,Gastroparesis,Paresthesia,0.64026874
+2602616,Plasmodium vivax infection,Disorder of lymph node,0.55017763
+2578683,Refractory shock,Gingival Diseases,0.53502536
+2838322,Endometrial Hyperplasia,"EPILEPSY, PARTIAL, WITH PERICENTRAL SPIKES",0.6586864
+983528,Post-Concussion Syndrome,Hyperkinesia,0.6324897
+2705057,Microvascular Angina,"Infant, Very Low Birth Weight",0.41312298
+2038980,Reversible pulpitis,Hyponatremia,0.51754534
+1137800,Influenza-like illness,Kidney Calculi,0.46702567
+1032663,Dysequilibrium syndrome,Chlamydia trachomatis infection,0.6971069
+1325825,Chronic central serous chorioretinopathy,skin toxicity,0.57607824
+1469691,Hypothalamic amenorrhea,THROMBOCYTOPENIA 5,0.78201216
+1643085,Adrenal gland hypofunction,Cervix Diseases,0.5521609
+2982868,Corneal Neovascularization,Neurodegenerative Disorders,0.6474693
+327101,Pneumococcal Infections,Vascular occlusion,0.6488433
+122415,Malaria,Cervix Diseases,0.71234804
+1522977,Arthropathy,Facial paralysis,0.6322705
+523081,Extrapyramidal Disorders,Acute pulmonary embolism,0.6797773
+2607433,"Polyneuropathy, Familial",Ascites,0.58236444
+44567,Lipodystrophy,vulvar infection,0.48880997
+1201275,Pseudohyperkalemia Cardiff,Acute hepatitis,0.60167813
+2113477,Decompensated cirrhosis of liver,Alopecia totalis,0.517556
+2494516,awaiting Transplantation,Corneal Infection,0.6607331
+2310843,Interstitial Cystitis,Cardiac Tamponade,0.5207792
+298355,ERBB2 Gene Amplification,Cervical disc disorder,0.6857709
+857506,Obstruction of biliary tree,"Pneumonia, Bacterial",0.5750159
+2189679,Leukocytosis,Thyroid associated opthalmopathies,0.6293814
+1531754,Proliferative diabetic retinopathy - high risk,"Pneumonia, Ventilator-Associated",0.6419993
+112519,Coronary Artery Disease,"Respiratory Distress Syndrome, Newborn",0.694751
+2913353,Hypopituitarism,Gestational Diabetes,0.5989578
+1426971,Invasive Candidiasis,"Uveitis, Intermediate",0.6040019
+1874640,Postoperative ileus,Allergic asthma,0.54453933
+2002956,Pericardial effusion,Skin Ulcer,0.4793582
+1804389,"Cholestasis-edema syndrome, Norwegian type",Flap necrosis,0.6291474
+1295142,Enteritis due to specified virus,Toxemia of pregnancy,0.8166968
+2698203,Deficiency of glucose-6-phosphate dehydrogenase,X-linked agammaglobulinemia,0.6972543
+1953987,Renal cyst,Thrombocytopenia 4,0.6633739
+2754905,Hemoglobinemia,Hypophosphatemia,0.7296847
+967410,HAIM-MUNK SYNDROME,"Hypotension, Orthostatic",0.5930313
+1993832,Refractive Errors,Gastrointestinal infection,0.45791087
+2464524,Acute rhinosinusitis,Amyloidosis,0.6405232
+659003,Inflammatory disorder,Chronic postoperative pain,0.6629272
+1131926,Graft-vs-Host Disease,Psoriasis of nail,0.56254005
+1971724,Dysentery,Structural disorder of heart,0.6361854
+2411487,Friedreich Ataxia,MUNGAN SYNDROME,0.7034127
+2379998,Aphthous Stomatitis,Hyaloideoretinal degeneration of Wagner,0.6867492
+2256471,Intrinsic Factor Deficiency,"Cardiomyopathy, Dilated",0.58480287
+1748765,Amyloid Neuropathies,THROMBOCYTOPENIA 2 (disorder),0.70730925
+2609269,Mycotic corneal ulcer,neonatal effect nos,0.58786374
+954128,"Cardiomyopathy, Dilated",Gastroparesis,0.668739
+601491,Ulcerative Colitis,"Arteriosclerotic cardiovascular disease, NOS",0.66175187
+1193595,Chronic idiopathic urticaria,Carnevale syndrome,0.5888953
+1237637,Poliomyelitis,Apraxia of Phonation,0.7329111
+2577821,Refractory shock,Cytokine Release Syndrome,0.6194332
+2032226,Symphysis Pubis Dysfunction,anemia deficiency iron treatment,0.7022202
+2150440,Ulcerative colitis in remission,Geographic Atrophy,0.49868757
+2877467,Aortic root dilation,Acne Vulgaris,0.598382
+995020,Cerebellar decompression injury,Bone lesion,0.661287
+559786,Ascites,Epstein,0.68659776
+2258543,Infection by Cryptococcus neoformans,CAMPOMELIC DYSPLASIA,0.75280493
+2508054,"Mucopolysaccharidosis, MPS-IV-A",Respiratory Syncytial Virus Infections,0.5912962
+2158936,"Arthritis, Gouty","Nephritis, Interstitial",0.6288856
+1400664,"AMYLOIDOSIS, HEREDITARY, TRANSTHYRETIN-RELATED",Necrotizing Enterocolitis,0.66942585
+603113,Neurodegenerative Disorders,Irritable bowel syndrome with constipation,0.6164381
+2019575,Normal drug tolerance,MRSA - Methicillin resistant Staphylococcus aureus infection,0.6068001
+967345,HAIM-MUNK SYNDROME,Synovitis,0.67887574
+2072884,Hemodynamic instability,"Dermatitis, Phototoxic",0.6395851
+385812,Ovarian Hyperstimulation Syndrome,Renal Insufficiency,0.5754822
+1558247,Diamond-Blackfan Anemia 1,"Arthritis, Gouty",0.61051387
+1458290,Severe Sepsis,Contact Dermatitis,0.6690129
+846932,Severe persistent allergic asthma,iliac disease,0.6060382
+2960578,Premenstrual Tension,Ischemic myocardial dysfunction,0.52288854
+2833412,Xerosis,Allergy to peanuts,0.7023251
+2269282,Occlusive vascular disease,Asymptomatic human immunodeficiency virus infection,0.643568
+1006814,Epileptic encephalopathy,Hypopituitarism,0.59906083
+2558115,Premature coronary artery atherosclerosis,Polyneuropathy,0.6655119
+1182029,Ileus,Movement Disorders,0.6178728
+812427,Hepatic Encephalopathy,AICARDI-GOUTIERES SYNDROME,0.66980696
+327833,Pneumococcal Infections,Unverricht-Lundborg Syndrome,0.5131746
+2336430,Dermatofibrosis lenticularis disseminata,Uterine Perforation,0.744189
+1939047,Inborn Errors of Metabolism,Pure Autonomic Failure,0.7364633
+97779,Cardiac Arrest,Gastroparesis with diabetes mellitus,0.5668403
+1373771,Bone Marrow Diseases,"Secondary disease, NOS",0.7313783
+749354,"Color Blindness, Red-Green",Limb ischemia,0.4008303
+1646237,Diastolic hypertension,Hyperprolactinemia,0.7567158
+2039015,Reversible pulpitis,"Aortic Aneurysm, Abdominal",0.5680965
+270687,Autoimmune Diseases,Clostridium difficile diarrhea,0.55106014
+819672,Pulmonary Emphysema,Severe Acute Respiratory Syndrome,0.6761148
+1993041,Refractive Errors,Heart Diseases,0.6156422
+1159771,Pityriasis Rubra Pilaris,Proliferative diabetic retinopathy,0.69922274
+1178482,TUBEROUS SCLEROSIS 2 (disorder),Aortic Valve Insufficiency,0.6577143
+2151825,Ulcerative colitis in remission,"Aneurysm, Ruptured",0.5007972
+597832,Thalassemia,infection induced,0.7591098
+611935,Pharyngitis,Asymptomatic Diseases,0.67617244
+2064121,End stage heart failure,Chronic infectious disease,0.69993347
+497505,Early Rheumatoid Arthritis,Genital Herpes,0.528871
+1513866,Inflammatory dermatosis,Chronic pain syndrome,0.78614897
+2529397,Inflammatory disorder of immune system,Prehypertension,0.53192246
+1646062,Diastolic hypertension,Hypernatremia,0.7475128
+2721189,Intrahepatic Cholestasis,"Glycogen storage disease due to acid maltase deficiency, late-onset",0.5963455
+455697,carotid disease,"Hyperaldosteronism, Familial, Type II",0.5681847
+1939182,Inborn Errors of Metabolism,Antibiotic-associated diarrhea,0.59855115
+1187473,Cystic Disease Of Lung,Hemoglobin SC Disease,0.5816849
+2440592,Lower urinary tract infectious disease,Disease of mucous membrane,0.68880457
+669584,Sleep Apnea Syndromes,Gastroesophageal reflux disease,0.6664669
+422171,Overactive Bladder,Drusen,0.6598834
+2822252,Epidemic disease,Lupus erythematosus tumidus,0.5526927
+2171148,Structural disorder of heart,Perforation of colon,0.5889235
+2340810,Turner Syndrome,Respiratory Failure,0.7832698
+1248078,Papilledema,Enteritis due to specified virus,0.60099393
+1925807,pulmonary involvement,Liver Cirrhosis,0.66676676
+2298479,Pseudomeningocele,Severe hereditary factor VIII deficiency disease,0.53940547
+2790059,Free plasma hemoglobin (disorder),Severe Acute Malnutrition,0.70121974
+2078952,Neuromyelitis Optica,Hydrothorax,0.5314319
+2209718,Rotavirus Infections,Acute respiratory infections,0.72846586
+2307684,Systemic onset juvenile chronic arthritis,Metabolic Bone Disorder,0.76898736
+68993,Erythema Multiforme,Bronchial dysplasia,0.6882307
+2473888,"Asthma, Exercise-Induced",progressive multiple sclerosis,0.5785023
+1588300,"Malaria, Falciparum",Juvenile Chronic Polyarthritis,0.66570437
+976280,Effects of heat,"HETEROTAXY, VISCERAL, 2, AUTOSOMAL",0.6268347
+2555005,Staphylococcus aureus infection,"Ulcerative colitis, active moderate",0.4768668
+2751924,Apert-Crouzon Disease,Methylenetetrahydrofolate reductase Genetic Polymorphisms,0.6625868
+626966,Immune Reconstitution Inflammatory Syndrome,Glucocorticoid-remediable aldosteronism,0.71827346
+737562,Macula lutea edema,Hypocalcemia,0.5630563
+418892,Thrombophilia,Pneumocystis jiroveci pneumonia,0.57902783
+2420710,Severe persistent asthma,Dental caries,0.47922263
+1095076,Acute asthma,Androgen-Insensitivity Syndrome,0.6263738
+1080724,Healthcare associated pneumonia,Hypogammaglobulinemia,0.55279845
+1156901,"Hypoalphalipoproteinemia, Familial",Viral upper respiratory tract infection,0.6687758
+369135,"Hepatitis C, Chronic",skin toxicity,0.6157525
+1074656,Acute pulmonary embolism,Glaucoma,0.5036705
+376457,Nasal Polyps,Migraine with Aura,0.5764504
+394576,Barakat syndrome,Nasopharyngitis,0.57961214
+1824651,Intestinal Perforation,Graves Disease,0.60110277
+89791,Drusen,Epileptic drop attack,0.7246939
+417543,Aneurysm of internal carotid artery,Gastric ulcer,0.61109185
+1869927,Chronic ulcerative rectosigmoiditis,Early childhood caries,0.5552579
+1340769,type 2 Diabetic Kidney Disease,Acute Chest Syndrome,0.690601
+1191119,Adams-Oliver syndrome 1,Ketonuria,0.6303455
+2442929,Pyelonephritis,Sarcoidosis,0.7421642
+1408807,Marfan Syndrome,anaphylaxis,0.61887807
+1876607,Bursitis,Astigmatism,0.5964206
+406757,AIDS defining illness,Dengue Fever,0.6453012
+1156481,"Hypoalphalipoproteinemia, Familial",Vitamin A Deficiency,0.5529378
+2100585,"MALE PSEUDOHERMAPHRODITISM: DEFICIENCY OF TESTICULAR 17,20-DESMOLASE",Lumbar facet joint pain,0.6407986
+796613,Anemia due to infection,antepartum malaria,0.66316724
+1895114,Chronic kidney disease stage 1,Retinal Detachment,0.6387117
+2642114,Early childhood caries,Embolic stroke,0.62688464
+2345198,Rheumatic Fever,Steatohepatitis,0.7087891
+1836446,Invasive aspergillosis,Episodic Kinesigenic Dyskinesia 1,0.5916227
+2567551,Disorder of pregnancy,Chronic infectious disease,0.7296817
+2611864,Mobius Syndrome,physical illness,0.6627923
+2110136,Miosis disorder,Akinesia,0.6542423
+92082,Juvenile arthritis,Zellweger Syndrome,0.5492374
+2066799,Infection of kidney,Irreversible pulpitis,0.52605283
+2140349,Papillon-Lefevre Disease,Osteoporotic Fractures,0.55038327
+1674548,Postherpetic neuralgia,Yellow Fever,0.5803212
+49,Hydranencephaly with Renal Aplasia-Dysplasia,Ventricular Fibrillation,0.5998279
+1301157,Spinal Diseases,Panuveitis,0.7365565
+2836672,"Candidiasis, Vulvovaginal",CULLER-JONES SYNDROME,0.5666953
+884753,Chronic gouty arthritis,Duodenal Ulcer,0.7195439
+583666,Zinc deficiency,"Infections, Hospital",0.66782635
+2935610,Cardiac arrest in children,"FUNDUS DYSTROPHY, PSEUDOINFLAMMATORY, OF SORSBY",0.6178833
+2949903,Cystitis,Thrombotic Microangiopathies,0.58019054
+2836144,"Candidiasis, Vulvovaginal",Chronic sinusitis,0.6065125
+1265753,Seborrheic dermatitis,airway disease,0.65029234
+902107,Influenza A (H5N1),Obstructive Ureterocele,0.4903785
+2474748,Atherosclerotic renal artery stenosis,Vascular calcification,0.616654
+1489038,Bacterial keratitis,Noonan Syndrome 1,0.6654652
+2532237,"SEIZURES, CORTICAL BLINDNESS, AND MICROCEPHALY SYNDROME","Arthritis, Gouty",0.58045125
+23101,Coronary Arteriosclerosis,Familial dilated cardiomyopathy,0.6914526
+929219,Acute heart failure,Fibromyalgia,0.51361793
+884930,Chronic gouty arthritis,Diamond-Blackfan Anemia 1,0.5737215
+797910,Diphtheria,Inflammatory disorder,0.6174362
+2480890,Intracranial Aneurysm,Malaria,0.5489054
+629888,Chronic osteoarthritis,"Sarcoidosis, Pulmonary",0.6729575
+644821,Hematochezia,Viral upper respiratory tract infection,0.6246222
+2944826,triple vessel disease,Japanese Encephalitis,0.5647888
+365371,HIV Infections,vascular inflammations,0.74741703
+211871,Persistent asthma,diabetic foot infection,0.6828814
+1840732,"Muscular Dystrophy, Duchenne",Anemia,0.5051794
+1684922,Hyperuricemia without signs of inflammatory arthritis and tophaceous disease,Ventricular hypertrophy,0.7126466
+2049292,Adult Fanconi syndrome,Acute ischemic heart disease,0.6807851
+71938,SCHIZOPHRENIA 6 (disorder),Gross' disease,0.6608406
+2525138,"Acidosis, Respiratory",Systemic disease,0.73639935
+2358820,Osteomyelitis,early pregnancy,0.62961996
+1056369,Immune System Diseases,Myositis,0.65640634
+1026668,Paroxysmal Nonkinesigenic Dyskinesia 1,Rhinosinusitis,0.5773366
+691862,Liver Failure,Hemoglobinemia,0.66863376
+921569,Ketosis,Enzyme Deficiency,0.7553828
+2929092,Refractory angina,Vesicoureteral Reflux 1,0.76717585
+1440858,Hypernatremia,Intestinal Obstruction,0.49139163
+107760,"Osteoarthritis, Knee",Gastrointestinal perforation,0.5119804
+2757881,Metabolic Bone Disorder,"Glycosuria, Renal",0.7214544
+833039,Chronic disease of cardiovascular system,Hypertensive Episode,0.6593804
+462714,ST segment elevation myocardial infarction,Infectious Otitis Media,0.4496531
+1027080,Paroxysmal Nonkinesigenic Dyskinesia 1,Kidney Calculi,0.4663066
+906925,abortion in first trimester,Barber Say syndrome,0.66640663
+398947,Respiratory Tract Infections,Migraine with Aura,0.6067169
+2853542,HMN (Hereditary Motor Neuropathy) Proximal Type I,Viral Respiratory Tract Infection,0.5164466
+98834,Diabetic macular edema,Psoriasis,0.6022344
+1014905,Complications of Diabetes Mellitus,Heart valve disease,0.67248744
+1922514,Amyloidosis cutis dyschromia,Cyst,0.60997236
+2960913,Premenstrual Tension,"Glaucoma, Neovascular",0.5620545
+2308365,Chronic heart disease,Secondary Parkinson Disease,0.8690135
+2252254,Oral infection,Antiphospholipid Syndrome,0.6775076
+1714766,Iron Overload,Disorder of eye,0.5942737
+954183,"Cardiomyopathy, Dilated",Vitamin B 6 Deficiency,0.49422616
+1700588,infection induced,Perforation of colon,0.6174262
+2318858,Polymyalgia Rheumatica,Severe chronic obstructive pulmonary disease,0.6090482
+1949763,Bronchiectasis,Juvenile arthritis,0.59049404
+323345,Persistent infection,Hyperaldosteronism,0.55540293
+901421,Influenza A (H5N1),Nerve Root Compression,0.43942663
+1559507,Meningitis,Obstructive Ureterocele,0.66159856
+843982,Influenza A,Impetigo,0.5919534
+1628117,Mucosal ulcer,cervical abnormality,0.62043154
+2928174,Refractory heart failure,Shoulder Impingement Syndrome,0.6680612
+513853,Systemic Scleroderma,First myocardial infarction,0.63514584
+167084,Subacute Bacterial Endocarditis,Amyloidosis,0.6620745
+2358855,Osteomyelitis,"Pleural Effusion, Malignant",0.5682333
+1405118,Chronic thromboembolic pulmonary hypertension,Dysmenorrhea,0.6774627
+2961072,Premenstrual Tension,"Cholestasis-edema syndrome, Norwegian type",0.6538988
+1175053,Pituitary-dependent Cushing's disease,Periodontitis,0.511644
+1883373,"Bronchiolitis, Viral",X-linked agammaglobulinemia,0.6592237
+144331,"BESTROPHINOPATHY, AUTOSOMAL RECESSIVE","Glaucoma, Open-Angle",0.4989294
+450779,Ocular Hypertension,Intestinal metaplasia,0.7143114
+1052880,Esophagitis,Hyponatremia,0.5381589
+1479588,Hypertriglyceridemia,Arteriopathic disease,0.65554273
+1731062,Cholelithiasis,Pneumothorax,0.6029798
+2765197,Diarrhea predominant Irritable bowel,Influenza-like illness,0.6358713
+424259,Erectile dysfunction,Acne,0.6196748
+695099,poorly controlled diabetes mellitus,Hand eczema,0.5941219
+1729092,Lysosomal Storage Diseases,CCHS WITH HIRSCHSPRUNG DISEASE,0.62008953
+1607621,Cluster headaches and other trigeminal autonomic cephalgias,Lupus Vulgaris,0.67248106
+2800312,Ureteral Calculi,"SCLERODERMA, PULMONARY",0.54167205
+2307192,Systemic onset juvenile chronic arthritis,Toxemia of pregnancy,0.67532456
+2289462,Sentinel node (disorder),Recurrent skin infections,0.64815265
+479969,Pseudomonas Infections,Bacteremia due to Staphylococcus aureus,0.74568295
+2553468,Swelling at injection site,progressive multiple sclerosis,0.44598445
+2437211,Urolithiasis,Enteritis,0.65048486
+784463,Quadriplegia,Viral respiratory infection,0.5158218
+2682959,Silent cerebral infarct,"Acidosis, Respiratory",0.61023444
+2710046,Painful Bladder Syndrome,"Epilepsies, Partial",0.7347184
+2451066,osteoporosis risk,Lower limb ischemia,0.59154266
+1397080,Clostridium difficile diarrhea,Urticaria,0.6482179
+96638,Diabetic Retinopathy,"Aortic Aneurysm, Thoracic",0.67369336
+2944787,triple vessel disease,Left Bundle-Branch Block,0.53741264
+793716,Freeman-Sheldon syndrome,Deficiency of testosterone biosynthesis,0.64020455
+1545607,CAMPOMELIC DYSPLASIA,hiv-infection/aids,0.57792914
+1432453,Postthrombotic Syndrome,Coronary Arteriosclerosis,0.6616727
+586974,Osteoporotic Fractures,Prurigo,0.61933076
+18553,"Diabetes Mellitus, Non-Insulin-Dependent",Gray Platelet Syndrome,0.56239754
+1709441,"POPLITEAL PTERYGIUM SYNDROME, LETHAL TYPE",Alzheimer's Disease,0.5550421
+2556825,"Tachycardia, Atrioventricular Nodal Reentry",Pediatric human immunodeficiency virus infection,0.48441204
+672798,pregnancy related,Cholestasis,0.6022582
+2774369,Chronic postoperative pain,Irreversible pulpitis,0.5991074
+2727092,"ECTODERMAL DYSPLASIA 10A, HYPOHIDROTIC/HAIR/NAIL TYPE, AUTOSOMAL DOMINANT",Impaired glucose tolerance,0.59810114
+448862,"Glaucoma, Primary Open Angle","Nephrogenic Diabetes Insipidus, Type I",0.53880656
+2721387,Mucopolysaccharidosis III,Bacterial conjunctivitis,0.65047836
+2032786,Polyneuropathy,Hypoglycemia,0.5848708
+1735942,Primary amyloidosis,Spinal Diseases,0.56930345
+526978,Non ST elevation acute coronary syndrome,Plasmodium falciparum infection,0.5034957
+1577167,Facial Hemiatrophy,Systemic Inflammatory Response Syndrome,0.6491224
+1097676,Abdominal Infection,Hypertensive heart failure,0.6160678
+1555739,Gastroparesis with diabetes mellitus,Hepatic Encephalopathy,0.73124105
+2435691,Hypoglycemia of childhood,"Multiple Sclerosis, Primary Progressive",0.5872628
+2604533,Familial hypercholesterolemia - homozygous,"Glaucoma, Neovascular",0.51063573
+1545252,CAMPOMELIC DYSPLASIA,Immune Reconstitution Inflammatory Syndrome,0.5469882
+2908354,Anuria,Psoriasis,0.6021484
+665082,Periodontal Diseases,Influenza,0.5881436
+1269815,Transient Ischemic Attack,Thalassemia Intermedia,0.66751844
+1860303,"Aortic Aneurysm, Abdominal",Ischemic cardiomyopathy,0.6317686
+772240,Extreme immaturity,"Robinow syndrome, autosomal recessive",0.65630317
+1808274,Lupus Nephritis,Wolf-Hirschhorn Syndrome,0.69106704
+1548189,Premature ventricular contractions,Idiopathic disease,0.5234632
+2530727,Inflammatory disorder of immune system,Congenital cytomegalovirus infection,0.6731639
+1029510,seizure disorder complex,Juvenile Chronic Polyarthritis,0.65873426
+2187810,Postcapillary pulmonary hypertension,Nail-Patella Syndrome,0.55046135
+2194957,Episodic ataxia type 1,vulvar infection,0.62486273
+1952210,Primary chronic pain,Cholecystitis,0.57857174
+1124079,Infectious Lung Disorder,Sensorineural Hearing Loss (disorder),0.73089564
+1616621,Pancreatitis,Renal fibrosis,0.64815325
+2771305,Chronic anemia,"Cardiomyopathy, Familial Idiopathic",0.61543596
+1465308,Mucolipidosis Type IV,Perforation of colon,0.74302506
+1632714,herpes,Asymptomatic Infections,0.59856594
+790084,Postmyocardial infarction syndrome,Hypogammaglobulinemia,0.70640063
+2782904,Keratitis caused by infection,"Muscular Dystrophy, Duchenne",0.5156905
+2759440,Gastroenteritis in children,Intermittent Claudication,0.475858
+57251,Gestational Diabetes,Hypoglycaemic episode,0.57875556
+1933917,Cardioembolic stroke,"Polyneuropathy, Familial",0.5698348
+949406,Ischemic myocardial dysfunction,Acquired generalized lipodystrophy,0.66004276
+669364,"Sleep Apnea, Central",Secondarily generalized seizures,0.6254006
+506039,Neuropathy,Ketonuria,0.644776
+844803,Pediculus capitis infestation,Hypothyroidism,0.6366913
+1591113,Paresis,Ulcerative colitis in remission,0.5966994
+835766,Hypogonadism,Primary Ciliary Dyskinesia,0.6338999
+2431628,Superficial Thrombophlebitis,Acute gout,0.67879784
+1251872,Duodenal Ulcer,OROFACIAL CLEFT 1,0.660233
+2354030,Type 2 obese diabetic,Exophthalmos,0.5283529
+281568,Leukopenia,Varicosity,0.6331496
+946148,Synovial Hypertrophy,Chronic nonmalignant pain,0.60853475
+2971290,Mitral Valve Stenosis,Arthropathy,0.5145225
+2748689,Allergy to eggs,"Mucopolysaccharidosis, MPS-IV-A",0.6124214
+366976,hepatobiliary disease,Stomatitis,0.6175908
+1334243,Alkalemia,Gingivitis,0.57450336
+997653,Viral gastroenteritis due to Rotavirus,Retinal Pigment Epithelial Detachment,0.6313922
+1805630,Adolescent Obesity,Intraventricular hemorrhage of prematurity,0.5118378
+1219460,"Pneumonia, Ventilator-Associated",Cumulative Trauma Disorders,0.651187
+2886358,Calcium pyrophosphate deposition disease,"Abortion, Habitual",0.5717648
+1971958,Dysentery,"Aortic Aneurysm, Thoracic",0.64663494
+399029,Respiratory Tract Infections,Renal cyst,0.60665715
+2707502,Hyperaldosteronism,"Diabetes Mellitus, Insulin-Dependent",0.71149474
+2761500,Sickle Cell Trait,Klinefelter Syndrome,0.7421716
+315971,Ankylosing spondylitis,Amyloidosis cutis dyschromia,0.7584221
+2544423,Hyperimmunoglobulinemia D,Sentinel node (disorder),0.5603546
+1745822,"Amyloid Neuropathies, Familial",Hemolytic-Uremic Syndrome,0.6077852
+159415,Widespread Disease,Capillary Leak Syndrome,0.6373085
+415280,Gigantism,Hyperemia,0.6723654
+2194641,Episodic ataxia type 1,"Obesity, Morbid",0.5732336
+874648,Chronic hcv genotype 1,Phrenic nerve lesion,0.5567523
