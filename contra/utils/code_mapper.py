@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import pandas as pd
 import os
-from contra.constants import DATA_PATH, LOS_TEST_PATH
+from contra.constants import DATA_PATH
 from ast import literal_eval
 
 import numpy as np

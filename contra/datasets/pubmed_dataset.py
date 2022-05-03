@@ -21,9 +21,10 @@ from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact
 
 
 class PubMedModule(pl.LightningDataModule):
-    def __init__(self, hparams, reassign=False, test_mlm=False):
+    def __init__(self, hparams, reassign=False, test_mlm=False, year_gap_in_assigned=True):
         super().__init__()
-        self.hparams = hparams
+        # self.hparams = hparams
+        self.debug, self.overlap_sentences, self.bert_tokenizer = hparams.debug, hparams.overlap_sentences, hparams.bert_tokenizer
         self.serve_type = hparams.serve_type
         self.min_num_participants = hparams.min_num_participants
         self.first_time_range = (datetime(hparams.first_start_year, 1, 1), datetime(hparams.first_end_year, 12, 31))
@@ -39,6 +40,7 @@ class PubMedModule(pl.LightningDataModule):
         self.batch_size = hparams.batch_size
         self.reassign = reassign
         self.test_mlm = test_mlm
+        self.year_gap_in_assigned = year_gap_in_assigned
         self.df = None
         self.train_df, self.val_df = None, None
         self.train, self.test, self.val = None, None, None
@@ -50,7 +52,7 @@ class PubMedModule(pl.LightningDataModule):
         if self.reassign:
             print("reassign is True, not reading from assigned")
             # This is a df containing a row for each abstract.
-            df = load_aact_data(self.pubmed_version, year_range=None, sample=self.hparams.debug)
+            df = load_aact_data(self.pubmed_version, year_range=None, sample=self.debug)
             df = df.dropna(subset=['date', 'male', 'female'], axis=0)
             df['date'] = df['date'].map(lambda dt: datetime.strptime(dt, '%Y-%m-%d'))
             df['num_participants'] = df['female'] + df['male']
@@ -72,10 +74,13 @@ class PubMedModule(pl.LightningDataModule):
                 train_df, val_df = old_train_df, old_val_df
 
         else:
-            df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
+            if self.year_gap_in_assigned:
+                df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
+            else:
+                df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_no_year_gap_assigned.csv'), index_col=0)
             tu = TextUtils()
             df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
-            if self.hparams.debug:
+            if self.debug:
                 df = df.sample(1000)
             train_df = df[df['assignment'] == 0].copy()
             val_df = df[df['assignment'] == 1].copy()
@@ -92,11 +97,11 @@ class PubMedModule(pl.LightningDataModule):
             keep_fields = ['date', 'year', 'female', 'male', 'num_participants', 'title_and_abstract']
             split_params = {'text_field': 'title_and_abstract',
                             'keep': keep_fields,
-                            'overlap': self.hparams.overlap_sentences}
+                            'overlap': self.overlap_sentences}
             print(f"Before splitting to (3?) sentences, train: {len(train_df)} val: {len(val_df)}")
             self.train_df = split_abstracts_to_sentences_df(train_df, **split_params)
             self.val_df = split_abstracts_to_sentences_df(val_df, **split_params)
-        print(f'Serve type: {self.serve_type}, overlap: {self.hparams.overlap_sentences}')
+        print(f'Serve type: {self.serve_type}, overlap: {self.overlap_sentences}')
         print(f'Loaded {len(self.train_df)} train samples and {len(self.val_df)} validation samples.')
 
     def setup(self, stage=None):
@@ -107,11 +112,11 @@ class PubMedModule(pl.LightningDataModule):
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], filter_cuis=False,
                                    read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
-            bert_path = f'bert_tiny_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
+            bert_path = f'bert_base_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             #bert_path = f'bert_tiny_uncased_2020_2020_v{self.pubmed_version}_epoch39'
             #bert_path = f'bert_base_cased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
-                                   bert_tokenizer=self.hparams.bert_tokenizer,
+                                   bert_tokenizer=self.bert_tokenizer,
                                    test_start_year=self.test_start_year, test_end_year=self.test_end_year,
                                    # When filter_cuis=True, better use sample_type=0 (no sampling). Otherwise, sample_type=1.
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], filter_cuis=False,
@@ -273,7 +278,7 @@ class CUIDataset(Dataset):
 
         self.similarity_df.to_csv(
             os.path.join(SAVE_PATH,
-                         f'test_similarities_CUI_names_{self.model_desc}_{test_start_year}_{test_end_year}.csv'))
+                         f'test_similarities_CUI_names_{self.model_desc}_{test_start_year}_{test_end_year}_211221.csv'))
 
     def __len__(self):
         return len(self.similarity_df)

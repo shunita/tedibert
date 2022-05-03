@@ -21,19 +21,27 @@ from contra.tests.test_readmission_by_diags import EmbOnDiagsWithClassifier
 from contra.constants import LOS_TEST_PATH_V4
 from sklearn.metrics import mean_squared_error
 from contra.utils.diebold_mariano import dm_test
+from contra.tests.descs_and_models import DESCS_AND_MODELS, cui_embeddings
 
 MIMIC3_CUSTOM_TASKS_PATH = '/home/shunita/mimic3/custom_tasks/data'
 MIMIC_PATH = "/home/shunita/mimic3/physionet.org/files/mimiciii/1.4/"
 
-DESCS_AND_MODELS = [('BERT10-18_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39')),  # 0
-                    ('tinybert_non_medical', 'google/bert_uncased_L-2_H-128_A-2'),  # 1
-                    ('GAN20', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_concat_epoch19')),  # 2
-                    ('BERT2020_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2020_2020_v2020_epoch39')),  # 3
-                    ('BERT18_20eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2018_2018_v2020_epoch19')),  # 4
-                    ]
+
+# LR = 5e-4
+# BATCH_SIZE = 163
+
+# params used in ACL ARR, october 15 2021
 LR = 1e-3
 BATCH_SIZE = 128
-RUN_MODEL_INDEX = 0
+
+# params used for bert-base runs
+# LR = 1e-4
+# BATCH_SIZE = 4
+
+RUN_MODEL_INDEX = 3
+# UPSAMPLE_FEMALE = 'data/los_by_diags_female_sample.csv'
+UPSAMPLE_FEMALE = None
+USE_EMB = True
 
 # setting random seeds
 torch.manual_seed(0)
@@ -47,7 +55,7 @@ def dm_test_on_df(df, true_field, pred1_field, pred2_field):
     return dm_test(df[true_field], df[pred1_field], df[pred2_field])
 
 
-def join_results(result_files_and_descs, output_fname, descs_for_comparison=None):
+def join_results(result_files_and_descs, output_fname, descs_for_comparison=[]):
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
     for desc, fname in result_files_and_descs:
         df = pd.read_csv(fname, index_col=0)
@@ -192,22 +200,33 @@ class Regressor(nn.Module):
 
 
 class BertOnDiagsWithRegression(BertOnDiagsBase):
-    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, additionals=0):
+    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, use_diags=True, additionals=0):
         super(BertOnDiagsWithRegression, self).__init__(bert_model, diag_to_title, proc_to_title, lr, name, use_lstm)
         self.additionals = additionals
         emb_size = self.bert_model.get_input_embeddings().embedding_dim
+        self.use_diags = use_diags
+        input_dim = 0
+        if self.use_diags:
+            input_dim += 2 * emb_size  # primary diag + prev_diags
+        input_dim += additionals
         # self.regression_model = Regressor(emb_size, emb_size//2)
-        self.regression_model = Regressor(emb_size*2 + additionals, emb_size)
+        hidden = 128 # this is the emb size of tiny bert but can be increased when using bert base (768?).
+        self.regression_model = Regressor(input_dim, hidden)
+        # self.regression_model = torch.nn.Linear(input_dim, hidden_dim)
         self.loss_func = torch.nn.MSELoss()
 
     def forward(self, batch):
         # test here what happens if we only take the first diagnosis
         agg = 'lstm' if self.use_lstm else 'sum'
-        sample_prev_diag_embeddings = self.embed_diags(batch['prev_diags'], agg=agg)
-        sample_primary_diag_embeddings = self.embed_diags(batch['diags'], agg='first')
-        sample_embeddings = torch.cat([sample_prev_diag_embeddings, sample_primary_diag_embeddings], dim=1)
+        if self.use_diags:
+            sample_prev_diag_embeddings = self.embed_diags(batch['prev_diags'], agg=agg)
+            sample_primary_diag_embeddings = self.embed_diags(batch['diags'], agg='first')
+            sample_embeddings = torch.cat([sample_prev_diag_embeddings, sample_primary_diag_embeddings], dim=1)
         if self.additionals > 0:
-            sample_embeddings = torch.cat([sample_embeddings, batch['additionals']], dim=1)
+            if self.use_diags:
+                sample_embeddings = torch.cat([sample_embeddings, batch['additionals']], dim=1)
+            else:  # only additionals
+                sample_embeddings = batch['additionals']
         ypred = self.regression_model(sample_embeddings)
         return ypred
 
@@ -252,13 +271,16 @@ class EmbOnDiagsWithRegression(EmbOnDiagsBase):
         super(EmbOnDiagsWithRegression, self).__init__(emb_path, lr, name, use_lstm)
         emb_size = list(self.emb.values())[0].shape[0]
         self.additionals = additionals
-        self.regression_model = Regressor(2*emb_size+additionals, emb_size)
+        input_dim = 2*emb_size+additionals
+        self.regression_model = Regressor(input_dim, emb_size)
+        # self.regression_model = torch.nn.Linear(input_dim, 1)
         self.loss_func = torch.nn.MSELoss()
 
     def forward(self, batch):
         # can use tf-idf by passing weights to embed_diags
         # sample_embeddings = self.embed_diags(batch['diags'], batch['diag_idfs'])
-        sample_prev_diag_embeddings = self.embed_codes(batch['prev_diags'], agg='sum', weights=None)
+        agg = 'lstm' if self.use_lstm else 'sum'
+        sample_prev_diag_embeddings = self.embed_codes(batch['prev_diags'], agg=agg, weights=None)
         sample_primary_diag_embeddings = self.embed_codes(batch['diags'], agg='first', weights=None)
         sample_embeddings = torch.cat([sample_prev_diag_embeddings, sample_primary_diag_embeddings], dim=1)
         if self.additionals > 0:
@@ -302,7 +324,8 @@ class EmbOnDiagsWithRegression(EmbOnDiagsBase):
 
 if __name__ == '__main__':
     desc, model_path = DESCS_AND_MODELS[RUN_MODEL_INDEX]
-    cui_embeddings = [9, 10, 11, 12]
+    # cui_embeddings = [9, 10, 11, 12]
+    # cui_embeddings = [7, 8, 9, 10, 11]
     if RUN_MODEL_INDEX in cui_embeddings:
         embs_with_missing_diags = [DESCS_AND_MODELS[i][1] for i in cui_embeddings]
         dm = LOSbyEmbDiagsModule(embs_with_missing_diags, batch_size=BATCH_SIZE)
@@ -317,11 +340,15 @@ if __name__ == '__main__':
         diag_dict = diag_dict.set_index('ICD9_CODE')['LONG_TITLE'].to_dict()  # icd9 code to description
         proc_dict = pd.read_csv(os.path.join(MIMIC_PATH, 'D_ICD_PROCEDURES.csv'), index_col=0)
         proc_dict = proc_dict.set_index('ICD9_CODE')['LONG_TITLE'].to_dict()
-        dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=64)
-        model = BertOnDiagsWithRegression(model_path, diag_dict, proc_dict, lr=LR, name=desc, use_lstm=True, additionals=0)
-                                          #additionals=93)
+        dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE)
+        model = BertOnDiagsWithRegression(model_path, diag_dict, proc_dict, lr=LR, name=desc, use_lstm=True,
+                                          use_diags=USE_EMB,
+                                          additionals=0  # submitted results
+                                          # additionals=93
+                                          # additionals=3
+                                          )
 
-    logger = WandbLogger(name=f'{desc}_los_lstm_2L', save_dir=LOG_PATH,
+    logger = WandbLogger(name=f'{desc}_los_medgan', save_dir=LOG_PATH,
                          version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                          project='FairEmbedding_test',
                          config={'lr': LR, 'batch_size': BATCH_SIZE}

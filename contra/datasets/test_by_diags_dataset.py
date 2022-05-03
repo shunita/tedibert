@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 from contra.utils.code_mapper import read_emb, CodeMapper
 from contra.utils.pubmed_utils import clean_abstracts
 from contra.utils.text_utils import TextUtils
-from contra.constants import DATA_PATH, LOS_TEST_PATH_V2, READMIT_TEST_PATH, LOS_TEST_PATH_V4
+from contra.constants import DATA_PATH, READMIT_TEST_PATH, LOS_TEST_PATH_V4
 from ast import literal_eval
 import numpy as np
 
@@ -32,14 +32,28 @@ def clean_nans(string_rep_of_seq):
     return string_rep_of_seq.replace('nan, ', '').replace(', nan', '').replace('nan', '')
 
 
+def clean_ethnicity_field(ethnicity_str):
+    s = ethnicity_str.split(" - ")[0]
+    if s == 'HISPANIC OR LATINO':
+        return 'HISPANIC/LATINO'
+    if s.startswith('BLACK'):
+        return 'BLACK'
+    if s in ['UNABLE TO OBTAIN', 'PATIENT DECLINED TO ANSWER', 'UNKNOWN/NOT SPECIFIED']:
+        return 'UNKNOWN'
+    return s
+
+
 class DiagsModuleBase(pl.LightningDataModule):
     def __init__(self,
                  diag_dict,
                  procedures_dict,
                  data_file,
-                 batch_size=16):
+                 batch_size=16,
+                 upsample_female_file=None):
         super().__init__()
         self.batch_size = batch_size
+        self.upsample_female = upsample_female_file
+        print(f"Reading data from {data_file}")
         self.data = pd.read_csv(data_file, index_col=0)
         self.diag_dict = diag_dict
         self.procedure_dict = procedures_dict
@@ -61,7 +75,7 @@ class DiagsModuleBase(pl.LightningDataModule):
             return '[]'
         new_codes = []
         for code in codes:
-            if name=='diags':
+            if name == 'diags':
                 self.total_diags.add(code)
             elif name == 'procs':
                 self.total_procs.add(code)
@@ -78,7 +92,7 @@ class DiagsModuleBase(pl.LightningDataModule):
     def prepare_data(self):
         # Assumes that all NAs in important fields were dropped.
         self.handle_categorical_features()
-        self.data = self.data[self.data.AGE >= 18]  # don't include newborns, but also not children
+        self.data = self.data[self.data.AGE >= 18]  # don't include newborns and children
         self.data.DIAGS = self.data.DIAGS.apply(lambda x: self.filter_code_list(x, self.diag_dict, 'diags', remove_if_half_missing=False))
         records_before = len(self.data)
         self.data = self.data[self.data.DIAGS != '[]']
@@ -98,7 +112,7 @@ class DiagsModuleBase(pl.LightningDataModule):
             self.data['DRUG'] = self.data.DRUG.fillna('{}')
 
         if 'PROCEDURES' in self.data.columns:
-            self.data['PROCEDURES'] = self.data.DRUG.fillna('[]')
+            self.data['PROCEDURES'] = self.data.PROCEDURES.fillna('[]')
             self.data.PROCEDURES = self.data.PROCEDURES.apply(clean_nans)
             self.data.PROCEDURES = self.data.PROCEDURES.apply(
                 lambda x: self.filter_code_list(x, self.procedure_dict, 'procs', remove_if_half_missing=False))
@@ -109,6 +123,21 @@ class DiagsModuleBase(pl.LightningDataModule):
         self.train_df = self.data[self.data['ASSIGNMENT'] == 'train']
         self.val_df = self.data[self.data['ASSIGNMENT'] == 'test']
         print(f'Divided to {len(self.train_df)} train, {len(self.val_df)} test.')
+        if self.upsample_female is not None:
+            print(f"before upsampling female patients, train contains {self.train_df.GENDER_F.sum()} female patients.")
+            if os.path.exists(self.upsample_female):
+                sample = pd.read_csv(self.upsample_female, index_col=0)
+            else:  # resample
+                train_fem = self.train_df[self.train_df.GENDER_F == 1]
+                train_male = self.train_df[self.train_df.GENDER_M == 1]
+                num_fem_subjects = train_fem.SUBJECT_ID.nunique()
+                num_male_subjects = train_male.SUBJECT_ID.nunique()
+                subjects_to_sample = num_male_subjects - num_fem_subjects
+                sampled_subjects = np.random.choice(train_fem.SUBJECT_ID.unique(), size=subjects_to_sample, replace=False)
+                sample = train_fem[train_fem.SUBJECT_ID.isin(sampled_subjects)]
+                sample.to_csv(self.upsample_female)
+            self.train_df = pd.concat([self.train_df, sample]).reset_index()  # The original index will still be under 'index'
+            print(f'After upsampling female patients: {len(self.train_df)} train, {len(self.val_df)} test. Train contains {self.train_df.GENDER_F.sum()} female patients.')
         self.diag_idf = calculate_idf(self.train_df.DIAGS.apply(literal_eval).values)
         self.calculate_stats()
 
@@ -120,20 +149,20 @@ class DiagsModuleBase(pl.LightningDataModule):
         self.data = pd.get_dummies(self.data, columns=self.categorical_features)
 
     def train_dataloader(self):
-        return DataLoader(self.train, shuffle=True, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.train, shuffle=True, batch_size=self.batch_size, num_workers=4)
 
     def val_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=4)
 
     def test_dataloader(self):
-        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=4)
 
 
 class LOSbyDiagsModule(DiagsModuleBase):
     def __init__(self, diag_dict, procedure_dict,
                  data_file=LOS_TEST_PATH_V4,
-                 batch_size=16, classification=False):
-        super(LOSbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size)
+                 batch_size=16, classification=False, upsample_female_file=None):
+        super(LOSbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file)
         self.data = self.data.rename({'ICD9_CODE': 'DIAGS'}, axis=1)
         self.data = self.data.dropna(subset=['DIAGS', 'LOS'])
         self.data = self.data[self.data.DIAGS != '[nan]']
@@ -145,7 +174,8 @@ class LOSbyDiagsModule(DiagsModuleBase):
             before = len(self.data)
             self.data = self.data[self.data.LOS <= longest_LOS]
             print(f"Removed records with LOS above {longest_LOS}, remaining records: {len(self.data)/before}")
-        self.categorical_features = ['GENDER', 'ADMISSION_TYPE', 'ADMISSION_LOCATION', 'INSURANCE', 'RELIGION',
+        self.categorical_features = ['GENDER']   +\
+                                    ['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'INSURANCE', 'RELIGION',
                                      'ETHNICITY', 'MARITAL_STATUS']
 
     def calculate_stats(self):
@@ -164,12 +194,19 @@ class ReadmissionbyDiagsModule(DiagsModuleBase):
     def __init__(self, diag_dict,
                  procedure_dict,
                  data_file=READMIT_TEST_PATH,
-                 batch_size=16):
-        super(ReadmissionbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size)
+                 batch_size=16,
+                 upsample_female_file=None):
+        super(ReadmissionbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file)
         self.data = self.data.dropna(subset=['DIAGS', 'READMISSION'])
         self.data = self.data[self.data['READMISSION'] != 2]  # Remove patients who died in the hospital
-        self.categorical_features = ['GENDER', 'ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
-                                     'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS']
+        # print("train: female: {}")
+        self.categorical_features = ['GENDER'] + \
+                                    ['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
+                                     'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS'] #+\
+                                    # ['Glascow coma scale eye opening first', 'Glascow coma scale eye opening last',
+                                    #  'Glascow coma scale motor response first', 'Glascow coma scale motor response last',
+                                    #  'Glascow coma scale verbal response first', 'Glascow coma scale verbal response last'
+                                    #  ]
         # can add FIRST/LAST CAREUNIT/WARDID, LOS (in the ICU)
 
     # def prepare_data(self):
@@ -210,7 +247,9 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes, classification=False):
         super(LOSbyDiagsDataset, self).__init__(
             df, diag_idf, categorical_feature_prefixes,
-            non_cat_features=['AGE', 'NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS'])
+            non_cat_features=['AGE'] + \
+                             ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
+        )
         self.classification = classification
 
     def __getitem__(self, index):
@@ -233,14 +272,40 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
 
 class ReadmitbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes):
+        non_cat_features = ['AGE'] + \
+                           ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
+                           # ['Glascow coma scale total avg', 'Glascow coma scale total first',
+                           #  'Glascow coma scale total last', 'Capillary refill rate avg',
+                           #  'Capillary refill rate first', 'Capillary refill rate last',
+                           #  'Diastolic blood pressure avg', 'Diastolic blood pressure first',
+                           #  'Diastolic blood pressure last',
+                           #  'Fraction inspired oxygen avg',
+                           #  'Fraction inspired oxygen first', 'Fraction inspired oxygen last',
+                           #  'Glucose avg',
+                           #  'Glucose first', 'Glucose last', 'Heart Rate avg', 'Heart Rate first',
+                           #  'Heart Rate last', 'Height avg', 'Height first', 'Height last',
+                           #  'Mean blood pressure avg', 'Mean blood pressure first',
+                           #  'Mean blood pressure last',
+                           #  'Oxygen saturation avg',
+                           #  'Oxygen saturation first', 'Oxygen saturation last',
+                           #  'Respiratory rate avg', 'Respiratory rate first',
+                           #  'Respiratory rate last',
+                           #  'Systolic blood pressure avg',
+                           #  'Systolic blood pressure first', 'Systolic blood pressure last',
+                           #  'Temperature avg', 'Temperature first', 'Temperature last',
+                           #  'Weight avg', 'Weight first', 'Weight last',
+                           #  'pH avg', 'pH first', 'pH last',
+                           #  ]
         super(ReadmitbyDiagsDataset, self).__init__(
             df, diag_idf, categorical_feature_prefixes,
-            non_cat_features=['AGE', 'NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS'])
+            non_cat_features=non_cat_features)
         self.df = df
         self.diag_idf = diag_idf
         self.categorical_features = [c for c in self.df.columns
                                      if self.categorical_column(c, categorical_feature_prefixes)]
-        self.non_cat_features = ['AGE', 'NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
+
+        self.df = self.df.fillna(0)
+        # self.non_cat_features = non_cat_features
         print(
             f"ReadmitbyDiagsDataset: Additional features dimension: {len(self.categorical_features) + len(self.non_cat_features)}")
 
@@ -364,7 +429,8 @@ class ReadmissionbyEmbDiagsModule(DiagsEmbModuleBase):
         super(ReadmissionbyEmbDiagsModule, self).__init__(emb_files, data_file, batch_size)
         self.data = self.data.dropna(subset=['DIAGS', 'READMISSION'])
         self.data = self.data[self.data['READMISSION'] != 2]  # Remove patients who died in the hospital
-        self.categorical_features = ['GENDER', 'ETHNICITY',
+        self.categorical_features = ['GENDER',
+                                     'ETHNICITY',
                                      # 'ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
                                      # 'INSURANCE', 'RELIGION', 'MARITAL_STATUS'
                                      ]

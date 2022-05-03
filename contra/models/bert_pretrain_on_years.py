@@ -10,7 +10,8 @@ from contra.common.utils import break_sentence_batch
 class BertPretrainOnYears(pl.LightningModule):
     def __init__(self, hparams):
         super(BertPretrainOnYears, self).__init__()
-        self.hparams = hparams
+        # self.hparams = hparams
+        self.learning_rate = hparams.learning_rate
         # self.bert_embedding_size = 768  # TODO: this should come from hparams? or from the model maybe, if it is even needed
         self.start_year = hparams.start_year
         self.end_year = hparams.end_year
@@ -57,7 +58,7 @@ class BertPretrainOnYears(pl.LightningModule):
     def validation_step(self, batch: dict, batch_idx: int):
         path = os.path.join(SAVE_PATH, '{}_{}_{}_v{}_epoch{}'.format(
             self.model_desc, self.start_year, self.end_year, self.pubmed_version, self.current_epoch))
-        if self.current_epoch > 0 and not os.path.exists(path):
+        if self.current_epoch > 0 and (self.current_epoch % 10 == 9) and not os.path.exists(path):
             self.bert_model.save_pretrained(path)
         loss = self.step(batch, name='val')
         return loss
@@ -67,5 +68,5 @@ class BertPretrainOnYears(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.bert_model.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.Adam(self.bert_model.parameters(), lr=self.learning_rate)
         return [optimizer]

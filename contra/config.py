@@ -92,6 +92,16 @@ parser.add_argument('--regularize', default=0, type=float,
 parser.add_argument('--agg_sentences', default='transformer',
                     help='How should sentence embeddings from bert be aggregated into an abstract embedding?'
                          'Supported options: "transformer" or "concat".')
+parser.add_argument('--direction', default='both',
+                    help='Should old embeddings look like new ("old2new"), the other way around ("new2old") '
+                         'or both ways ("both")?')
+parser.add_argument('--new2old', default='both',
+                    help='Should old embeddings look like new ("old2new"), the other way around ("new2old") '
+                         'or both ways ("both"), or weighted ("weighted")? In the last case, "new2old_weight" is used.')
+parser.add_argument('--old2new_weight', default=0.5, type=float,
+                    help='How much weight (x) to give to the old2new direction loss. '
+                         'If x in [0,1], we perform old_mean * x + new_mean * (1-x). '
+                         'If larger than 1, each old example weights x times more than each new example. ')
 
 parser.add_argument('--lmb_isnew', default=1, type=float, help='discriminator weight in the loss function')
 parser.add_argument('--lmb_ratio', default=1, type=float, help='ratio prediction weight in the loss function')

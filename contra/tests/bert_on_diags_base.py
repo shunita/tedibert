@@ -3,6 +3,7 @@ import pytorch_lightning as pl
 from transformers import AutoTokenizer, AutoModel
 import torch
 from torch import nn
+import numpy as np
 
 from contra.utils.code_mapper import read_emb, CodeMapper
 
@@ -121,7 +122,7 @@ class EmbOnDiagsBase(pl.LightningModule):
                     embs.append(self.emb[code]*sample_weights[j])
                 embs = torch.Tensor(embs).to(self.device)
             else:
-                embs = torch.Tensor([self.emb[code] for code in admission]).to(self.device)
+                embs = torch.Tensor(np.array([self.emb[code] for code in admission])).to(self.device)
             if len(embs) == 0:
                 sample_embeddings.append(torch.zeros(self.emb_size, device=self.device))
             elif agg == 'mean':

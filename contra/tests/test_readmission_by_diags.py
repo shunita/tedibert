@@ -18,35 +18,46 @@ from pytorch_lightning.loggers import WandbLogger
 from transformers import AutoTokenizer, AutoModel
 from contra.constants import SAVE_PATH, LOG_PATH, DATA_PATH, LOS_TEST_PATH_V4
 from contra.models.Transformer1D import Encoder1DLayer
-from contra.datasets.test_by_diags_dataset import ReadmissionbyDiagsModule, ReadmissionbyEmbDiagsModule
+from contra.datasets.test_by_diags_dataset import ReadmissionbyDiagsModule, ReadmissionbyEmbDiagsModule, clean_nans
 from contra.tests.bert_on_diags_base import BertOnDiagsBase, EmbOnDiagsBase
 from contra.constants import READMIT_TEST_PATH
 from sklearn.metrics import roc_auc_score, accuracy_score, roc_curve
 from contra.utils.delong_auc import delong_roc_test
+from contra.tests.descs_and_models import DESCS_AND_MODELS, cui_embeddings
 
 MIMIC3_CUSTOM_TASKS_PATH = '/home/shunita/mimic3/custom_tasks/data'
 MIMIC_PATH = "/home/shunita/mimic3/physionet.org/files/mimiciii/1.4/"
 
-DESCS_AND_MODELS = [('BERT10-18_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39')),  # 0
-                    ('tinybert_non_medical', 'google/bert_uncased_L-2_H-128_A-2'),  # 1
-                    ('GAN20', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.3_concat_epoch19')),  # 2
-                    ('BERT2020_40eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2020_2020_v2020_epoch39')),  # 3
-                    ('BERT18_20eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2018_2018_v2020_epoch19')),  # 4
-                    ]
+DESCS_AND_MODELS = DESCS_AND_MODELS
+
+# LR = 0.87 * 1e-5
 LR = 1e-5
-BATCH_SIZE = 32
-RUN_MODEL_INDEX = 0
+# LR = 1e-3
+BATCH_SIZE = 64
+
+# used with bert base models
+# BATCH_SIZE = 16
+
+RUN_MODEL_INDEX = 3
+USE_EMB = True
+# UPSAMPLE_FEMALE = 'data/readmission_by_diags_female_sample.csv'
+# UPSAMPLE_FEMALE = 'data/readmission_by_diags_sampled_medgan.csv'
+UPSAMPLE_FEMALE = None
+MAX_EPOCHS = 4
 
 # setting random seeds
 torch.manual_seed(0)
 random.seed(0)
 np.random.seed(0)
 
+# Note: edited /home/shunita/miniconda3/envs/fairemb1/lib/python3.6/site-packages/pytorch_lightning/utilities/data.py to get rid of noisy warning
+
 
 def print_metrics(ytrue, ypred):
     auc = roc_auc_score(ytrue, ypred)
     acc = accuracy_score(ytrue, ypred.round())
     print(f"AUC: {auc}, Accuracy: {acc}")
+    return auc, acc
 
 
 def print_aucs_for_readmission(result_df):
@@ -54,13 +65,14 @@ def print_aucs_for_readmission(result_df):
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
     desc = 'pred_prob'
     print("all records:")
-    print_metrics(test_df['READMISSION'], test_df[desc])
+    all_auc, all_acc = print_metrics(test_df['READMISSION'], test_df[desc])
     fem_subset = test_df[test_df.GENDER == 'F']
     print("female records:")
-    print_metrics(fem_subset['READMISSION'], fem_subset[desc])
+    fem_auc, fem_acc = print_metrics(fem_subset['READMISSION'], fem_subset[desc])
     male_subset = test_df[test_df.GENDER == 'M']
     print("male records:")
-    print_metrics(male_subset['READMISSION'], male_subset[desc])
+    male_auc, male_acc = print_metrics(male_subset['READMISSION'], male_subset[desc])
+    return {'all_auc': all_auc, 'all_acc': all_acc, 'fem_auc': fem_auc, 'fem_acc': fem_acc, 'male_auc': male_auc, 'male_acc': male_acc}
 
 
 def print_aucs_for_los(result_df):
@@ -83,7 +95,9 @@ def print_aucs_for_los(result_df):
 
 
 def delong_on_df(df, true_field, pred1_field, pred2_field):
-    return 10**delong_roc_test(df[true_field], df[pred1_field], df[pred2_field])
+    df1 = df[(df[pred1_field] != 0) & (df[pred1_field] != 1) & (df[pred2_field] != 0) & (df[pred2_field] != 1)]
+    print(f"dropped {len(df)-len(df1)} rows because of extreme values")
+    return 10**delong_roc_test(df1[true_field], df1[pred1_field], df1[pred2_field])
 
 
 def join_results(result_files_and_descs, output_fname, descs_for_auc_comparison=[]):
@@ -117,6 +131,187 @@ def join_results(result_files_and_descs, output_fname, descs_for_auc_comparison=
         test_df.to_csv(output_fname)
 
 
+def analyze_results_by_field(res_file_or_df, compared_models=['female100', 'neutral100'],
+                             field='ETHNICITY_CLEAN',
+                             values=['BLACK/AFRICAN AMERICAN', 'WHITE', 'ASIAN', 'HISPANIC/LATINO']):
+    if type(res_file_or_df) == str:
+        res = pd.read_csv(res_file_or_df, index_col=0)
+    else:
+        res = res_file_or_df
+    if values == []:
+        values = set(res[field].values)
+    for v in values:
+        subset = res[res[field] == v]
+        print(f"stats for {v}\n~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(f"All records ({len(subset)}):")
+        if subset['READMISSION'].mean() == 0 or subset['READMISSION'].mean() == 1:
+            print(f"all values are {subset['READMISSION'].iloc[0]}")
+            continue
+        for model in compared_models:
+            print(f"AUC {model}")
+            print_metrics(subset['READMISSION'], subset[model])
+        desc1, desc2 = compared_models
+        print(f"diff pvalue: {delong_on_df(subset, 'READMISSION', desc1, desc2)}")
+
+        f_subset = subset[subset.GENDER == 'F']
+        m_subset = subset[subset.GENDER == 'M']
+
+        print(f"Female records ({len(f_subset)}):")
+        if f_subset['READMISSION'].mean() == 0 or f_subset['READMISSION'].mean() == 1:
+            print(f"all values are {f_subset['READMISSION'].iloc[0]}")
+        else:
+            for model in compared_models:
+                print(f"AUC {model}")
+                print_metrics(f_subset['READMISSION'], f_subset[model])
+            print(f"diff pvalue {delong_on_df(f_subset, 'READMISSION', desc1, desc2)}")
+
+        print(f"Male records ({len(m_subset)}):")
+        if m_subset['READMISSION'].mean() == 0 or m_subset['READMISSION'].mean() == 1:
+            print(f"all values are {f_subset['READMISSION'].iloc[0]}")
+        else:
+            for model in compared_models:
+                print(f"AUC {model}")
+                print_metrics(m_subset['READMISSION'], m_subset[model])
+            print(f"diff pvalue {delong_on_df(m_subset, 'READMISSION', desc1, desc2)}")
+
+
+def analyze_results_by_numeric_field(res_file_or_df, field, values, compared_models=['female100', 'neutral100']):
+    if type(res_file_or_df) == str:
+        res = pd.read_csv(res_file_or_df, index_col=0)
+    else:
+        res = res_file_or_df
+    for i in range(len(values)+1):
+        if i == 0:
+            subset = res[res[field] == values[i]]
+            s = "0 diags"
+        elif i == len(values):
+            subset = res[res[field] > values[i-1]]
+            s = f">{values[i-1]} diags"
+        else:
+            subset = res[(values[i-1] < res[field]) & (res[field] <= values[i])]
+            s = f"[{values[i-1]},{values[i]})"
+        print(f"\nstats for {s}\n~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(f"All records ({len(subset)}):")
+        for model in compared_models:
+            print(f"AUC {model}")
+            print_metrics(subset['READMISSION'], subset[model])
+        desc1, desc2 = compared_models
+        print(f"diff pvalue {delong_on_df(subset, 'READMISSION', desc1, desc2)}")
+
+        f_subset = subset[subset.GENDER == 'F']
+        m_subset = subset[subset.GENDER == 'M']
+
+        print(f"Female records ({len(f_subset)}):")
+        for model in compared_models:
+            print(f"AUC {model}")
+            print_metrics(f_subset['READMISSION'], f_subset[model])
+        print(f"diff pvalue {delong_on_df(f_subset, 'READMISSION', desc1, desc2)}")
+
+        print(f"Male records ({len(m_subset)}):")
+        for model in compared_models:
+            print(f"AUC {model}")
+            print_metrics(m_subset['READMISSION'], m_subset[model])
+        print(f"diff pvalue {delong_on_df(m_subset, 'READMISSION', desc1, desc2)}")
+
+
+def analyze_results_by_prev_diags(res_file, compared_models=['female100', 'neutral100']):
+    res = pd.read_csv(res_file, index_col=0)
+    res['PREV_DIAGS'] = res['PREV_DIAGS'].apply(clean_nans).apply(literal_eval)
+    res['num_prev_diags'] = res['PREV_DIAGS'].apply(len)
+    values = [0, 20, 40]
+    analyze_results_by_numeric_field(res, 'num_prev_diags', values, compared_models)
+
+
+def analyze_results_by_charlson_index(res_file, compared_models=['female100', 'neutral100']):
+    res = pd.read_csv(res_file, index_col=0)
+    res['DIAGS'] = res['DIAGS'].apply(literal_eval)
+    res['PREV_DIAGS'] = res['PREV_DIAGS'].apply(clean_nans).apply(literal_eval)
+    res['DIAGS_set'] = res['DIAGS'].apply(set)
+    res['all_diags'] = res.apply(lambda row: row['DIAGS_set'].union(row['DIAGS']), axis=1)
+
+    def find_common_code(list1, list2):
+        for code in list1:
+            if code in list2:
+                return True
+        return False
+
+    MI_codes = ['41000', '41001', '41002', '41010', '41011', '41012', '41020', '41021', '41022', '41030', '41031', '41032', '41040', '41041', '41042', '41050', '41051', '41052', '41080', '41081', '41082', '41090', '41091', '41092', '4110', '412']
+    res['MI'] = res['all_diags'].apply(lambda x: find_common_code(x, MI_codes))
+    CHF_codes = ['39891', '4280', '4281', '42820', '42821', '42822', '42823', '42830', '42831', '42832', '42833', '42840', '42841', '42842', '42843', '4289']
+    res['CHF'] = res['all_diags'].apply(lambda x: find_common_code(x, CHF_codes))
+    PVD_codes = ['44389', '4439', '74760', '74769', '9972']
+    res['PVD'] = res['all_diags'].apply(lambda x: find_common_code(x, PVD_codes))
+    CVA_or_TIA_codes = ['43884', '43885', '43889', '4389', '436', '4371', '4378', '4379', '4380', '43810', '43811', '43812', '43813', '43814', '43819', '43820', '43821', '43822', '43830', '43831', '43832', '43840', '43841', '43842', '43850', '43851', '43852', '43853', '4386', '4387', '43881', '43882', '43883', '74781', '67400', '67401', '67402', '67403', '99702', '67404', 'V1254', '38802']
+    res['CVA_or_TIA'] = res['all_diags'].apply(lambda x: find_common_code(x, CVA_or_TIA_codes))
+    dementia_codes = ['2900', '29010', '29011', '29012', '29013', '29020', '29021', '2903', '29040', '29041', '29042', '29043', '2912', '29282', '29410', '29411', '29420', '29421', '33119', '33182']
+    res['dementia'] = res['all_diags'].apply(lambda x: find_common_code(x, dementia_codes))
+    COPD_codes = ['49120', '49121', '49122']
+    res['COPD'] = res['all_diags'].apply(lambda x: find_common_code(x, COPD_codes))
+    connective_tissue_codes = ['7108', '7109']
+    res['connective_tissue'] = res['all_diags'].apply(lambda x: find_common_code(x, connective_tissue_codes))
+    peptic_ulcer_codes = ['53300', '53301', '53310', '53311', '53320', '53321', '53330', '53331', '53340', '53341', '53350', '53351', '53360', '53361', '53370', '53371', '53390', '53391', 'V1271']
+    res['peptic_ulcer'] = res['all_diags'].apply(lambda x: find_common_code(x, peptic_ulcer_codes))
+    liver_non_mild = ['5723', '5712', '5715', '5716']
+    res['liver_non_mild'] = res['all_diags'].apply(lambda x: find_common_code(x, liver_non_mild))
+    liver_mild = ['9162', '1305', '700', '701', '7022', '7023', '7032', '7033', '7041', '7042', '7043', '7044', '7049', '7051', '7052', '7053', '7054', '7059', '706', '7070', '7071', '709', '7271', '5711', '57140', '57141', '57142', '57149', '5731', '5732', '5733', 'V0260', 'V0261', 'V0262', 'V0269']
+    res['liver_mild'] = res['all_diags'].apply(lambda x: find_common_code(x, liver_mild))
+    DM_mild = ['25000', '25001', '25002', '25003', '24900', '24901']
+    res['DM_mild'] = res['all_diags'].apply(lambda x: find_common_code(x, DM_mild))
+    DM_complicated = ['24910', '24911', '24920', '24921', '24930', '24931', '24940', '24941', '24950', '24951', '24960', '24961', '24970', '24971', '24980', '24981', '24990', '24991']
+    res['DM_complicated'] = res['all_diags'].apply(lambda x: find_common_code(x, DM_complicated))
+    hemiplegia = ['34200', '34201', '34202', '34210', '34211', '34212', '34280', '34281', '34282', '34290', '34291', '34292', '3431', '3434', '43820', '43821', '43822']
+    res['hemiplegia'] = res['all_diags'].apply(lambda x: find_common_code(x, hemiplegia))
+    CKD_codes = ['28521', '40300', '40301', '40310', '40311', '40390', '40391', '40400', '40401', '40402', '40403', '40410', '40411', '40412', '40413', '40490', '40491', '40492', '40493', '5851', '5852', '5853', '5854', '5855', '5859']
+    res['CKD'] = res['all_diags'].apply(lambda x: find_common_code(x, CKD_codes))
+    # Tumor should be separated to localized or metastatic.
+    tumor_codes = ['20260', '20261', '20262', '20263', '20264', '20265', '20266', '20267', '20268', '20020', '20021', '20022', '20023', '20024', '20025', '20026', '20027', '20028', '27788', '20900', '20901', '20902', '20903', '20910', '20911', '20912', '20913', '20914', '20915', '20916', '20917', '20920', '20921', '20922', '20923', '20924', '20925', '20926', '20927', '20929', '20940', '20941', '20942', '20943', '20950', '20951', '20952', '20953', '20954', '20955', '20956', '20957', '20960', '20961', '20962', '20963', '20964', '20965', '20966', '20967', '20969', '20970', '20971', '20972', '20973', '20974', '20979', '36564', '65410', '65411', '65412', '65413', '65414', '79589', '7310', '72702', 'V1091']
+    res['tumor'] = res['all_diags'].apply(lambda x: find_common_code(x, tumor_codes))
+    leukemia = ['20310', '20311', '20312', '20400', '20401', '20402', '20410', '20411', '20412', '20420', '20421', '20422', '20480', '20481', '20482', '20490', '20491', '20492', '20500', '20501', '20502', '20510', '20511', '20512', '20520', '20521', '20522', '20580', '20581', '20582', '20590', '20591', '20592', '20600', '20601', '20602', '20610', '20611', '20612', '20620', '20621', '20622', '20680', '20681', '20682', '20690', '20691', '20692', '20700', '20701', '20702', '20720', '20721', '20722', '20780', '20781', '20782', '20800', '20801', '20802', '20810', '20811', '20812', '20820', '20821', '20822', '20880', '20881', '20882', '20890', '20891', '20892', 'V1060', 'V1061', 'V1062', 'V1063', 'V1069']
+    res['leukemia'] = res['all_diags'].apply(lambda x: find_common_code(x, leukemia))
+    lymphoma = ['20076', '20200', '20201', '20202', '20203', '20204', '20205', '20206', '20207', '20208', '20270', '20271', '20272', '20273', '20274', '20275', '20276', '20277', '20278', '20280', '20281', '20282', '20283', '20284', '20285', '20286', '20287', '20288', '20020', '20021', '20022', '20023', '20024', '20025', '20026', '20027', '20028', '20030', '20031', '20032', '20033', '20034', '20035', '20036', '20037', '20038', '20040', '20041', '20042', '20043', '20044', '20045', '20046', '20047', '20048', '20050', '20051', '20052', '20053', '20054', '20055', '20056', '20057', '20058', '20060', '20061', '20062', '20063', '20064', '20065', '20066', '20067', '20068', '20070', '20071', '20072', '20073', '20074', '20075', '20077', '20078']
+    res['lymphoma'] = res['all_diags'].apply(lambda x: find_common_code(x, lymphoma))
+    AIDS = ['42', '7953', '79571']
+    res['AIDS'] = res['all_diags'].apply(lambda x: find_common_code(x, AIDS))
+
+
+    def calculate_charlson_comorbidity_index(row):
+        # expecting a list of all diags: previous and current
+        cci = 0
+        age = row['AGE']
+        if age >= 50:
+            cci += 1
+        if age >= 60:
+            cci += 1
+        if age >= 70:
+            cci += 1
+        if age >= 80:
+            cci += 1
+        for field in ['MI', 'CHF', 'PVD', 'CVA_or_TIA', 'dementia', 'COPD', 'connective_tissue', 'peptic_ulcer']:
+            if row[field]:
+                cci += 1
+        if row['liver_non_mild']:
+            cci += 3
+        elif row['liver_mild']:
+            cci += 1
+
+        if row['DM_complicated']:
+            cci += 2
+        elif row['DM_mild']:
+            cci += 1
+
+        for field in ['hemiplegia', 'CKD', 'tumor', 'leukemia', 'lymphoma']:
+            if row[field]:
+                cci += 2
+
+        if row['AIDS']:
+            cci += 6
+        return cci
+
+    res['cci'] = res.apply(calculate_charlson_comorbidity_index, axis=1)
+    analyze_results_by_numeric_field(res, 'cci', values=[0, 2, 4, 6], compared_models=compared_models)
+    # analyze_results_by_field(res, values=[], field='cci')
+
+
 class Classifier(nn.Module):
     def __init__(self, input_dim, hidden_dim):
         super(Classifier, self).__init__()
@@ -135,8 +330,10 @@ class Classifier(nn.Module):
     def forward(self, x):
         out1 = self.activation(self.linear1(x))
         return self.linear2(out1)
+
         # out2 = self.activation(self.linear2(out1))
         # return self.linear3(out2)
+
         # out3 = self.activation(self.linear3(out2))
         # return self.linear4(out3)
 
@@ -160,7 +357,6 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
         self.use_drugs = use_drugs
         if self.use_drugs:
             cls_input_size += self.emb_size
-
 
         self.classifier = Classifier(cls_input_size, 100)
 
@@ -287,7 +483,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
                                                     self.cls,
                                                     self.classifier)
         diag_losses = self.loss_func(ypred_by_diags_logit.squeeze(1), ytrue)
-        self.log(f'classification/{name}_diags_BCE_loss', diag_losses.mean())
+        self.log(f'classification/{name}_diags_BCE_loss', diag_losses.mean(), batch_size=BATCH_SIZE)
 
         inputs_to_final_classifier = [self.activation(ypred_by_diags_logit)]
         if self.use_procedures:
@@ -298,13 +494,13 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
                                                              self.classifier2)
             inputs_to_final_classifier.append(self.activation(ypred_by_procedures_logit))
             proc_losses = self.loss_func(ypred_by_procedures_logit.squeeze(1), ytrue)
-            self.log(f'classification/{name}_procs_BCE_loss', proc_losses.mean())
+            self.log(f'classification/{name}_procs_BCE_loss', proc_losses.mean(), batch_size=BATCH_SIZE)
         if self.use_drugs:
             ypred_by_drugs_logit = self.forward_generic(batch['drugs'], None, self.sentence_transformer_encoder3,
                                                         self.cls3, self.classifier3)
             inputs_to_final_classifier.append(self.activation(ypred_by_drugs_logit))
             drug_losses = self.loss_func(ypred_by_drugs_logit.squeeze(1), ytrue)
-            self.log(f'classification/{name}_drugs_BCE_loss', drug_losses.mean())
+            self.log(f'classification/{name}_drugs_BCE_loss', drug_losses.mean(), batch_size=BATCH_SIZE)
         if len(inputs_to_final_classifier) > 1:
             # print(f"shape of ypred_by_diags: {ypred_by_diags_logit.shape}, ypred_by_procs: {ypred_by_procedures_logit.shape}")
             # ypred_logit = self.final_classifier(torch.cat(inputs_to_final_classifier, dim=1))
@@ -319,8 +515,22 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
         losses = self.loss_func(ypred_logit, batch[self.label_field].to(torch.float32))  # calculates loss per sample
         loss = losses.mean()
         self.log(f'classification/{name}_BCE_loss', loss)
-
+        if name == 'val':
+            ypred = self.y_pred_to_probabilities(self.forward(batch, 'mid_val'))
+            return {'loss': loss, 'sample_id': batch['sample_id'], 'pred_prob': ypred}
         return {'loss': loss}
+
+    def validation_epoch_end(self, outputs) -> None:
+        sample_ids = np.concatenate([batch['sample_id'].cpu().numpy() for batch in outputs])
+        pred_prob = np.concatenate([batch['pred_prob'].cpu().numpy().squeeze() for batch in outputs])
+        df = pd.DataFrame.from_dict({'sample_id': sample_ids, 'pred_prob': pred_prob}, orient='columns')
+        try:
+            res = self.print_aucs(df)
+            self.log(f'classification/AUC_all', res['all_auc'])
+            self.log(f'classification/AUC_female', res['fem_auc'])
+            self.log(f'classification/AUC_male', res['male_auc'])
+        except:
+            print("Could not calculate AUCs, probably only one class in batch.")
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
         ypred = self.y_pred_to_probabilities(self.forward(batch, 'test'))
@@ -369,7 +579,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
 
 class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
     def __init__(self, emb_path, lr, name, use_procedures=False, use_lstm=False, additionals=0,
-                 label_field='readmitted', agg_prev_diags=None, agg_diags=None):
+                 label_field='readmitted', agg_prev_diags=None, agg_diags=None, use_diags=True):
         # Can't use the drugs data because they are not CUIs
         super(EmbOnDiagsWithClassifier, self).__init__(emb_path, lr, name, use_lstm)
         self.label_field = label_field
@@ -384,9 +594,13 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
         self.agg_diags = agg_diags
         if self.agg_diags is None:
             self.agg_diags = default_agg
+        self.default_agg = default_agg
 
-        self.emb_size = list(self.emb.values())[0].shape[0]
-        cls_input_size = 2*self.emb_size  # diags + prev_diags
+        self.use_diags = use_diags
+        cls_input_size = 0
+        if self.use_diags:
+            self.emb_size = list(self.emb.values())[0].shape[0]
+            cls_input_size += 2*self.emb_size  # diags + prev_diags
         self.use_procedures = use_procedures
         if self.use_procedures:
             cls_input_size += self.emb_size
@@ -401,7 +615,9 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
 
         # TODO: more layers? concat instead of mean? the most diags per person is 39
         print(f"cls input size: {cls_input_size}")
+        # self.classifier = Classifier(cls_input_size, 100)
         self.classifier = Classifier(cls_input_size, 100)
+        # self.classifier = nn.Linear(cls_input_size, 1)
         self.loss_func = torch.nn.BCEWithLogitsLoss(reduction='none')
 
     def forward_transformer(self, x):
@@ -434,16 +650,18 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
     def forward(self, batch):
         # agg = 'lstm' if self.use_lstm else 'sum'
         # sample_diag_embeddings = self.embed_diags(batch['diags'], agg, batch['diag_idfs'])
-        sample_diag_embeddings = self.embed_codes(batch['diags'], self.agg_diags)  # no idf weighting
-        sample_prev_diag_embeddings = self.embed_codes(batch['prev_diags'], self.agg_prev_diags)
-        sample_embeddings = torch.cat([sample_prev_diag_embeddings, sample_diag_embeddings], dim=1)
+        if self.use_diags:
+            sample_diag_embeddings = self.embed_codes(batch['diags'], self.agg_diags)  # no idf weighting
+            sample_prev_diag_embeddings = self.embed_codes(batch['prev_diags'], self.agg_prev_diags)
+            sample_embeddings = torch.cat([sample_prev_diag_embeddings, sample_diag_embeddings], dim=1)
         if self.use_procedures:
-            sample_proc_embeddings = self.embed_codes(batch['procedures'], agg)
+            sample_proc_embeddings = self.embed_codes(batch['procedures'], self.default_agg)
             sample_embeddings = torch.cat([sample_embeddings, sample_proc_embeddings], dim=1)
-
         if self.additionals > 0:
-            sample_embeddings = torch.cat([sample_embeddings, batch['additionals']], dim=1)
-
+            if self.use_diags:
+                sample_embeddings = torch.cat([sample_embeddings, batch['additionals']], dim=1)
+            else:  # only additionals
+                sample_embeddings = batch['additionals']
         ypred = self.classifier(sample_embeddings)
         return ypred
 
@@ -454,7 +672,7 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
         ypred_logit = self.forward(batch).squeeze(1)
         losses = self.loss_func(ypred_logit, batch[self.label_field].to(torch.float32))  # calculates loss per sample
         loss = losses.mean()
-        self.log(f'classification/{name}_BCE_loss', loss)
+        self.log(f'classification/{name}_BCE_loss', loss, batch_size=BATCH_SIZE)
         return {'loss': loss}
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
@@ -487,12 +705,21 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
         optimizer = torch.optim.Adam(grouped_parameters, lr=self.learning_rate)
         return [optimizer]
 
-#
-# def desc_to_name(desc):
-#     return f'{desc}_cls_diags_lstm_2L'
+    def get_weights(self, feature_names):
+        feature_weights = self.classifier.weight # shape: (1, in_features)
+        names_and_weights = list(zip(feature_names, feature_weights.detach().transpose(0,1)))
+        names_and_weights = [(name, w.item()) for name, w in names_and_weights]
+        df = pd.DataFrame(names_and_weights, columns=['feat_name', 'weight'])
+
+        #names_and_weights = sorted(names_and_weights, key=lambda x: np.abs(x[1]), reverse=True)
+        return df
+
 
 def desc_to_name(desc):
-    return f'{desc}_cls_diags_drugs_procs_lstm_2L'
+    return f'{desc}_cls_diags_drugs_lstm_2L_upsample'
+
+# def desc_to_name(desc):
+#     return f'{desc}_cls_diags_sum_3L_100'
 
 
 def find_best_threshold_for_model(res_df, model_fields, label_field='READMISSION'):
@@ -520,11 +747,18 @@ def find_best_threshold_for_model(res_df, model_fields, label_field='READMISSION
 
 if __name__ == '__main__':
     desc, model_path = DESCS_AND_MODELS[RUN_MODEL_INDEX]
-    cui_embeddings = [7, 8, 9, 10]
+    # cui_embeddings = [7, 8, 9, 10, 11, 12, 13, 14, 15]
     if RUN_MODEL_INDEX in cui_embeddings:
         embs_with_missing_diags = [DESCS_AND_MODELS[i][1] for i in cui_embeddings]
-        dm = ReadmissionbyEmbDiagsModule(embs_with_missing_diags, batch_size=128)
-        model = EmbOnDiagsWithClassifier(model_path, lr=LR, name=desc, use_procedures=False, use_lstm=False, additionals=48)
+        dm = ReadmissionbyEmbDiagsModule(embs_with_missing_diags, batch_size=BATCH_SIZE)
+        # without measurements: 48 additionals
+        # with measurements: 90 additionals
+        # with measurements but removed some features: 78
+        model = EmbOnDiagsWithClassifier(model_path, lr=LR, name=desc, use_procedures=False, use_lstm=False,
+                                         additionals=90, use_diags=USE_EMB)
+        if not USE_EMB:
+            desc = 'only_feats'
+
     else:
         # Here the keys are str
         diag_dict = pd.read_csv(os.path.join(MIMIC_PATH, 'D_ICD_DIAGNOSES.csv'), index_col=0)
@@ -532,9 +766,15 @@ if __name__ == '__main__':
         # Here the keys are int
         proc_dict = pd.read_csv(os.path.join(MIMIC_PATH, 'D_ICD_PROCEDURES.csv'), index_col=0)
         proc_dict = proc_dict.set_index('ICD9_CODE')['LONG_TITLE'].to_dict()
-        dm = ReadmissionbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE)
+        dm = ReadmissionbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE)
         model = BertOnDiagsWithClassifier(model_path, diag_dict, proc_dict, lr=LR, name=desc_to_name(desc),
-                                          use_procedures=True, use_drugs=True, use_lstm=True, additionals=0) # additionals=110
+                                          use_procedures=False, use_drugs=True,
+                                          # use_procedures=False, use_drugs=False,
+                                          use_lstm=True,
+                                          additionals=0,
+                                          # additionals=3, # age and gender only
+                                          # additionals=110
+                                          )
 
     logger = WandbLogger(name=desc_to_name(desc), save_dir=LOG_PATH,
                          version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
@@ -542,7 +782,7 @@ if __name__ == '__main__':
                          config={'lr': LR, 'batch_size': BATCH_SIZE}
                          )
     trainer = pl.Trainer(gpus=1,
-                         max_epochs=4,
+                         max_epochs=MAX_EPOCHS,
                          logger=logger,
                          log_every_n_steps=20,
                          accumulate_grad_batches=1,
@@ -551,6 +791,12 @@ if __name__ == '__main__':
 
     trainer.fit(model, datamodule=dm)
     trainer.test(model, datamodule=dm)
+
+    # feature importance analysis
+    # feature_names = (40 * ['prev_emb']) + (40 * ['emb']) + dm.train.categorical_features + dm.train.non_cat_features
+    # names_and_weights = model.get_weights(feature_names)
+    # names_and_weights.to_csv(os.path.join(SAVE_PATH, f'{desc}_readmission_logreg_feat_importance.csv'))
+
     # to_show = [DESCS_AND_MODELS[i] for i in (1, 3, 5, 6)]
     # join_results([(desc, os.path.join(SAVE_PATH, f'readmission_test_{desc_to_name(desc)}.csv')) for desc, path in to_show],
     #              output_fname=os.path.join(SAVE_PATH, 'readmission_test_with_attrs_with2020.csv'))

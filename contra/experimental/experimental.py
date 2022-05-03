@@ -1,4 +1,7 @@
 import sys
+
+import scipy
+
 sys.path.append('/home/shunita/fairemb')
 import os
 import numpy as np
@@ -230,6 +233,27 @@ def CUI_diff_bert():
     dists = [cosine(aligned_CUI_embeddings1[i], CUI_embeddings2[i]) for i in range(len(CUI_names))]
     df['cosine_dist_old_v_new'] = dists
     df.to_csv(os.path.join(SAVE_PATH, 'CUI_emb_diff_old_v_new_procrustes.csv'))
+
+
+def compare_two_concepts(string1, string2, bert_model1=None, bert_model2=None):
+    bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
+    if bert_model1 is not None:
+        bert1 = bert_model1
+    else:
+        bert1 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2013_v2020_epoch39'))
+    if bert_model2 is not None:
+        bert2 = bert_model2
+    else:
+        bert2 = AutoModel.from_pretrained(os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch39'))
+
+    inputs = bert_tokenizer.batch_encode_plus([string1, string2], padding=True, truncation=True,
+                                              max_length=70,
+                                              add_special_tokens=True, return_tensors="pt")
+    outputs10_13 = bert1(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
+    outputs16_18 = bert2(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
+    dist_old = scipy.spatial.distance.cosine(outputs10_13.detach().numpy()[0], outputs10_13.detach().numpy()[1])
+    dist_new = scipy.spatial.distance.cosine(outputs16_18.detach().numpy()[0], outputs16_18.detach().numpy()[1])
+    print(f"For '{string1}' and '{string2}':\nsimilarity in 10-13: {1-dist_old}\nsimilarity in 16-18: {1-dist_new}")
 
 
 if __name__ == "__main__":

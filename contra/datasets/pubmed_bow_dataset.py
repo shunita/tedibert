@@ -2,14 +2,13 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from contra.datasets import PubMedModule
 from contra.experimental.exp_utils import get_vocab, texts_to_BOW, text_seq_to_BOW, fill_binary_year_label
-from contra.utils.text_utils import TextUtils
-tu = TextUtils()
-
-
 import pandas as pd
 import os
 from contra.constants import DATA_PATH
 from contra.experimental.exp_utils import make_array
+from contra.utils.text_utils import TextUtils
+tu = TextUtils()
+
 
 class PubMedExpModule(PubMedModule):
     def __init__(self, hparams):
@@ -108,6 +107,7 @@ class PubMedExpBOWDataset(Dataset):
     def __getitem__(self, index):
         x = self.X[index].toarray().squeeze().astype(np.double)
         return {'text': x, 'is_new': self.y[index]}
+
 
 class PubMedExpTextDataset(Dataset):
     def __init__(self, df, y):
