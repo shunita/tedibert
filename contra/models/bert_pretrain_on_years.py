@@ -58,7 +58,8 @@ class BertPretrainOnYears(pl.LightningModule):
     def validation_step(self, batch: dict, batch_idx: int):
         path = os.path.join(SAVE_PATH, '{}_{}_{}_v{}_epoch{}'.format(
             self.model_desc, self.start_year, self.end_year, self.pubmed_version, self.current_epoch))
-        if self.current_epoch > 0 and (self.current_epoch % 10 == 9) and not os.path.exists(path):
+        #if self.current_epoch > 0 and (self.current_epoch % 10 == 9) and not os.path.exists(path):
+        if self.current_epoch > 0 and (self.current_epoch % 5 == 4) and not os.path.exists(path):
             self.bert_model.save_pretrained(path)
         loss = self.step(batch, name='val')
         return loss

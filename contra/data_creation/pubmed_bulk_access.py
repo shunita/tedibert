@@ -4,8 +4,9 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import os
 
-PUBMED_FILES_2019 = 1015
-PUBMED_FILES = 1062  # 2020
+# PUBMED_FILES_2019 = 1015
+# PUBMED_FILES_2020 = 1062  # 2020
+PUBMED_FILES = 1114  # 2022
 
 # Pubmed XML utilities
 def get_first_element(xml_object, xpath):
@@ -62,15 +63,27 @@ class BulkPubmedAccess:
         self.output_folder = output_folder
         self.fname_pattern = xmlgz_fname_pattern
 
-    def download_pubmed(self):
+    def download_pubmed(self, start=1, select=[]):
         host = 'ftp.ncbi.nlm.nih.gov'
         ftp = ftplib.FTP(host, passwd="shunit.agmon@gmail.com")
         ftp.login()
         ftp.cwd("pubmed/baseline/")
-        for i in range(1, PUBMED_FILES+1):
+        failed = []
+
+        if len(select) == 0:
+            run_indexes = range(start, PUBMED_FILES+1)
+        else:
+            run_indexes = select
+        for i in run_indexes:
             fname = self.fname_pattern.format(i)
             print("downloading file {}".format(fname))
-            ftp.retrbinary('RETR {}'.format(fname), open(os.path.join(self.gz_folder, fname), "wb").write)
+            try:
+                ftp.retrbinary('RETR {}'.format(fname), open(os.path.join(self.gz_folder, fname), "wb").write)
+            except:
+                failed.append(fname)
+                print(f"failed to download file {fname}.")
+        print(failed)
+        return failed
 
     def shuffle_df_and_split_to_buckets(self, df, n=50):
         shuffled = df.sample(frac=1)
@@ -92,7 +105,6 @@ class BulkPubmedAccess:
             out = os.path.join(self.output_folder, 'pubmed_{}.csv'.format(year))
             write_header = not os.path.exists(out)
             subset.to_csv(os.path.join(self.output_folder, 'pubmed_{}.csv'.format(year)), mode='a', header=write_header)
-        
 
     def parse_pubmed_xml_to_dataframe(self, file_index):
         data = {}
@@ -138,9 +150,12 @@ class BulkPubmedAccess:
                              if item is not None 
                              and item.text is not None 
                              and item.text.startswith("NCT")])
+            journal_name = get_first_element(pubmed_article, "MedlineCitation/Article/Journal/Title")
+            journal_abbrv = get_first_element(pubmed_article, "MedlineCitation/Article/Journal/ISOAbbreviation")
             data[pmid] = {'title': title, 'abstract': abstract_text_as_string, 'labels': abstract_labels,
                           'pub_types': pub_types, 'date': date, 'file': file_index,
-                          'mesh_headings': mesh, 'keywords': kw_as_text, 'ncts': ncts}
+                          'mesh_headings': mesh, 'keywords': kw_as_text, 'ncts': ncts,
+                          'journal_name': journal_name, 'journal_abbrv': journal_abbrv}
         df = pd.DataFrame.from_dict(data, orient='index')
         return df
 
@@ -153,12 +168,21 @@ class BulkPubmedAccess:
 
 
 if __name__ == "__main__":
-    PUBMED_FOLDER = os.path.expanduser('~/pubmed_2020')
-    OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2020_by_years')
-    bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed21n{:04}.xml.gz')
-    bpa.download_pubmed()
+    PUBMED_FOLDER = os.path.expanduser('~/pubmed_2022')
+    OUTPUT_FOLDER = os.path.expanduser('~/pubmed_2022_by_years')
+    bpa = BulkPubmedAccess(PUBMED_FOLDER, OUTPUT_FOLDER, 'pubmed22n{:04}.xml.gz')
+    failed = bpa.download_pubmed(start=1108)
+    if len(failed) > 0:
+        bpa.download_pubmed(start=1, select=failed)
+    failed = []
+
     for i in range(1, PUBMED_FILES+1):
-        df = bpa.parse_pubmed_xml_to_dataframe(i)
+        try:
+            df = bpa.parse_pubmed_xml_to_dataframe(i)
+        except:
+            failed.append(i)
+            continue
         bpa.split_df_by_years(df)
+    print(f"parsing failed on: {failed}")
 
     #bpa.split_df_into_papers(os.path.join(OUTPUT_FOLDER, 'pubmed_2018.csv'), os.path.join(OUTPUT_FOLDER, '2018') )

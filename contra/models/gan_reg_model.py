@@ -298,15 +298,15 @@ class GAN(pl.LightningModule):
             correlation, pvalue = stats.spearmanr(true_rank, pred_rank)
             self.log('test/correlation', correlation)
             self.log('test/pvalue', pvalue)
-            if self.max_epochs > 0:
-                self.bert_model.save_pretrained(
-                    os.path.join(SAVE_PATH, f'bert_{self.name}_epoch{self.max_epochs-1}'))
 
     def training_epoch_end(self, outputs):
         self.on_end(outputs, 'train')
 
     def validation_epoch_end(self, outputs):
         self.on_end(outputs, 'val')
+        if self.max_epochs > 0:
+            self.bert_model.save_pretrained(
+                os.path.join(SAVE_PATH, f'bert_{self.name}_epoch{self.current_epoch}'))
 
     def on_end(self, outputs, name):
         # outputs is a list (len=number of batches) of dicts (as returned from the step methods).
@@ -371,7 +371,8 @@ class GAN(pl.LightningModule):
                                   sep='\t', header=False, index=False)
 
 
-hparams = config.parser.parse_args(['--name', 'DERT_tiny_o2n5_new0.3_ref0.1_0.3_concat_20eps',
+hparams = config.parser.parse_args(['--name', 'DERT_tiny_gender_sensitive_new0.3_ref0.1_0.3_concat_20eps',
+                                    # '--name', 'BERT5_tiny_gender_sensitive',
                                     '--first_start_year', '2010',
                                     '--first_end_year', '2013',
                                     '--second_start_year', '2016',
@@ -385,7 +386,7 @@ hparams = config.parser.parse_args(['--name', 'DERT_tiny_o2n5_new0.3_ref0.1_0.3_
                                     '--lmb_isnew', '0.3',
                                     '--lmb_ref', '0.3',
                                     '--agg_sentences', 'concat',
-                                    '--direction', 'weighted',
+                                    '--direction', 'both',
                                     '--old2new_weight', '5',
                                     '--max_epochs', '20',
                                     '--test_size', '0.3',
@@ -394,6 +395,7 @@ hparams = config.parser.parse_args(['--name', 'DERT_tiny_o2n5_new0.3_ref0.1_0.3_
                                     '--pubmed_version', '2020',
                                     '--only_aact_data',
                                     '--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2018_v2020_epoch39'),
+                                    # '--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch19'),
                                     # '--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_base_uncased_2010_2018_v2020_epoch39'),
                                     # '--bert_pretrained_path', os.path.join(SAVE_PATH, 'bert_DERT_bertbase_new0.3_ref0.3_concat_anchor40_epoch19'),
 
@@ -413,7 +415,7 @@ hparams = config.parser.parse_args(['--name', 'DERT_tiny_o2n5_new0.3_ref0.1_0.3_
                                     ])
 hparams.gpus = 1
 if __name__ == '__main__':
-    dm = PubMedModule(hparams, test_mlm=False, reassign=False, year_gap_in_assigned=False)
+    dm = PubMedModule(hparams, test_mlm=False, reassign=False, year_gap_in_assigned=False, apply_gender_weight=False)
     model = GAN(hparams)
     logger = WandbLogger(name=hparams.name, save_dir=hparams.log_path,
                          version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),

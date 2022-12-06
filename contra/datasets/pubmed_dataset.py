@@ -17,11 +17,12 @@ from transformers import AutoTokenizer, AutoModel
 from contra.experimental.exp_utils import fill_binary_year_label
 from contra.models.w2v_on_years import read_w2v_model
 from contra.utils.text_utils import TextUtils
-from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts
+from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact_data, clean_abstracts, \
+    repeat_by_participants
 
 
 class PubMedModule(pl.LightningDataModule):
-    def __init__(self, hparams, reassign=False, test_mlm=False, year_gap_in_assigned=True):
+    def __init__(self, hparams, reassign=False, test_mlm=False, year_gap_in_assigned=True, apply_gender_weight=False):
         super().__init__()
         # self.hparams = hparams
         self.debug, self.overlap_sentences, self.bert_tokenizer = hparams.debug, hparams.overlap_sentences, hparams.bert_tokenizer
@@ -41,6 +42,7 @@ class PubMedModule(pl.LightningDataModule):
         self.reassign = reassign
         self.test_mlm = test_mlm
         self.year_gap_in_assigned = year_gap_in_assigned
+        self.apply_gender_weight = apply_gender_weight
         self.df = None
         self.train_df, self.val_df = None, None
         self.train, self.test, self.val = None, None, None
@@ -89,6 +91,11 @@ class PubMedModule(pl.LightningDataModule):
         train_df = clean_abstracts(train_df)
         val_df = clean_abstracts(val_df)
 
+        if self.apply_gender_weight:
+            print(f"applying repeat_by_participants. Train size before: {len(train_df)}")
+            train_df = repeat_by_participants(train_df)
+            print(f"Train size after: {len(train_df)}")
+
         if self.serve_type == 0:  # Full abstract
             self.train_df = train_df.rename({'title_and_abstract': 'text'}, axis=1)
             self.val_df = val_df.rename({'title_and_abstract': 'text'}, axis=1)
@@ -112,8 +119,8 @@ class PubMedModule(pl.LightningDataModule):
                                    frac=0.001, sample_type=1, top_percentile=0.5, semtypes=['dsyn'], filter_cuis=False,
                                    read_from_file=self.test_fname)
         elif self.emb_algorithm == 'bert':
-            bert_path = f'bert_base_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
-            #bert_path = f'bert_tiny_uncased_2020_2020_v{self.pubmed_version}_epoch39'
+            # bert_path = f'bert_base_uncased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
+            bert_path = f'bert_tiny_uncased_2020_2020_v{self.pubmed_version}_epoch39'
             #bert_path = f'bert_base_cased_{self.test_start_year}_{self.test_end_year}_v{self.pubmed_version}_epoch39'
             self.test = CUIDataset(bert=os.path.join(SAVE_PATH, bert_path),
                                    bert_tokenizer=self.bert_tokenizer,

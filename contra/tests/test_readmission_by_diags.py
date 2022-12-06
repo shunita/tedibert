@@ -33,12 +33,16 @@ DESCS_AND_MODELS = DESCS_AND_MODELS
 # LR = 0.87 * 1e-5
 LR = 1e-5
 # LR = 1e-3
-BATCH_SIZE = 64
+# used for most experiments
+# BATCH_SIZE = 64
 
 # used with bert base models
 # BATCH_SIZE = 16
 
-RUN_MODEL_INDEX = 3
+# used with clinical BERT
+BATCH_SIZE = 2
+
+RUN_MODEL_INDEX = 5
 USE_EMB = True
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_female_sample.csv'
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_sampled_medgan.csv'
@@ -349,6 +353,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
             self.print_aucs = print_aucs_for_los
 
         self.emb_size = self.bert_model.get_input_embeddings().embedding_dim
+        print(f"embedding dim: {self.emb_size}")
         self.additionals = additionals
         cls_input_size = self.emb_size * 2 + additionals  # diags and previous diags
         self.use_procedures = use_procedures

@@ -329,3 +329,23 @@ def calculate_prevalence(abstract, prevalence_dict, prev_agg_mode=0, return_cui=
         if return_cui:
             return prevalence, cui2name(most_common_cui)
         return prevalence
+
+
+def participants_to_repetitions(x):
+    if x == 0:
+        return 0
+    if x <= 10:
+        return 1
+    if x <= 100:
+        return 10
+    else:
+        return 20
+
+
+def repeat_by_participants(df):
+    """repeat some of the entries in the dataset based on the number of women in them ('female' field)"""
+    df['reps'] = df['female'].apply(participants_to_repetitions)
+    df2 = df.loc[df.index.repeat(df['reps'])]
+    # shuffle
+    df2 = df2.sample(len(df2)).reset_index(drop=True)
+    return df2

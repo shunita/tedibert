@@ -40,6 +40,14 @@ DESCS_AND_MODELS = [('GAN10', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.
                     ('GAN20_1side_old2new', os.path.join(SAVE_PATH, 'bert_DERT_tiny_old2new_new0.3_ref0.1_0.3_concat_20eps_epoch19')),  #31
                     ('GAN20_old2new0.2', os.path.join(SAVE_PATH, 'bert_DERT_tiny_o2n0.2_new0.3_ref0.1_0.3_concat_20eps_epoch19')),  #32
                     ('GAN20_old2new0.8', os.path.join(SAVE_PATH, 'bert_DERT_tiny_o2n0.8_new0.3_ref0.1_0.3_concat_20eps_epoch19')),  #33
+                    ('GAN10_gender_sensitive', os.path.join(SAVE_PATH, 'bert_DERT_tiny_gender_sensitive_new0.3_ref0.1_0.3_concat_20eps_epoch9')),  #34
+
+                    # External baselines
+                    ('Bio_ClinicalBERT', 'emilyalsentzer/Bio_ClinicalBERT'), #35
+
+                    # gender sensitive BERT
+                    ('BERT5_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch4')),  #36
+                    ('BERT10_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch9')),  #37
 
                     ]
 cui_embeddings = [7, 8, 9, 10, 11, 12, 13, 14, 15]

@@ -13,7 +13,10 @@ class BertOnDiagsBase(pl.LightningModule):
         super(BertOnDiagsBase, self).__init__()
         self.diag_to_title = diag_to_title
         self.proc_to_title = proc_to_title
-        self.bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
+        if bert_model == 'emilyalsentzer/Bio_ClinicalBERT':
+            self.bert_tokenizer = AutoTokenizer.from_pretrained(bert_model)
+        else:
+            self.bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
         self.bert_model = AutoModel.from_pretrained(bert_model)
         self.emb_size = self.bert_model.get_input_embeddings().embedding_dim
         self.use_lstm = use_lstm

@@ -38,7 +38,7 @@ BATCH_SIZE = 128
 # LR = 1e-4
 # BATCH_SIZE = 4
 
-RUN_MODEL_INDEX = 3
+RUN_MODEL_INDEX = 37
 # UPSAMPLE_FEMALE = 'data/los_by_diags_female_sample.csv'
 UPSAMPLE_FEMALE = None
 USE_EMB = True
