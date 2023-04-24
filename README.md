@@ -1,6 +1,6 @@
-# DERT - Debiasing Embeddings by Regularization with Temporal distribution matching
+# TeDi-BERT - Temporal Distribution-matching BERT
 
-Repository for submission to AAAI named: "Leveraging Temporal Trends for Training Contextual Word Embeddings to
+Repository for paper: "Leveraging Temporal Trends for Training Contextual Word Embeddings to
 Address Bias in Biomedical Applications".
 
 The DERT model is trained through contra/models/gan_reg_model.py.
