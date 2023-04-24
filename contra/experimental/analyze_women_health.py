@@ -39,12 +39,35 @@ def data_stats():
 def topic_modelling(df):
     topic_model = BERTopic()
     topics, probs = topic_model.fit_transform(df.abstract.values)
+    df['topic'] = topics
+    df['probability'] = probs
+    df.to_csv('exp_results/women_health/abstracts_and_topics.csv')
     topic_model.save('exp_results/women_health/women_health_topics.model')
     fig = topic_model.visualize_barchart()
     fig.write_html('exp_results/women_health/topics_barchart.html')
     fig2 = topic_model.visualize_topics()
     fig2.write_html('exp_results/women_health/topics_map.html')
 
+def apply_topic_model(df, model_path):
+    model = BERTopic.load(model_path)
+    info_df = model.get_topic_info()
+    for i in range(1, len(info_df)):
+        info_df.loc[i, 'top_words'] = ';'.join(['{}:{:.4f}'.format(w, p) for w, p in model.get_topic(i-1)])
+    topics = model.transform(df.abstract.values)
+
+def analyze_labelled_topics(path):
+    df = pd.read_csv(path, index_col=0)
+    df = df[~df.category.isna()]
+    df['category'] = df['category'].apply(lambda x: x.strip())
+
+    df['category'] = df['category'].apply(lambda x: x.replace('heath', 'health'))
+    df['category'] = df['category'].apply(lambda x: x.replace('onology', 'oncology'))
+    df['category'] = df['category'].apply(lambda x: x.replace('neoplasm/oncology', 'neoplasm-oncology'))
+    df['category'] = df['category'].apply(lambda x: x.replace('neoplasm/ oncology', 'neoplasm-oncology'))
+    df['category'] = df['category'].apply(lambda x: x.replace('miscarrige', 'miscarriage'))
+
+    non_repro = ['domestic violence', 'endocrinology', 'endometriosis', 'faculty', 'hematology', 'immunology', 'menopause', 'menstration', 'neoplasm-oncology', 'psychology/psychiatry', 'sexual function', 'sociology', 'STD', 'urogynecology', 'uterine health', 'vaginal & vulval health', 'UTI', 'HPV', 'PCOS', 'male sexual health', 'breast health']
+    repro = ['abortion ', 'breastfeeding', 'child care & development', 'contraception', 'delivery', 'fertility', 'fetal health', 'genetics', 'induction', 'male fertility', 'miscarriage', 'multiple pregnancy', 'perinatal', 'preganancy']
 
 if __name__ == '__main__':
     # read_from_relevant_journals()
