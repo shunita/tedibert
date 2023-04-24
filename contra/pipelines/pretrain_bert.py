@@ -20,10 +20,10 @@ from contra.constants import SAVE_PATH
 # np.random.seed(1)
 # torch.manual_seed(1)
 
-hparams = config.parser.parse_args(['--name', 'BertTinyYears10-18GenderSensitive',
+hparams = config.parser.parse_args(['--name', 'BertTinyYears2016-18',
                                     # TODO: originally used other params: start_year and end_year
                                     '--first_start_year', '2010',
-                                    '--first_end_year', '2018',
+                                    '--first_end_year', '2013',
 
                                     '--second_start_year', '2030',
                                     '--second_end_year', '1970',
@@ -47,7 +47,7 @@ hparams = config.parser.parse_args(['--name', 'BertTinyYears10-18GenderSensitive
                                     '--batch_size', '16',
                                     # Used to set the path of the saved BERT model
                                     '--start_year', '2010',
-                                    '--end_year', '2018',
+                                    '--end_year', '2013',
                                     # not really used - just for using the PubMedModule.
                                     # test_pairs_file must be specified - so as not to override it with a new sample.
                                     '--test_start_year', '2020',
@@ -59,7 +59,9 @@ hparams = config.parser.parse_args(['--name', 'BertTinyYears10-18GenderSensitive
 # When running with one gpu:
 hparams.gpus = 1
 
-dm = PubMedModule(hparams, reassign=True, test_mlm=False, year_gap_in_assigned=False, apply_gender_weight=True)
+dm = PubMedModule(hparams, reassign=False, test_mlm=False, year_gap_in_assigned=False, apply_gender_weight=False,
+                  #sample=945
+                  )
 # dm = PubMedFullModule(hparams)
 model = BertPretrainOnYears(hparams)
 

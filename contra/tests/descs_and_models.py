@@ -44,10 +44,25 @@ DESCS_AND_MODELS = [('GAN10', os.path.join(SAVE_PATH, 'bert_GAN_new0.3_ref0.1_0.
 
                     # External baselines
                     ('Bio_ClinicalBERT', 'emilyalsentzer/Bio_ClinicalBERT'), #35
+                    ('hurtful_words_baseline', os.path.join(SAVE_PATH, 'hurtful_words/baseline_clinical_bert_1_epoch_512')), #36
+                    ('hurtful_words_adv', os.path.join(SAVE_PATH, 'hurtful_words/adv_clinical_bert_1_epoch_512')), #37
+                    ('scibert_uncased', 'allenai/scibert_scivocab_uncased'), #38
+                    ('Medical_tiny_BERT_nullitout', ''), # 39
+                    ('hurtful_words_tiny_adv', os.path.expanduser('~/HurtfulWords/data/models/adv_clinical_BERT_gender_1_epoch_512')),  #40
+
 
                     # gender sensitive BERT
-                    ('BERT5_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch4')),  #36
-                    ('BERT10_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch9')),  #37
+                    ('BERT5_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch4')),  #41
+                    ('BERT10_gender_sensitive', os.path.join(SAVE_PATH, 'bert_tiny_gender_sensitive_2010_2018_v2020_epoch9')),  #42
+
+                    # sampled from each year
+                    ('BERT_2017_sampled945', os.path.join(SAVE_PATH, 'bert_tiny_sample945_2017_2017_v2020_epoch19')),  #43
+                    ('BERT_2018_sampled945', os.path.join(SAVE_PATH, 'bert_tiny_sample945_2018_2018_v2020_epoch19')),  #44
+
+                    # our two time periods
+                    ('BERT_tiny10-13_10eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2010_2013_v2020_epoch9')),  #45
+                    ('BERT_tiny16-18_10eps', os.path.join(SAVE_PATH, 'bert_tiny_uncased_2016_2018_v2020_epoch9')),  #46
+
 
                     ]
 cui_embeddings = [7, 8, 9, 10, 11, 12, 13, 14, 15]

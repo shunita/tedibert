@@ -9,16 +9,24 @@ from contra.utils.code_mapper import read_emb, CodeMapper
 
 
 class BertOnDiagsBase(pl.LightningModule):
-    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False):
+    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, frozen_emb_file=None):
+        print(f"frozen emb? {frozen_emb_file}")
         super(BertOnDiagsBase, self).__init__()
         self.diag_to_title = diag_to_title
         self.proc_to_title = proc_to_title
-        if bert_model == 'emilyalsentzer/Bio_ClinicalBERT':
-            self.bert_tokenizer = AutoTokenizer.from_pretrained(bert_model)
+        self.frozen_emb = None
+        if frozen_emb_file is not None:
+            self.frozen_emb = read_emb(frozen_emb_file)
+            self.emb_size = list(self.frozen_emb.values())[0].shape[0]
+            self.bert_model = None
+            self.bert_tokenizer = None
         else:
-            self.bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
-        self.bert_model = AutoModel.from_pretrained(bert_model)
-        self.emb_size = self.bert_model.get_input_embeddings().embedding_dim
+            if bert_model == 'emilyalsentzer/Bio_ClinicalBERT':
+                self.bert_tokenizer = AutoTokenizer.from_pretrained(bert_model)
+            else:
+                self.bert_tokenizer = AutoTokenizer.from_pretrained('google/bert_uncased_L-2_H-128_A-2')
+            self.bert_model = AutoModel.from_pretrained(bert_model)
+            self.emb_size = self.bert_model.get_input_embeddings().embedding_dim
         self.use_lstm = use_lstm
         if use_lstm:
             self.lstm = torch.nn.LSTM(self.emb_size, self.emb_size, 1, bidirectional=False, batch_first=True)
@@ -52,12 +60,28 @@ class BertOnDiagsBase(pl.LightningModule):
         # First make each diag list into a sentence (description/title) list.
         indexes, texts, max_len = self.code_list_to_text_list([literal_eval(str_repr) for str_repr in x], lookup_dict)
         if len(texts) > 0:
-            inputs = self.bert_tokenizer.batch_encode_plus(texts, padding=True, truncation=True,
-                                                       max_length=70,
-                                                       add_special_tokens=True, return_tensors="pt")
-            inputs = {k: v.to(self.device) for k, v in inputs.items()}
-            # each title is embedded - we take the CLS token embedding
-            outputs = self.bert_model(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
+            if self.frozen_emb is not None:
+                embs = []
+                for text in texts:
+                    if text in self.frozen_emb:
+                        embs.append(self.frozen_emb[text])
+                    elif text.lower() in self.frozen_emb:
+                        embs.append(self.frozen_emb[text.lower()])
+                    elif text.replace('"', '') in self.frozen_emb:
+                        embs.append(self.frozen_emb[text.replace('"', '')])
+                    elif text == 'Alteplase Recombinant':
+                        embs.append(self.frozen_emb['Alteplase Recombit'])
+                    else:
+                        print(f"Could not find '{text}' in the frozen embedding.")
+                        embs.append(np.zeros(self.emb_size))
+                outputs = torch.tensor(np.array(embs)).float().to(self.device)
+            else:
+                inputs = self.bert_tokenizer.batch_encode_plus(texts, padding=True, truncation=True,
+                                                           max_length=70,
+                                                           add_special_tokens=True, return_tensors="pt")
+                inputs = {k: v.to(self.device) for k, v in inputs.items()}
+                # each title is embedded - we take the CLS token embedding
+                outputs = self.bert_model(**inputs, output_hidden_states=True).hidden_states[-1][:, 0]
         sample_embeddings = []
         # Aggregate the title embeddings into a single embedding (for each patient)
         for start, end in indexes:

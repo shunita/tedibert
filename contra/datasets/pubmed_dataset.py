@@ -22,7 +22,7 @@ from contra.utils.pubmed_utils import split_abstracts_to_sentences_df, load_aact
 
 
 class PubMedModule(pl.LightningDataModule):
-    def __init__(self, hparams, reassign=False, test_mlm=False, year_gap_in_assigned=True, apply_gender_weight=False):
+    def __init__(self, hparams, reassign=False, test_mlm=False, year_gap_in_assigned=True, apply_gender_weight=False, sample=None):
         super().__init__()
         # self.hparams = hparams
         self.debug, self.overlap_sentences, self.bert_tokenizer = hparams.debug, hparams.overlap_sentences, hparams.bert_tokenizer
@@ -46,6 +46,7 @@ class PubMedModule(pl.LightningDataModule):
         self.df = None
         self.train_df, self.val_df = None, None
         self.train, self.test, self.val = None, None, None
+        self.sample = sample
 
     def prepare_data(self):
         print("prepare data called for pubmed_dataset")
@@ -61,6 +62,9 @@ class PubMedModule(pl.LightningDataModule):
             df = df[df['num_participants'] >= self.min_num_participants]
             self.df = df
 
+            if self.sample is not None:
+                self.df = self.df.sample(n=self.sample)
+                print(f"sampling at most {self.sample} records. Remaining: {len(self.df)}")
             old_df = self.df[(self.df['date'] >= self.first_time_range[0]) & (self.df['date'] <= self.first_time_range[1])]
             new_df = self.df[
                 (self.df['date'] >= self.second_time_range[0]) & (self.df['date'] <= self.second_time_range[1])]
@@ -80,6 +84,9 @@ class PubMedModule(pl.LightningDataModule):
                 df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_assigned.csv'), index_col=0)
             else:
                 df = pd.read_csv(os.path.join(DATA_PATH, 'pubmed2020_no_year_gap_assigned.csv'), index_col=0)
+            if self.sample is not None:
+                df = df.sample(n=self.sample)
+                print(f"sampling at most {self.sample} records. Remaining: {len(df)}")
             tu = TextUtils()
             df['sentences'] = df['title_and_abstract'].apply(tu.split_abstract_to_sentences)
             if self.debug:

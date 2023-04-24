@@ -1,13 +1,16 @@
+import pytorch_lightning as pl
+# pl.trainer.seed_everything(42)
 import sys
 sys.path.append('/home/shunita/fairemb/')
 import os
 import pandas as pd
 import numpy as np
+import scipy.stats as st
 import torch
 from torch import nn
 import pytz
 import random
-import pytorch_lightning as pl
+# import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 from datetime import datetime
 from ast import literal_eval
@@ -33,15 +36,22 @@ MIMIC_PATH = "/home/shunita/mimic3/physionet.org/files/mimiciii/1.4/"
 # params used in ACL ARR, october 15 2021
 LR = 1e-3
 BATCH_SIZE = 128
+MAX_EPOCHS = 15
 
 # params used for bert-base runs
 # LR = 1e-4
 # BATCH_SIZE = 4
 
-RUN_MODEL_INDEX = 37
+RUN_MODEL_INDEX = 5
 # UPSAMPLE_FEMALE = 'data/los_by_diags_female_sample.csv'
 UPSAMPLE_FEMALE = None
+DOWNSAMPLE_MALE = True
 USE_EMB = True
+CROSS_VAL = None  # number of folds (10) or None
+# 3 - age+gender (used in upsample). 0 - no additional features (used in main figure).
+ADDITIONALS = 1
+
+
 
 # setting random seeds
 torch.manual_seed(0)
@@ -57,6 +67,8 @@ def dm_test_on_df(df, true_field, pred1_field, pred2_field):
 
 def join_results(result_files_and_descs, output_fname, descs_for_comparison=[]):
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
+    if 'source' in test_df.columns:
+        test_df = test_df[test_df['source'] == 'orig']
     for desc, fname in result_files_and_descs:
         df = pd.read_csv(fname, index_col=0)
         df = df.rename({'pred_LOS': desc}, axis=1)
@@ -80,19 +92,50 @@ def join_results(result_files_and_descs, output_fname, descs_for_comparison=[]):
 def abs_error(ytrue, ypred):
     return np.mean(np.abs(ytrue-ypred))
 
-def print_results(result_df):
+
+def print_results(result_df, name=None):
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
-
+    if 'source' in test_df.columns:
+        test_df = test_df[test_df['source'] == 'orig']
     fem_subset = test_df[test_df.GENDER == 'F']
     male_subset = test_df[test_df.GENDER == 'M']
-    print(f"\nRMSE all records: {mean_squared_error(test_df['LOS'], test_df['pred_LOS'], squared=False)}")
-    print(f"RMSE female records: {mean_squared_error(fem_subset['LOS'], fem_subset['pred_LOS'], squared=False)}")
-    print(f"RMSE male records: {mean_squared_error(male_subset['LOS'], male_subset['pred_LOS'], squared=False)}")
+    all_RMSE = mean_squared_error(test_df['LOS'], test_df['pred_LOS'], squared=False)
+    print(f"\nRMSE all records: {all_RMSE}")
+    fem_RMSE = mean_squared_error(fem_subset['LOS'], fem_subset['pred_LOS'], squared=False)
+    print(f"RMSE female records: {fem_RMSE}")
+    male_RMSE = mean_squared_error(male_subset['LOS'], male_subset['pred_LOS'], squared=False)
+    print(f"RMSE male records: {male_RMSE}")
+    all_MAE = abs_error(test_df['LOS'], test_df['pred_LOS'])
+    print(f"\nMAE loss on all records: {all_MAE}")
+    fem_MAE = abs_error(fem_subset['LOS'], fem_subset['pred_LOS'])
+    print(f"MAE loss on female records: {fem_MAE}")
+    male_MAE = abs_error(male_subset['LOS'], male_subset['pred_LOS'])
+    print(f"MAE loss on male records: {male_MAE}")
+    if name is not None:
+        out_path = os.path.join(SAVE_PATH, "cross_validation", f"{name}_metrics.csv")
+        if not os.path.exists(out_path):
+            f = open(out_path, "w")
+            f.write("all_MAE,all_RMSE,fem_MAE,fem_RMSE,male_MAE,male_RMSE\n")
+        else:
+            f = open(out_path, "a")
+        f.write(f"{all_MAE},{all_RMSE},{fem_MAE},{fem_RMSE},{male_MAE},{male_RMSE}\n")
+    return {'all_MAE': all_MAE, 'fem_MAE': fem_MAE, 'male_MAE': male_MAE,
+            'all_RMSE': all_RMSE, 'fem_RMSE': fem_RMSE, 'male_RMSE': male_RMSE}
 
-    print(f"\nMAE loss on all records: {abs_error(test_df['LOS'], test_df['pred_LOS'])}")
-    print(f"MAE loss on female records: {abs_error(fem_subset['LOS'], fem_subset['pred_LOS'])}")
-    print(f"MAE loss on male records: {abs_error(male_subset['LOS'], male_subset['pred_LOS'])}")
+
+def calc_avg_results(fname_template):
+    #{'all_MAE': all_MAE, 'fem_MAE': fem_MAE, 'male_MAE': male_MAE,
+    #'all_RMSE': all_RMSE, 'fem_RMSE': fem_RMSE, 'male_RMSE': male_RMSE}
+    results_list = []
+    print(fname_template)
+    for i in range(CROSS_VAL):
+        res = pd.read_csv(fname_template.format(i)).to_dict(orient='records')[0]
+        results_list.append(res)
+    for population in ['all', 'fem', 'male']:
+        maes = [res[f'{population}_MAE'] for res in results_list]
+        ci = st.t.interval(0.95, len(maes) - 1, loc=np.mean(maes), scale=st.sem(maes))
+        print(f"population: {population}, mean MAE: {np.mean(maes)}, CI: {ci}")
 
 
 def union(list_of_lists):
@@ -200,14 +243,16 @@ class Regressor(nn.Module):
 
 
 class BertOnDiagsWithRegression(BertOnDiagsBase):
-    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, use_diags=True, additionals=0):
-        super(BertOnDiagsWithRegression, self).__init__(bert_model, diag_to_title, proc_to_title, lr, name, use_lstm)
+    def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, use_diags=True,
+                 additionals=0, frozen_emb_file=None):
+        super(BertOnDiagsWithRegression, self).__init__(bert_model, diag_to_title, proc_to_title, lr, name, use_lstm, frozen_emb_file)
         self.additionals = additionals
-        emb_size = self.bert_model.get_input_embeddings().embedding_dim
+        print(f"BertOnDiagsWithRegression: using {self.additionals} additional features")
+        # emb_size = self.bert_model.get_input_embeddings().embedding_dim
         self.use_diags = use_diags
         input_dim = 0
         if self.use_diags:
-            input_dim += 2 * emb_size  # primary diag + prev_diags
+            input_dim += 2 * self.emb_size  # primary diag + prev_diags
         input_dim += additionals
         # self.regression_model = Regressor(emb_size, emb_size//2)
         hidden = 128 # this is the emb size of tiny bert but can be increased when using bert base (768?).
@@ -252,7 +297,10 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
         df = pd.DataFrame.from_records(records)
         df.to_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'))
         df = pd.read_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'), index_col=0)
-        print_results(df)
+        if CROSS_VAL is not None:
+            print_results(df, self.name)
+        else:
+            print_results(df)
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -324,6 +372,19 @@ class EmbOnDiagsWithRegression(EmbOnDiagsBase):
 
 if __name__ == '__main__':
     desc, model_path = DESCS_AND_MODELS[RUN_MODEL_INDEX]
+    if UPSAMPLE_FEMALE is not None:
+        desc = desc + "_random_upsample"
+    elif "smote" in LOS_TEST_PATH_V4:
+        desc = desc + "_smote"
+    elif "medgan" in LOS_TEST_PATH_V4:
+        desc = desc + "_medgan"
+    elif DOWNSAMPLE_MALE:
+        desc = desc + "_downsample"
+
+    frozen_emb = None
+    if RUN_MODEL_INDEX == 39:  # null it out uses frozen embeddings
+        frozen_emb = os.path.expanduser(
+            '~/fairemb/exp_results/nullspace_projection/BERT_tiny_medical_diags_and_drugs_debiased.tsv')
     # cui_embeddings = [9, 10, 11, 12]
     # cui_embeddings = [7, 8, 9, 10, 11]
     if RUN_MODEL_INDEX in cui_embeddings:
@@ -335,34 +396,82 @@ if __name__ == '__main__':
         # dm = LOSbyEmbDiagsModule(embs_with_missing_diags, batch_size=BATCH_SIZE, classification=True)
         # model = EmbOnDiagsWithClassifier(model_path, lr=LR, name=desc, use_lstm=True, additionals=48,
         #                                  label_field='los', agg_prev_diags=None, agg_diags='first')
+        logger = WandbLogger(name=f'{desc}_los', save_dir=LOG_PATH,
+                             version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
+                             project='FairEmbedding_test',
+                             config={'lr': LR, 'batch_size': BATCH_SIZE}
+                             )
+        trainer = pl.Trainer(gpus=1,
+                             max_epochs=MAX_EPOCHS,
+                             logger=logger,
+                             log_every_n_steps=20,
+                             accumulate_grad_batches=1,
+                             # num_sanity_val_steps=2,
+                             )
+        trainer.fit(model, datamodule=dm)
+        trainer.test(model, datamodule=dm)
     else:
         diag_dict = pd.read_csv(os.path.join(MIMIC_PATH, 'D_ICD_DIAGNOSES.csv'), index_col=0)
         diag_dict = diag_dict.set_index('ICD9_CODE')['LONG_TITLE'].to_dict()  # icd9 code to description
         proc_dict = pd.read_csv(os.path.join(MIMIC_PATH, 'D_ICD_PROCEDURES.csv'), index_col=0)
         proc_dict = proc_dict.set_index('ICD9_CODE')['LONG_TITLE'].to_dict()
-        dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE)
-        model = BertOnDiagsWithRegression(model_path, diag_dict, proc_dict, lr=LR, name=desc, use_lstm=True,
-                                          use_diags=USE_EMB,
-                                          additionals=0  # submitted results
-                                          # additionals=93
-                                          # additionals=3
-                                          )
 
-    logger = WandbLogger(name=f'{desc}_los_medgan', save_dir=LOG_PATH,
-                         version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
-                         project='FairEmbedding_test',
-                         config={'lr': LR, 'batch_size': BATCH_SIZE}
-                         )
-    trainer = pl.Trainer(gpus=1,
-                         max_epochs=15,
-                         logger=logger,
-                         log_every_n_steps=20,
-                         accumulate_grad_batches=1,
-                         #num_sanity_val_steps=2,
-                         )
+        if CROSS_VAL is not None:
 
-    trainer.fit(model, datamodule=dm)
-    trainer.test(model, datamodule=dm)
+            results = []
+            for i in range(CROSS_VAL):
+                model = BertOnDiagsWithRegression(model_path, diag_dict, proc_dict, lr=LR, name=f'{desc}_los_CV{i}', use_lstm=True,
+                                                  use_diags=USE_EMB,
+                                                  additionals=ADDITIONALS,  # submitted results
+                                                  # additionals=93
+                                                  # additionals=3
+                                                  frozen_emb_file=frozen_emb
+                                                  )
+                logger = WandbLogger(name=f'{desc}_los_CV{i}', save_dir=LOG_PATH,
+                                     version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
+                                     project='FairEmbedding_test',
+                                     config={'lr': LR, 'batch_size': BATCH_SIZE}
+                                     )
+                trainer = pl.Trainer(gpus=1,
+                                     max_epochs=MAX_EPOCHS,
+                                     logger=logger,
+                                     log_every_n_steps=20,
+                                     accumulate_grad_batches=1,
+                                     # num_sanity_val_steps=2,
+                                     )
+                dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE,
+                                      downsample_male=DOWNSAMPLE_MALE, CV_fold=i)
+                trainer.fit(model, datamodule=dm)
+                res = trainer.test(model, datamodule=dm)
+                results.append(res)
+            # print(results)
+            calc_avg_results(os.path.join(SAVE_PATH, "cross_validation", desc+"_los_CV{}_metrics.csv"))
+
+        else:
+            model = BertOnDiagsWithRegression(model_path, diag_dict, proc_dict, lr=LR, name=f'{desc}_los',
+                                              use_lstm=True,
+                                              use_diags=USE_EMB,
+                                              #additionals=0,  # submitted results
+                                              # additionals=93
+                                              additionals=ADDITIONALS,
+                                              frozen_emb_file=frozen_emb
+                                              )
+            logger = WandbLogger(name=f'{desc}_los', save_dir=LOG_PATH,
+                                 version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
+                                 project='FairEmbedding_test',
+                                 config={'lr': LR, 'batch_size': BATCH_SIZE}
+                                 )
+            trainer = pl.Trainer(gpus=1,
+                                 max_epochs=MAX_EPOCHS,
+                                 logger=logger,
+                                 log_every_n_steps=20,
+                                 accumulate_grad_batches=1,
+                                 # num_sanity_val_steps=2,
+                                 )
+            dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE,
+                                  downsample_male=DOWNSAMPLE_MALE)
+            trainer.fit(model, datamodule=dm)
+            trainer.test(model, datamodule=dm)
     # join_results([(desc, os.path.join(SAVE_PATH, f'los_test_{desc}.csv')) for desc, path in DESCS_AND_MODELS],
     #              output_fname=os.path.join(SAVE_PATH, 'los_test_2L_with_attrs.csv'))
 

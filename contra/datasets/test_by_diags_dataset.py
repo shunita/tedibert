@@ -49,10 +49,13 @@ class DiagsModuleBase(pl.LightningDataModule):
                  procedures_dict,
                  data_file,
                  batch_size=16,
-                 upsample_female_file=None):
+                 upsample_female_file=None,
+                 downsample_male=False,
+                 CV_fold=None):
         super().__init__()
         self.batch_size = batch_size
         self.upsample_female = upsample_female_file
+        self.downsample_male = downsample_male
         print(f"Reading data from {data_file}")
         self.data = pd.read_csv(data_file, index_col=0)
         self.diag_dict = diag_dict
@@ -63,6 +66,7 @@ class DiagsModuleBase(pl.LightningDataModule):
         self.total_procs = set()
         self.diag_idf = defaultdict(lambda: 1)
         self.categorical_features = []
+        self.CV_fold = CV_fold
 
     def filter_code_list(self, icd9_codes_list_as_text, lookup_dict, name='diags', remove_if_half_missing=False):
         icd9_codes_list_as_text = clean_nans(icd9_codes_list_as_text)
@@ -120,8 +124,11 @@ class DiagsModuleBase(pl.LightningDataModule):
         print(f'Unknown diag codes: {len(self.removed_diags)}/{len(self.total_diags)}')
         print(f'Unknown procedure codes: {len(self.removed_procs)}/{len(self.total_procs)}')
 
-        self.train_df = self.data[self.data['ASSIGNMENT'] == 'train']
-        self.val_df = self.data[self.data['ASSIGNMENT'] == 'test']
+        assignment_field = 'ASSIGNMENT'
+        if self.CV_fold is not None:
+            assignment_field = f'ASSIGNMENT_{self.CV_fold}'
+        self.train_df = self.data[self.data[assignment_field] == 'train']
+        self.val_df = self.data[self.data[assignment_field] == 'test']
         print(f'Divided to {len(self.train_df)} train, {len(self.val_df)} test.')
         if self.upsample_female is not None:
             print(f"before upsampling female patients, train contains {self.train_df.GENDER_F.sum()} female patients.")
@@ -138,6 +145,10 @@ class DiagsModuleBase(pl.LightningDataModule):
                 sample.to_csv(self.upsample_female)
             self.train_df = pd.concat([self.train_df, sample]).reset_index()  # The original index will still be under 'index'
             print(f'After upsampling female patients: {len(self.train_df)} train, {len(self.val_df)} test. Train contains {self.train_df.GENDER_F.sum()} female patients.')
+        if self.downsample_male:
+            b = len(self.train_df)
+            self.train_df = self.train_df[self.train_df['downsample_keep']]
+            print(f"Downsampled male patients in train - removed {b - len(self.train_df)} rows.")
         self.diag_idf = calculate_idf(self.train_df.DIAGS.apply(literal_eval).values)
         self.calculate_stats()
 
@@ -161,8 +172,8 @@ class DiagsModuleBase(pl.LightningDataModule):
 class LOSbyDiagsModule(DiagsModuleBase):
     def __init__(self, diag_dict, procedure_dict,
                  data_file=LOS_TEST_PATH_V4,
-                 batch_size=16, classification=False, upsample_female_file=None):
-        super(LOSbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file)
+                 batch_size=16, classification=False, upsample_female_file=None, downsample_male=False, CV_fold=None):
+        super(LOSbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file, downsample_male, CV_fold)
         self.data = self.data.rename({'ICD9_CODE': 'DIAGS'}, axis=1)
         self.data = self.data.dropna(subset=['DIAGS', 'LOS'])
         self.data = self.data[self.data.DIAGS != '[nan]']
@@ -170,13 +181,14 @@ class LOSbyDiagsModule(DiagsModuleBase):
         # only for regression - remove the top 5% because they are outliers.
         if not self.classification:
             # remove top 5%
-            longest_LOS = self.data.LOS.quantile(0.95)
+            longest_LOS = 30.7561111
+            # longest_LOS = self.data.LOS.quantile(0.95)
             before = len(self.data)
             self.data = self.data[self.data.LOS <= longest_LOS]
             print(f"Removed records with LOS above {longest_LOS}, remaining records: {len(self.data)/before}")
-        self.categorical_features = ['GENDER']   +\
-                                    ['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'INSURANCE', 'RELIGION',
-                                     'ETHNICITY', 'MARITAL_STATUS']
+        self.categorical_features = [] #['GENDER'] # +\
+                                    #['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'INSURANCE', 'RELIGION',
+                                    # 'ETHNICITY', 'MARITAL_STATUS']
 
     def calculate_stats(self):
         c = self.train_df['LOS'].mean()
@@ -195,14 +207,16 @@ class ReadmissionbyDiagsModule(DiagsModuleBase):
                  procedure_dict,
                  data_file=READMIT_TEST_PATH,
                  batch_size=16,
-                 upsample_female_file=None):
-        super(ReadmissionbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file)
+                 upsample_female_file=None,
+                 downsample_male=False,
+                 CV_fold=None):
+        super(ReadmissionbyDiagsModule, self).__init__(diag_dict, procedure_dict, data_file, batch_size, upsample_female_file, downsample_male, CV_fold)
         self.data = self.data.dropna(subset=['DIAGS', 'READMISSION'])
         self.data = self.data[self.data['READMISSION'] != 2]  # Remove patients who died in the hospital
         # print("train: female: {}")
-        self.categorical_features = ['GENDER'] + \
-                                    ['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
-                                     'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS'] #+\
+        self.categorical_features = [] #['GENDER'] #+ \
+                                    #['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
+                                    # 'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS'] #+\
                                     # ['Glascow coma scale eye opening first', 'Glascow coma scale eye opening last',
                                     #  'Glascow coma scale motor response first', 'Glascow coma scale motor response last',
                                     #  'Glascow coma scale verbal response first', 'Glascow coma scale verbal response last'
@@ -247,8 +261,8 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes, classification=False):
         super(LOSbyDiagsDataset, self).__init__(
             df, diag_idf, categorical_feature_prefixes,
-            non_cat_features=['AGE'] + \
-                             ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
+            non_cat_features=['AGE'] #+ \
+                             #['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
         )
         self.classification = classification
 
@@ -272,8 +286,8 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
 
 class ReadmitbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes):
-        non_cat_features = ['AGE'] + \
-                           ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
+        non_cat_features = ['AGE'] #+ \
+                           #['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
                            # ['Glascow coma scale total avg', 'Glascow coma scale total first',
                            #  'Glascow coma scale total last', 'Capillary refill rate avg',
                            #  'Capillary refill rate first', 'Capillary refill rate last',
@@ -402,7 +416,8 @@ class LOSbyEmbDiagsModule(DiagsEmbModuleBase):
 
         self.classification = classification
         if not self.classification:
-            longest_LOS = self.data.LOS.quantile(0.95)
+            longest_LOS = 30.75611111111111
+            # longest_LOS = self.data.LOS.quantile(0.95)
             before = len(self.data)
             self.data = self.data[self.data.LOS <= longest_LOS]
             print(f"Removed records with LOS above {longest_LOS}, remaining records: {len(self.data) / before}")

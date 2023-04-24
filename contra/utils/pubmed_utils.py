@@ -268,9 +268,12 @@ def read_cui_prevalence(with_total=False):
         return dandp[['fem_prevalence_prop', 'total_patients']].to_dict(orient='index')
     return dandp['fem_prevalence_prop'].to_dict()
 
-def read_cui_names():
+
+def read_cui_names(return_semtypes=False):
     cui_table = pd.read_csv(os.path.join(DATA_PATH, 'cui_table_for_cui2vec.tsv'), sep='\t', index_col=0)
     cui_table = cui_table.set_index(['cui'])
+    if return_semtypes:
+        return cui_table['name'].to_dict(), cui_table['semtypes'].to_dict()
     return cui_table['name'].to_dict()
 
 
@@ -349,3 +352,7 @@ def repeat_by_participants(df):
     # shuffle
     df2 = df2.sample(len(df2)).reset_index(drop=True)
     return df2
+
+
+def read_mesh_terms(path):
+    lines = open(path, "r").read().split('\n')
