@@ -16,6 +16,7 @@ from datetime import datetime
 from ast import literal_eval
 from collections import defaultdict
 from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 from transformers import AutoTokenizer, AutoModel
 from contra.constants import SAVE_PATH, LOG_PATH, DATA_PATH
 from contra.datasets.test_by_diags_dataset import LOSbyDiagsModule, LOSbyEmbDiagsModule
@@ -93,7 +94,7 @@ def abs_error(ytrue, ypred):
     return np.mean(np.abs(ytrue-ypred))
 
 
-def print_results(result_df, name=None):
+def print_results(result_df, name=None, log_file=None):
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
     if 'source' in test_df.columns:
@@ -112,14 +113,17 @@ def print_results(result_df, name=None):
     print(f"MAE loss on female records: {fem_MAE}")
     male_MAE = abs_error(male_subset['LOS'], male_subset['pred_LOS'])
     print(f"MAE loss on male records: {male_MAE}")
-    if name is not None:
-        out_path = os.path.join(SAVE_PATH, "cross_validation", f"{name}_metrics.csv")
+    if name is not None or log_file is not None:
+        if name is not None:
+            out_path = os.path.join(SAVE_PATH, "cross_validation", f"{name}_metrics.csv")
+        else:
+            out_path = log_file
         if not os.path.exists(out_path):
             f = open(out_path, "w")
-            f.write("all_MAE,all_RMSE,fem_MAE,fem_RMSE,male_MAE,male_RMSE\n")
+            f.write("all_RMSE,fem_RMSE,male_RMSE,all_MAE,fem_MAE,male_MAE\n")
         else:
             f = open(out_path, "a")
-        f.write(f"{all_MAE},{all_RMSE},{fem_MAE},{fem_RMSE},{male_MAE},{male_RMSE}\n")
+        f.write(f"{all_RMSE},{fem_RMSE},{male_RMSE},{all_MAE},{fem_MAE},{male_MAE}\n")
     return {'all_MAE': all_MAE, 'fem_MAE': fem_MAE, 'male_MAE': male_MAE,
             'all_RMSE': all_RMSE, 'fem_RMSE': fem_RMSE, 'male_RMSE': male_RMSE}
 
@@ -244,8 +248,9 @@ class Regressor(nn.Module):
 
 class BertOnDiagsWithRegression(BertOnDiagsBase):
     def __init__(self, bert_model, diag_to_title, proc_to_title, lr, name, use_lstm=False, use_diags=True,
-                 additionals=0, frozen_emb_file=None):
+                 additionals=0, frozen_emb_file=None, save_dir=None):
         super(BertOnDiagsWithRegression, self).__init__(bert_model, diag_to_title, proc_to_title, lr, name, use_lstm, frozen_emb_file)
+        self.save_dir = save_dir
         self.additionals = additionals
         print(f"BertOnDiagsWithRegression: using {self.additionals} additional features")
         # emb_size = self.bert_model.get_input_embeddings().embedding_dim
@@ -255,7 +260,7 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
             input_dim += 2 * self.emb_size  # primary diag + prev_diags
         input_dim += additionals
         # self.regression_model = Regressor(emb_size, emb_size//2)
-        hidden = 128 # this is the emb size of tiny bert but can be increased when using bert base (768?).
+        hidden = 128  # this is the emb size of tiny bert but can be increased when using bert base (768?).
         self.regression_model = Regressor(input_dim, hidden)
         # self.regression_model = torch.nn.Linear(input_dim, hidden_dim)
         self.loss_func = torch.nn.MSELoss()
@@ -279,7 +284,15 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
         ypred = self.forward(batch).squeeze(1)
         loss = self.loss_func(ypred, batch['los'].to(torch.float32))
         self.log(f'regression/{name}_MSE_loss', loss)
+        if name == 'val':
+            return {'loss': loss, 'sample_id': batch['sample_id'], 'pred_LOS': ypred}
         return {'loss': loss}
+
+    def validation_epoch_end(self, outputs) -> None:
+        sample_ids = np.concatenate([batch['sample_id'].cpu().numpy() for batch in outputs])
+        pred_prob = np.concatenate([batch['pred_LOS'].cpu().numpy().squeeze() for batch in outputs])
+        df = pd.DataFrame.from_dict({'sample_id': sample_ids, 'pred_LOS': pred_prob}, orient='columns')
+        print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
         return batch['sample_id'], self.forward(batch).squeeze(1)
@@ -295,12 +308,13 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
                     'pred_LOS': batch[1][i].cpu().numpy(),
                     })
         df = pd.DataFrame.from_records(records)
-        df.to_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'))
-        df = pd.read_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'), index_col=0)
+        sp = self.save_dir if self.save_dir is not None else SAVE_PATH
+        df.to_csv(os.path.join(sp, f'los_test_{self.name}.csv'))
+        df = pd.read_csv(os.path.join(sp, f'los_test_{self.name}.csv'), index_col=0)
         if CROSS_VAL is not None:
-            print_results(df, self.name)
+            print_results(df, name=self.name)
         else:
-            print_results(df)
+            print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -315,8 +329,9 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
 
 class EmbOnDiagsWithRegression(EmbOnDiagsBase):
 
-    def __init__(self, emb_path, lr, name, use_lstm, additionals=0):
+    def __init__(self, emb_path, lr, name, use_lstm, additionals=0, save_dir=None):
         super(EmbOnDiagsWithRegression, self).__init__(emb_path, lr, name, use_lstm)
+        self.save_dir = save_dir
         emb_size = list(self.emb.values())[0].shape[0]
         self.additionals = additionals
         input_dim = 2*emb_size+additionals
@@ -356,9 +371,10 @@ class EmbOnDiagsWithRegression(EmbOnDiagsBase):
                     'pred_LOS': batch[1][i].cpu().numpy(),
                     })
         df = pd.DataFrame.from_records(records)
-        df.to_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'))
-        df = pd.read_csv(os.path.join(SAVE_PATH, f'los_test_{self.name}.csv'), index_col=0)
-        print_results(df)
+        sp = self.save_dir if self.save_dir is not None else SAVE_PATH
+        df.to_csv(os.path.join(sp, f'los_test_{self.name}.csv'))
+        df = pd.read_csv(os.path.join(sp, f'los_test_{self.name}.csv'), index_col=0)
+        print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -385,12 +401,20 @@ if __name__ == '__main__':
     if RUN_MODEL_INDEX == 39:  # null it out uses frozen embeddings
         frozen_emb = os.path.expanduser(
             '~/fairemb/exp_results/nullspace_projection/BERT_tiny_medical_diags_and_drugs_debiased.tsv')
+
+    next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'LOS'))]) + 1
+    save_dir = os.path.join(SAVE_PATH, 'LOS', f'exp_{next_exp_index}')
+    os.makedirs(save_dir)
+
+    ckpt_callback = ModelCheckpoint(dirpath=save_dir, every_n_epochs=1, save_top_k=-1)
+
     # cui_embeddings = [9, 10, 11, 12]
     # cui_embeddings = [7, 8, 9, 10, 11]
     if RUN_MODEL_INDEX in cui_embeddings:
         embs_with_missing_diags = [DESCS_AND_MODELS[i][1] for i in cui_embeddings]
         dm = LOSbyEmbDiagsModule(embs_with_missing_diags, batch_size=BATCH_SIZE)
-        model = EmbOnDiagsWithRegression(model_path, lr=LR, name=desc, use_lstm=True, additionals=48)
+        model = EmbOnDiagsWithRegression(model_path, lr=LR, name=desc, use_lstm=True, additionals=48,
+                                         save_dir=save_dir)
         # additionals = 93 with all categorical features + non categorical
         # additionals = 48 with GENDER, ETHNICITY +  non categoricals
         # dm = LOSbyEmbDiagsModule(embs_with_missing_diags, batch_size=BATCH_SIZE, classification=True)
@@ -407,6 +431,7 @@ if __name__ == '__main__':
                              log_every_n_steps=20,
                              accumulate_grad_batches=1,
                              # num_sanity_val_steps=2,
+                             callbacks=[ckpt_callback]
                              )
         trainer.fit(model, datamodule=dm)
         trainer.test(model, datamodule=dm)
@@ -425,7 +450,8 @@ if __name__ == '__main__':
                                                   additionals=ADDITIONALS,  # submitted results
                                                   # additionals=93
                                                   # additionals=3
-                                                  frozen_emb_file=frozen_emb
+                                                  frozen_emb_file=frozen_emb,
+                                                  save_dir=save_dir,
                                                   )
                 logger = WandbLogger(name=f'{desc}_los_CV{i}', save_dir=LOG_PATH,
                                      version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
@@ -438,6 +464,7 @@ if __name__ == '__main__':
                                      log_every_n_steps=20,
                                      accumulate_grad_batches=1,
                                      # num_sanity_val_steps=2,
+                                     callbacks=[ckpt_callback]
                                      )
                 dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE,
                                       downsample_male=DOWNSAMPLE_MALE, CV_fold=i)
@@ -454,7 +481,8 @@ if __name__ == '__main__':
                                               #additionals=0,  # submitted results
                                               # additionals=93
                                               additionals=ADDITIONALS,
-                                              frozen_emb_file=frozen_emb
+                                              frozen_emb_file=frozen_emb,
+                                              save_dir=save_dir,
                                               )
             logger = WandbLogger(name=f'{desc}_los', save_dir=LOG_PATH,
                                  version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
@@ -467,11 +495,19 @@ if __name__ == '__main__':
                                  log_every_n_steps=20,
                                  accumulate_grad_batches=1,
                                  # num_sanity_val_steps=2,
+                                 callbacks=[ckpt_callback],
                                  )
             dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE,
                                   downsample_male=DOWNSAMPLE_MALE)
             trainer.fit(model, datamodule=dm)
             trainer.test(model, datamodule=dm)
+
+    with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
+        f.write(f"Run description: {desc}\n")
+        f.write(f"Used features: diags? {USE_EMB}\n")
+        f.write(f"Additional features: using {ADDITIONALS}, available features: {dm.additional_features_list()}\n")
+        f.write(f"Batch size: {BATCH_SIZE}, learning rate: {LR}, epochs: {MAX_EPOCHS}, cross_val? {CROSS_VAL}\n")
+
     # join_results([(desc, os.path.join(SAVE_PATH, f'los_test_{desc}.csv')) for desc, path in DESCS_AND_MODELS],
     #              output_fname=os.path.join(SAVE_PATH, 'los_test_2L_with_attrs.csv'))
 

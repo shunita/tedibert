@@ -168,6 +168,11 @@ class DiagsModuleBase(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.val, shuffle=False, batch_size=self.batch_size, num_workers=4)
 
+    def additional_features_list(self):
+        ret = f"categorical: {self.categorical_features}\n"
+        ret += f"non categorical: {self.train.non_cat_features}\n"
+        return ret
+
 
 class LOSbyDiagsModule(DiagsModuleBase):
     def __init__(self, diag_dict, procedure_dict,

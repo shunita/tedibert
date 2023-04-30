@@ -16,6 +16,7 @@ from datetime import datetime
 from ast import literal_eval
 from collections import defaultdict
 from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 from transformers import AutoTokenizer, AutoModel
 from contra.constants import SAVE_PATH, LOG_PATH, DATA_PATH, LOS_TEST_PATH_V4
 from contra.models.Transformer1D import Encoder1DLayer
@@ -45,6 +46,9 @@ BATCH_SIZE = 64
 
 RUN_MODEL_INDEX = 5
 USE_EMB = True
+USE_PROCEDURES = False
+USE_DRUGS = True
+USE_LSTM = True
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_female_sample.csv'
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_sampled_medgan.csv'
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_with_smote.csv'
@@ -74,7 +78,7 @@ def print_metrics(ytrue, ypred):
     return auc, acc
 
 
-def print_aucs_for_readmission(result_df, name=None):
+def print_aucs_for_readmission(result_df, name=None, log_file=None):
     test_df = pd.read_csv(READMIT_TEST_PATH, index_col=0)
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
     desc = 'pred_prob'
@@ -86,18 +90,23 @@ def print_aucs_for_readmission(result_df, name=None):
     male_subset = test_df[test_df.GENDER == 'M']
     print("male records:")
     male_auc, male_acc = print_metrics(male_subset['READMISSION'], male_subset[desc])
-    if name is not None:
-        out_path = os.path.join(SAVE_PATH, "cross_validation", f"{name}_metrics.csv")
+    if name is not None or log_file is not None:
+        if name is not None:
+            out_path = os.path.join(SAVE_PATH, "cross_validation", f"{name}_metrics.csv")
+        else:
+            out_path = log_file
         if not os.path.exists(out_path):
             f = open(out_path, "w")
-            f.write("all_auc,all_acc,fem_auc,fem_acc,male_auc,male_acc\n")
+            f.write("all_auc,fem_auc,male_auc,all_acc,fem_acc,male_acc\n")
         else:
             f = open(out_path, "a")
-        f.write(f"{all_auc},{all_acc},{fem_auc},{fem_acc},{male_auc},{male_acc}\n")
+        f.write(f"{all_auc},{fem_auc},{male_auc},{all_acc},{fem_acc},{male_acc}\n")
     return {'all_auc': all_auc, 'all_acc': all_acc, 'fem_auc': fem_auc, 'fem_acc': fem_acc, 'male_auc': male_auc, 'male_acc': male_acc}
 
 
-def print_aucs_for_los(result_df):
+def print_aucs_for_los(result_df, name=None, log_file=None):
+    if name is not None or log_file is not None:
+        print("unsupported argument for 'print_aucs_for_los'")
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
     test_df['LOS5'] = test_df['LOS'] > 5
 
@@ -114,6 +123,7 @@ def print_aucs_for_los(result_df):
     male_subset = test_df[test_df.GENDER == 'M']
     print(f"male records: {sum(male_subset['LOS5']) / len(male_subset)} positive (>5 days)")
     print_metrics(male_subset['LOS5'], male_subset[desc])
+    return {}
 
 
 def delong_on_df(df, true_field, pred1_field, pred2_field):
@@ -362,8 +372,9 @@ class Classifier(nn.Module):
 
 class BertOnDiagsWithClassifier(BertOnDiagsBase):
     def __init__(self, bert_model, diag_to_title, procedure_to_title, lr, name, use_procedures=False, use_drugs=False,
-                 use_lstm=False, additionals=0, label_field='readmitted', frozen_emb_file=None):
+                 use_lstm=False, additionals=0, label_field='readmitted', frozen_emb_file=None, save_dir=None):
         super(BertOnDiagsWithClassifier, self).__init__(bert_model, diag_to_title, procedure_to_title, lr, name, use_lstm, frozen_emb_file)
+        self.save_dir = save_dir
         self.label_field = label_field
         if self.label_field == 'readmitted':
             self.print_aucs = print_aucs_for_readmission
@@ -549,7 +560,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
         pred_prob = np.concatenate([batch['pred_prob'].cpu().numpy().squeeze() for batch in outputs])
         df = pd.DataFrame.from_dict({'sample_id': sample_ids, 'pred_prob': pred_prob}, orient='columns')
         try:
-            res = self.print_aucs(df)
+            res = self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
             self.log(f'classification/AUC_all', res['all_auc'])
             self.log(f'classification/AUC_female', res['fem_auc'])
             self.log(f'classification/AUC_male', res['male_auc'])
@@ -571,13 +582,13 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
                     'pred_prob': batch[1][i].cpu().numpy().squeeze(),
                     })
         df = pd.DataFrame.from_records(records)
-        df.to_csv(os.path.join(SAVE_PATH, f'readmission_test_{self.name}.csv'))
-        df = pd.read_csv(os.path.join(SAVE_PATH, f'readmission_test_{self.name}.csv'), index_col=0)
+        sp = self.save_dir if self.save_dir is not None else SAVE_PATH
+        df.to_csv(os.path.join(sp, f'readmission_test_{self.name}.csv'))
+        df = pd.read_csv(os.path.join(sp, f'readmission_test_{self.name}.csv'), index_col=0)
         if CROSS_VAL is not None:
-            self.print_aucs(df, self.name)
+            self.print_aucs(df, name=self.name)
         else:
-            self.print_aucs(df)
-
+            self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -606,9 +617,10 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
 
 class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
     def __init__(self, emb_path, lr, name, use_procedures=False, use_lstm=False, additionals=0,
-                 label_field='readmitted', agg_prev_diags=None, agg_diags=None, use_diags=True):
+                 label_field='readmitted', agg_prev_diags=None, agg_diags=None, use_diags=True, save_dir=None):
         # Can't use the drugs data because they are not CUIs
         super(EmbOnDiagsWithClassifier, self).__init__(emb_path, lr, name, use_lstm)
+        self.save_dir = save_dir
         self.label_field = label_field
         if self.label_field == 'readmitted':
             self.print_aucs = print_aucs_for_readmission
@@ -716,8 +728,9 @@ class EmbOnDiagsWithClassifier(EmbOnDiagsBase):
                     'pred_prob': batch[1][i].cpu().numpy(),
                     })
         df = pd.DataFrame.from_records(records)
-        df.to_csv(os.path.join(SAVE_PATH, f'readmission_test_{self.name}.csv'))
-        df = pd.read_csv(os.path.join(SAVE_PATH, f'readmission_test_{self.name}.csv'), index_col=0)
+        sp = self.save_dir if self.save_dir is not None else SAVE_PATH
+        df.to_csv(os.path.join(sp, f'readmission_test_{self.name}.csv'))
+        df = pd.read_csv(os.path.join(sp, f'readmission_test_{self.name}.csv'), index_col=0)
         return self.print_aucs(df)
 
     def configure_optimizers(self):
@@ -799,6 +812,11 @@ if __name__ == '__main__':
     if RUN_MODEL_INDEX == 39:  # null it out uses frozen embeddings
         frozen_emb = os.path.expanduser('~/fairemb/exp_results/nullspace_projection/BERT_tiny_medical_diags_and_drugs_debiased.tsv')
 
+    next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'readmission'))]) + 1
+    save_dir = os.path.join(SAVE_PATH, 'readmission', f'exp_{next_exp_index}')
+    os.makedirs(save_dir)
+
+    ckpt_callback = ModelCheckpoint(dirpath=save_dir, every_n_epochs=1, save_top_k=-1)
 
     # cui_embeddings = [7, 8, 9, 10, 11, 12, 13, 14, 15]
     if RUN_MODEL_INDEX in cui_embeddings:
@@ -807,8 +825,8 @@ if __name__ == '__main__':
         # without measurements: 48 additionals
         # with measurements: 90 additionals
         # with measurements but removed some features: 78
-        model = EmbOnDiagsWithClassifier(model_path, lr=LR, name=desc, use_procedures=False, use_lstm=False,
-                                         additionals=90, use_diags=USE_EMB)
+        model = EmbOnDiagsWithClassifier(model_path, lr=LR, name=desc, use_procedures=USE_PROCEDURES, use_lstm=False,
+                                         additionals=90, use_diags=USE_EMB, save_dir=save_dir)
         logger = WandbLogger(name=desc, save_dir=LOG_PATH,
                              version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
                              project='FairEmbedding_test',
@@ -820,6 +838,7 @@ if __name__ == '__main__':
                              log_every_n_steps=20,
                              accumulate_grad_batches=1,
                              # num_sanity_val_steps=2,
+                             callbacks=[ckpt_callback]
                              )
         trainer.fit(model, datamodule=dm)
         trainer.test(model, datamodule=dm)
@@ -837,13 +856,14 @@ if __name__ == '__main__':
             results = []
             for i in range(CROSS_VAL):
                 model = BertOnDiagsWithClassifier(model_path, diag_dict, proc_dict, lr=LR, name=desc + f"_CV{i}",
-                                                  use_procedures=False, use_drugs=True,
+                                                  use_procedures=USE_PROCEDURES, use_drugs=USE_DRUGS,
                                                   # use_procedures=False, use_drugs=False,
                                                   use_lstm=True,
                                                   additionals=ADDITIONALS,
                                                   # additionals=3, # age and gender only
                                                   # additionals=110
-                                                  frozen_emb_file=frozen_emb
+                                                  frozen_emb_file=frozen_emb,
+                                                  save_dir=save_dir,
                                                   )
                 dm = ReadmissionbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE,
                                               upsample_female_file=UPSAMPLE_FEMALE, downsample_male=DOWNSAMPLE_MALE, CV_fold=i)
@@ -858,6 +878,7 @@ if __name__ == '__main__':
                                      log_every_n_steps=20,
                                      accumulate_grad_batches=1,
                                      # num_sanity_val_steps=2,
+                                     callbacks=[ckpt_callback]
                                      )
                 trainer.fit(model, datamodule=dm)
                 # TODO: trainer.test returns empty dict
@@ -869,12 +890,13 @@ if __name__ == '__main__':
             dm = ReadmissionbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, downsample_male=DOWNSAMPLE_MALE,
                                           upsample_female_file=UPSAMPLE_FEMALE)
             model = BertOnDiagsWithClassifier(model_path, diag_dict, proc_dict, lr=LR, name=desc,
-                                              use_procedures=False, use_drugs=True,
+                                              use_procedures=USE_PROCEDURES, use_drugs=USE_DRUGS,
                                               # use_procedures=False, use_drugs=False,
-                                              use_lstm=True,
+                                              use_lstm=USE_LSTM,
                                               additionals=ADDITIONALS,  # age and gender only
                                               # additionals=110
-                                              frozen_emb_file=frozen_emb
+                                              frozen_emb_file=frozen_emb,
+                                              save_dir=save_dir,
                                               )
             logger = WandbLogger(name=desc, save_dir=LOG_PATH,
                                  version=datetime.now(pytz.timezone('Asia/Jerusalem')).strftime('%y%m%d_%H%M%S.%f'),
@@ -887,9 +909,17 @@ if __name__ == '__main__':
                                  log_every_n_steps=20,
                                  accumulate_grad_batches=1,
                                  # num_sanity_val_steps=2,
+                                 callbacks=[ckpt_callback]
                                  )
             trainer.fit(model, datamodule=dm)
             trainer.test(model, datamodule=dm)
+
+    with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
+        f.write(f"Run description: {desc}\n")
+        f.write(f"Used features: diags? {USE_EMB}, procedures? {USE_PROCEDURES}, drugs? {USE_DRUGS}\n")
+        f.write(f"Additional features: using {ADDITIONALS}, available features: {dm.additional_features_list()}\n")
+        f.write(f"Batch size: {BATCH_SIZE}, learning rate: {LR}, epochs: {MAX_EPOCHS}, cross_val? {CROSS_VAL}\n")
+
 
     # feature importance analysis
     # feature_names = (40 * ['prev_emb']) + (40 * ['emb']) + dm.train.categorical_features + dm.train.non_cat_features
