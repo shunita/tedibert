@@ -16,7 +16,8 @@ from contra.utils.diebold_mariano import dm_test
 # main_los_file = 'merged_with_upsample_raw_test_data.csv'
 # LOS_PATH = r'C:\Users\shunita\OneDrive - Technion\kira\fairemb\exp_results\paper 2 los\tiny bert no additionals'
 # main_los_file = 'merged_orig_and_upsample.csv'
-LOS_PATH = r'C:\Users\shunita\OneDrive - Technion\kira\fairemb\exp_results\paper 2 los\age tiny bert'
+# LOS_PATH = r'C:\Users\shunita\OneDrive - Technion\kira\fairemb\exp_results\paper 2 los\age tiny bert'
+LOS_PATH = r'C:\Users\shunita\OneDrive - Technion\kira\fairemb\exp_results\paper 2 los\gender+numericals'
 main_los_file = ''
 
 
@@ -60,17 +61,18 @@ def calculate_diebold_mariano(test_df=None, pairs=None):
                 subset = test_df
             else:
                 subset = test_df[test_df['GENDER'] == population]
-            cols = [c for c in models if c in subset.columns]
-            m = subset[['LOS', 'GENDER', 'sample_id'] + cols + [x+'_loss' for x in cols]]
+            # cols = [c for c in models if c in subset.columns]
+            #m = subset[['LOS', 'GENDER', 'sample_id'] + cols + [x+'_loss' for x in cols]]
+            m = subset
             for model in pair:
                 if model not in subset.columns:
                     print(f"{model} is not in the columns. Reading from separate file.")
                     df1 = pd.read_csv(os.path.join(LOS_PATH, los_files[model]), index_col=0).rename(
                         {'pred_LOS': model}, axis=1)
-                    m = m.merge(df1, on='sample_id')
+                    m = subset.merge(df1, on='sample_id')
                     m[model + "_loss"] = (m[model] - m['LOS']).abs()
                 print(f"{model} MAE: {m[model + '_loss'].mean()}")
-            print(dm_test(m['LOS'], m[pair[0]], m[pair[1]]))
+            print(dm_test(m['LOS'], m[pair[0]], m[pair[1]], crit='MAD'))
 
 
 def merge_los_files():
@@ -91,19 +93,20 @@ def merge_los_files():
             df = df[df['source'] == 'orig']
         df['sample_id'] = df.index
 
-    los_files = {
-        'DERT': 'los_test_GAN20_los.csv',
-        'BERT10-18': 'los_test_BERT10-18_40eps_los.csv',
-        'tinybert_non_med': 'los_test_tinybert_non_medical_los.csv',
-        'hurtful_words': 'los_test_hurtful_words_tiny_adv_los.csv',
-        'nullitout': 'los_test_Medical_tiny_BERT_nullitout_los.csv',
-        'BERT10-18_Medgan': 'los_test_BERT10-18_40eps_medgan_los.csv',
-        'DERT_Medgan': 'los_test_GAN20_medgan_los.csv',
-        'BERT10-18_SMOTE': 'los_test_BERT10-18_40eps_smote_los.csv',
-        'DERT_SMOTE': 'los_test_GAN20_smote_los.csv',
-        'BERT10-18_downsample': 'los_test_BERT10-18_40eps_downsample_los.csv',
-        'DERT_downsample': 'los_test_GAN20_downsample_los.csv'
-        }
+    # los_files = {
+    #     'DERT': 'los_test_GAN20_los.csv',
+    #     'BERT10-18': 'los_test_BERT10-18_40eps_los.csv',
+    #     'tinybert_non_med': 'los_test_tinybert_non_medical_los.csv',
+    #     'hurtful_words': 'los_test_hurtful_words_tiny_adv_los.csv',
+    #     'nullitout': 'los_test_Medical_tiny_BERT_nullitout_los.csv',
+    #     'BERT10-18_Medgan': 'los_test_BERT10-18_40eps_medgan_los.csv',
+    #     'DERT_Medgan': 'los_test_GAN20_medgan_los.csv',
+    #     'BERT10-18_SMOTE': 'los_test_BERT10-18_40eps_smote_los.csv',
+    #     'DERT_SMOTE': 'los_test_GAN20_smote_los.csv',
+    #     'BERT10-18_downsample': 'los_test_BERT10-18_40eps_downsample_los.csv',
+    #     'DERT_downsample': 'los_test_GAN20_downsample_los.csv'
+    #     }
+    los_files = {fname[9:].split('_los')[0]: fname for fname in os.listdir(LOS_PATH) if fname.startswith("los_test")}
 
     for name, file_path in los_files.items():
         path = os.path.join(LOS_PATH, file_path)
@@ -119,6 +122,11 @@ def merge_los_files():
             df = df1
         df[f'{name}_loss'] = (df[f'{name}']-df['LOS']).abs()
 
+    df = df.rename(lambda x:
+                   x.replace('GAN20', 'TeDi-BERT')
+                   .replace('BERT10-18_40eps', 'BERT10-18')
+                   .replace('Medical_tiny_BERT_nullitout', 'nullitout')
+                   .replace('tinybert_non_medical', 'tinybert_non_med'), axis=1)
     # df.to_csv(os.path.join(los_path, 'merged_with_upsample_raw_test_data_4upsampling_methods.csv'))
     return df
 

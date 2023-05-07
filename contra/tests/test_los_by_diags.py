@@ -37,7 +37,7 @@ MIMIC_PATH = "/home/shunita/mimic3/physionet.org/files/mimiciii/1.4/"
 # params used in ACL ARR, october 15 2021
 LR = 1e-3
 BATCH_SIZE = 128
-MAX_EPOCHS = 15
+MAX_EPOCHS = 1
 
 # params used for bert-base runs
 # LR = 1e-4
@@ -46,11 +46,13 @@ MAX_EPOCHS = 15
 RUN_MODEL_INDEX = 5
 # UPSAMPLE_FEMALE = 'data/los_by_diags_female_sample.csv'
 UPSAMPLE_FEMALE = None
-DOWNSAMPLE_MALE = True
+DOWNSAMPLE_MALE = False
 USE_EMB = True
 CROSS_VAL = None  # number of folds (10) or None
-# 3 - age+gender (used in upsample). 0 - no additional features (used in main figure).
-ADDITIONALS = 1
+# 3 - age+gender (used in upsample). 0 - no additional features (used in main figure). 1- only age.
+ADDITIONALS = 7
+TEST_CHECKPOINT = '/home/shunita/fairemb/saved_models/LOS/exp_15/epoch=0-step=304.ckpt'
+# TEST_CHECKPOINT = None
 
 
 
@@ -94,7 +96,7 @@ def abs_error(ytrue, ypred):
     return np.mean(np.abs(ytrue-ypred))
 
 
-def print_results(result_df, name=None, log_file=None):
+def print_results(result_df, name=None, log_file=None, row_desc=''):
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
     if 'source' in test_df.columns:
@@ -120,10 +122,10 @@ def print_results(result_df, name=None, log_file=None):
             out_path = log_file
         if not os.path.exists(out_path):
             f = open(out_path, "w")
-            f.write("all_RMSE,fem_RMSE,male_RMSE,all_MAE,fem_MAE,male_MAE\n")
+            f.write("row,all_RMSE,fem_RMSE,male_RMSE,all_MAE,fem_MAE,male_MAE\n")
         else:
             f = open(out_path, "a")
-        f.write(f"{all_RMSE},{fem_RMSE},{male_RMSE},{all_MAE},{fem_MAE},{male_MAE}\n")
+        f.write(f"{row_desc},{all_RMSE},{fem_RMSE},{male_RMSE},{all_MAE},{fem_MAE},{male_MAE}\n")
     return {'all_MAE': all_MAE, 'fem_MAE': fem_MAE, 'male_MAE': male_MAE,
             'all_RMSE': all_RMSE, 'fem_RMSE': fem_RMSE, 'male_RMSE': male_RMSE}
 
@@ -292,7 +294,7 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
         sample_ids = np.concatenate([batch['sample_id'].cpu().numpy() for batch in outputs])
         pred_prob = np.concatenate([batch['pred_LOS'].cpu().numpy().squeeze() for batch in outputs])
         df = pd.DataFrame.from_dict({'sample_id': sample_ids, 'pred_LOS': pred_prob}, orient='columns')
-        print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
+        print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'), row_desc=f'val_ep{self.current_epoch}')
 
     def test_step(self, batch: dict, batch_idx: int, optimizer_idx: int = None):
         return batch['sample_id'], self.forward(batch).squeeze(1)
@@ -309,12 +311,12 @@ class BertOnDiagsWithRegression(BertOnDiagsBase):
                     })
         df = pd.DataFrame.from_records(records)
         sp = self.save_dir if self.save_dir is not None else SAVE_PATH
-        df.to_csv(os.path.join(sp, f'los_test_{self.name}.csv'))
-        df = pd.read_csv(os.path.join(sp, f'los_test_{self.name}.csv'), index_col=0)
+        df.to_csv(os.path.join(sp, f'los_test_{self.name}_ep{self.current_epoch}.csv'))
+        df = pd.read_csv(os.path.join(sp, f'los_test_{self.name}_ep{self.current_epoch}.csv'), index_col=0)
         if CROSS_VAL is not None:
             print_results(df, name=self.name)
         else:
-            print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
+            print_results(df, log_file=os.path.join(self.save_dir, 'metrics.csv'), row_desc=f'test_ep_{self.current_epoch}')
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -402,9 +404,15 @@ if __name__ == '__main__':
         frozen_emb = os.path.expanduser(
             '~/fairemb/exp_results/nullspace_projection/BERT_tiny_medical_diags_and_drugs_debiased.tsv')
 
-    next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'LOS'))]) + 1
-    save_dir = os.path.join(SAVE_PATH, 'LOS', f'exp_{next_exp_index}')
-    os.makedirs(save_dir)
+    if TEST_CHECKPOINT is not None:
+        save_dir, filename = os.path.split(TEST_CHECKPOINT)
+        ep = filename.split("-")[0]
+    else:
+        next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'LOS'))]) + 1
+        save_dir = os.path.join(SAVE_PATH, 'LOS', f'exp_{next_exp_index}')
+        os.makedirs(save_dir)
+    print(f'results will be written to: {save_dir}')
+
 
     ckpt_callback = ModelCheckpoint(dirpath=save_dir, every_n_epochs=1, save_top_k=-1)
 
@@ -499,14 +507,26 @@ if __name__ == '__main__':
                                  )
             dm = LOSbyDiagsModule(diag_dict, proc_dict, batch_size=BATCH_SIZE, upsample_female_file=UPSAMPLE_FEMALE,
                                   downsample_male=DOWNSAMPLE_MALE)
-            trainer.fit(model, datamodule=dm)
-            trainer.test(model, datamodule=dm)
+            if TEST_CHECKPOINT is not None:
+                # torch_model = torch.load(TEST_CHECKPOINT)
+                # torch_model['state_dict']['bert_model.pooler.dense.bias']
+                # torch_model['state_dict']['bert_model.pooler.dense.weight']
+                # print(f"testing checkpoint: {TEST_CHECKPOINT}")
+                # print('without passing the checkpoint path again to trainer.test')
+                # trainer.test(model, datamodule=dm)
+                # print('when passing the checkpoint path again to trainer.test')
+                model.eval() # did not check if this works/ is needed
+                trainer.test(model, datamodule=dm, ckpt_path=TEST_CHECKPOINT)
+            else:
+                trainer.fit(model, datamodule=dm)
+                trainer.test(model, datamodule=dm)
 
-    with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
-        f.write(f"Run description: {desc}\n")
-        f.write(f"Used features: diags? {USE_EMB}\n")
-        f.write(f"Additional features: using {ADDITIONALS}, available features: {dm.additional_features_list()}\n")
-        f.write(f"Batch size: {BATCH_SIZE}, learning rate: {LR}, epochs: {MAX_EPOCHS}, cross_val? {CROSS_VAL}\n")
+    if TEST_CHECKPOINT is None:
+        with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
+            f.write(f"Run description: {desc}\n")
+            f.write(f"Used features: diags? {USE_EMB}\n")
+            f.write(f"Additional features: using {ADDITIONALS}\navailable features: {dm.additional_features_list()}\n")
+            f.write(f"Batch size: {BATCH_SIZE}\nlearning rate: {LR}\nepochs: {MAX_EPOCHS}\ncross_val? {CROSS_VAL}\n")
 
     # join_results([(desc, os.path.join(SAVE_PATH, f'los_test_{desc}.csv')) for desc, path in DESCS_AND_MODELS],
     #              output_fname=os.path.join(SAVE_PATH, 'los_test_2L_with_attrs.csv'))

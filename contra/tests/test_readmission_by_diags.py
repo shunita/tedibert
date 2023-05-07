@@ -44,7 +44,7 @@ BATCH_SIZE = 64
 # used with clinical BERT
 # BATCH_SIZE = 2
 
-RUN_MODEL_INDEX = 5
+RUN_MODEL_INDEX = 1
 USE_EMB = True
 USE_PROCEDURES = False
 USE_DRUGS = True
@@ -53,12 +53,14 @@ USE_LSTM = True
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_sampled_medgan.csv'
 # UPSAMPLE_FEMALE = 'data/readmission_by_diags_with_smote.csv'
 UPSAMPLE_FEMALE = None
-DOWNSAMPLE_MALE = True
+DOWNSAMPLE_MALE = False
 MAX_EPOCHS = 4  # 4
 CROSS_VAL = None  # number (10) or None
-# ADDITIONALS = 3 # age + gender
+# ADDITIONALS = 3  # age + gender
 # ADDITIONALS = 0
-ADDITIONALS = 1 # age
+# ADDITIONALS = 1  # age
+ADDITIONALS = 7  # age, gender, and some summary history features
+TEST_CHECKPOINT = None
 
 # setting random seeds
 torch.manual_seed(0)
@@ -78,7 +80,7 @@ def print_metrics(ytrue, ypred):
     return auc, acc
 
 
-def print_aucs_for_readmission(result_df, name=None, log_file=None):
+def print_aucs_for_readmission(result_df, name=None, log_file=None, row_desc=''):
     test_df = pd.read_csv(READMIT_TEST_PATH, index_col=0)
     test_df = test_df.merge(result_df, left_index=True, right_on='sample_id')
     desc = 'pred_prob'
@@ -97,14 +99,14 @@ def print_aucs_for_readmission(result_df, name=None, log_file=None):
             out_path = log_file
         if not os.path.exists(out_path):
             f = open(out_path, "w")
-            f.write("all_auc,fem_auc,male_auc,all_acc,fem_acc,male_acc\n")
+            f.write("row,all_auc,fem_auc,male_auc,all_acc,fem_acc,male_acc\n")
         else:
             f = open(out_path, "a")
-        f.write(f"{all_auc},{fem_auc},{male_auc},{all_acc},{fem_acc},{male_acc}\n")
+        f.write(f"{row_desc},{all_auc},{fem_auc},{male_auc},{all_acc},{fem_acc},{male_acc}\n")
     return {'all_auc': all_auc, 'all_acc': all_acc, 'fem_auc': fem_auc, 'fem_acc': fem_acc, 'male_auc': male_auc, 'male_acc': male_acc}
 
 
-def print_aucs_for_los(result_df, name=None, log_file=None):
+def print_aucs_for_los(result_df, name=None, log_file=None, row_desc=''):
     if name is not None or log_file is not None:
         print("unsupported argument for 'print_aucs_for_los'")
     test_df = pd.read_csv(LOS_TEST_PATH_V4, index_col=0)
@@ -560,7 +562,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
         pred_prob = np.concatenate([batch['pred_prob'].cpu().numpy().squeeze() for batch in outputs])
         df = pd.DataFrame.from_dict({'sample_id': sample_ids, 'pred_prob': pred_prob}, orient='columns')
         try:
-            res = self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
+            res = self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'), row_desc=f'val_ep{self.current_epoch}')
             self.log(f'classification/AUC_all', res['all_auc'])
             self.log(f'classification/AUC_female', res['fem_auc'])
             self.log(f'classification/AUC_male', res['male_auc'])
@@ -588,7 +590,7 @@ class BertOnDiagsWithClassifier(BertOnDiagsBase):
         if CROSS_VAL is not None:
             self.print_aucs(df, name=self.name)
         else:
-            self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'))
+            self.print_aucs(df, log_file=os.path.join(self.save_dir, 'metrics.csv'), row_desc=f'test_ep{self.current_epoch}')
 
     def configure_optimizers(self):
         grouped_parameters = [
@@ -812,9 +814,15 @@ if __name__ == '__main__':
     if RUN_MODEL_INDEX == 39:  # null it out uses frozen embeddings
         frozen_emb = os.path.expanduser('~/fairemb/exp_results/nullspace_projection/BERT_tiny_medical_diags_and_drugs_debiased.tsv')
 
-    next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'readmission'))]) + 1
-    save_dir = os.path.join(SAVE_PATH, 'readmission', f'exp_{next_exp_index}')
-    os.makedirs(save_dir)
+    if TEST_CHECKPOINT is not None:
+        save_dir, filename = os.path.split(TEST_CHECKPOINT)
+        ep = filename.split("-")[0]
+    else:
+        next_exp_index = max([int(x.split('_')[-1]) for x in os.listdir(os.path.join(SAVE_PATH, 'readmission'))]) + 1
+        save_dir = os.path.join(SAVE_PATH, 'readmission', f'exp_{next_exp_index}')
+        os.makedirs(save_dir)
+    print(f'results will be written to: {save_dir}')
+
 
     ckpt_callback = ModelCheckpoint(dirpath=save_dir, every_n_epochs=1, save_top_k=-1)
 
@@ -911,14 +919,19 @@ if __name__ == '__main__':
                                  # num_sanity_val_steps=2,
                                  callbacks=[ckpt_callback]
                                  )
-            trainer.fit(model, datamodule=dm)
-            trainer.test(model, datamodule=dm)
+            if TEST_CHECKPOINT is not None:
+                print(f"testing checkpoint: {TEST_CHECKPOINT}")
+                trainer.test(model, datamodule=dm, ckpt_path=TEST_CHECKPOINT)
+            else:
+                trainer.fit(model, datamodule=dm)
+                trainer.test(model, datamodule=dm)
 
-    with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
-        f.write(f"Run description: {desc}\n")
-        f.write(f"Used features: diags? {USE_EMB}, procedures? {USE_PROCEDURES}, drugs? {USE_DRUGS}\n")
-        f.write(f"Additional features: using {ADDITIONALS}, available features: {dm.additional_features_list()}\n")
-        f.write(f"Batch size: {BATCH_SIZE}, learning rate: {LR}, epochs: {MAX_EPOCHS}, cross_val? {CROSS_VAL}\n")
+    if TEST_CHECKPOINT is None:
+        with open(os.path.join(save_dir, 'log.txt'), 'w') as f:
+            f.write(f"Run description: {desc}\n")
+            f.write(f"Used features: diags? {USE_EMB}, procedures? {USE_PROCEDURES}, drugs? {USE_DRUGS}\n")
+            f.write(f"Additional features: using {ADDITIONALS}, available features: {dm.additional_features_list()}\n")
+            f.write(f"Batch size: {BATCH_SIZE}, learning rate: {LR}, epochs: {MAX_EPOCHS}, cross_val? {CROSS_VAL}\n")
 
 
     # feature importance analysis

@@ -67,6 +67,9 @@ class DiagsModuleBase(pl.LightningDataModule):
         self.diag_idf = defaultdict(lambda: 1)
         self.categorical_features = []
         self.CV_fold = CV_fold
+        self.assignment_field = 'ASSIGNMENT'
+        if self.CV_fold is not None:
+            self.assignment_field = f'ASSIGNMENT_{self.CV_fold}'
 
     def filter_code_list(self, icd9_codes_list_as_text, lookup_dict, name='diags', remove_if_half_missing=False):
         icd9_codes_list_as_text = clean_nans(icd9_codes_list_as_text)
@@ -108,9 +111,6 @@ class DiagsModuleBase(pl.LightningDataModule):
             self.data.PREV_DIAGS = self.data.PREV_DIAGS.apply(
                 lambda x: self.filter_code_list(x, self.diag_dict, 'diags', remove_if_half_missing=False))
             self.data['NUM_PREV_DIAGS'] = self.data.PREV_DIAGS.apply(literal_eval).apply(len)
-            # self.data = self.data[self.data.PREV_DIAGS != '[]']
-            # TODO: what if we didn't remove cases without prev diags?
-            # print(f"Working with PREV_DIAGS. Kept {len(self.data)} records who had PREV_DIAGS.")
 
         if 'DRUG' in self.data.columns:
             self.data['DRUG'] = self.data.DRUG.fillna('{}')
@@ -123,12 +123,11 @@ class DiagsModuleBase(pl.LightningDataModule):
 
         print(f'Unknown diag codes: {len(self.removed_diags)}/{len(self.total_diags)}')
         print(f'Unknown procedure codes: {len(self.removed_procs)}/{len(self.total_procs)}')
+        # handle sampled files where some features are unknown
+        self.data = self.data.fillna(value={'NUM_PREV_ADMIS': 0, 'DAYS_SINCE_LAST_ADMIS': 0, 'NUM_PREV_PROCS': 0})
 
-        assignment_field = 'ASSIGNMENT'
-        if self.CV_fold is not None:
-            assignment_field = f'ASSIGNMENT_{self.CV_fold}'
-        self.train_df = self.data[self.data[assignment_field] == 'train']
-        self.val_df = self.data[self.data[assignment_field] == 'test']
+        self.train_df = self.data[self.data[self.assignment_field] == 'train']
+        self.val_df = self.data[self.data[self.assignment_field] == 'test']
         print(f'Divided to {len(self.train_df)} train, {len(self.val_df)} test.')
         if self.upsample_female is not None:
             print(f"before upsampling female patients, train contains {self.train_df.GENDER_F.sum()} female patients.")
@@ -191,7 +190,7 @@ class LOSbyDiagsModule(DiagsModuleBase):
             before = len(self.data)
             self.data = self.data[self.data.LOS <= longest_LOS]
             print(f"Removed records with LOS above {longest_LOS}, remaining records: {len(self.data)/before}")
-        self.categorical_features = [] #['GENDER'] # +\
+        self.categorical_features = ['GENDER'] # +\
                                     #['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'INSURANCE', 'RELIGION',
                                     # 'ETHNICITY', 'MARITAL_STATUS']
 
@@ -219,7 +218,7 @@ class ReadmissionbyDiagsModule(DiagsModuleBase):
         self.data = self.data.dropna(subset=['DIAGS', 'READMISSION'])
         self.data = self.data[self.data['READMISSION'] != 2]  # Remove patients who died in the hospital
         # print("train: female: {}")
-        self.categorical_features = [] #['GENDER'] #+ \
+        self.categorical_features = ['GENDER'] #+ \
                                     #['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
                                     # 'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS'] #+\
                                     # ['Glascow coma scale eye opening first', 'Glascow coma scale eye opening last',
@@ -266,8 +265,8 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes, classification=False):
         super(LOSbyDiagsDataset, self).__init__(
             df, diag_idf, categorical_feature_prefixes,
-            non_cat_features=['AGE'] #+ \
-                             #['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
+            non_cat_features=['AGE'] +
+                             ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']
         )
         self.classification = classification
 
@@ -291,8 +290,8 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
 
 class ReadmitbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes):
-        non_cat_features = ['AGE'] #+ \
-                           #['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
+        non_cat_features = ['AGE'] + \
+                           ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
                            # ['Glascow coma scale total avg', 'Glascow coma scale total first',
                            #  'Glascow coma scale total last', 'Capillary refill rate avg',
                            #  'Capillary refill rate first', 'Capillary refill rate last',
