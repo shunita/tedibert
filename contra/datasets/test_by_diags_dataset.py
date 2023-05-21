@@ -70,6 +70,7 @@ class DiagsModuleBase(pl.LightningDataModule):
         self.assignment_field = 'ASSIGNMENT'
         if self.CV_fold is not None:
             self.assignment_field = f'ASSIGNMENT_{self.CV_fold}'
+        self.did_prepare_data = False
 
     def filter_code_list(self, icd9_codes_list_as_text, lookup_dict, name='diags', remove_if_half_missing=False):
         icd9_codes_list_as_text = clean_nans(icd9_codes_list_as_text)
@@ -98,6 +99,8 @@ class DiagsModuleBase(pl.LightningDataModule):
 
     def prepare_data(self):
         # Assumes that all NAs in important fields were dropped.
+        if self.did_prepare_data:
+            return None
         self.handle_categorical_features()
         self.data = self.data[self.data.AGE >= 18]  # don't include newborns and children
         self.data.DIAGS = self.data.DIAGS.apply(lambda x: self.filter_code_list(x, self.diag_dict, 'diags', remove_if_half_missing=False))
@@ -150,12 +153,17 @@ class DiagsModuleBase(pl.LightningDataModule):
             print(f"Downsampled male patients in train - removed {b - len(self.train_df)} rows.")
         self.diag_idf = calculate_idf(self.train_df.DIAGS.apply(literal_eval).values)
         self.calculate_stats()
+        self.did_prepare_data = True
 
     def calculate_stats(self):
         pass
 
     def handle_categorical_features(self):
         # TODO: more refined handling of features like RELIGION and ETHNICITY?
+        for feat in self.categorical_features:
+            if feat not in self.data.columns:
+                print("probably already handled categorical features")
+                return
         self.data = pd.get_dummies(self.data, columns=self.categorical_features)
 
     def train_dataloader(self):
@@ -218,7 +226,7 @@ class ReadmissionbyDiagsModule(DiagsModuleBase):
         self.data = self.data.dropna(subset=['DIAGS', 'READMISSION'])
         self.data = self.data[self.data['READMISSION'] != 2]  # Remove patients who died in the hospital
         # print("train: female: {}")
-        self.categorical_features = ['GENDER'] #+ \
+        self.categorical_features = [] #['GENDER'] #+ \
                                     #['ADMISSION_TYPE', 'ADMISSION_LOCATION', 'DISCHARGE_LOCATION',
                                     # 'INSURANCE', 'RELIGION', 'ETHNICITY', 'MARITAL_STATUS'] #+\
                                     # ['Glascow coma scale eye opening first', 'Glascow coma scale eye opening last',
@@ -290,8 +298,8 @@ class LOSbyDiagsDataset(DiagsDatasetBase):
 
 class ReadmitbyDiagsDataset(DiagsDatasetBase):
     def __init__(self, df, diag_idf, categorical_feature_prefixes):
-        non_cat_features = ['AGE'] + \
-                           ['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
+        non_cat_features = ['AGE'] #+ \
+                           #['NUM_PREV_ADMIS', 'DAYS_SINCE_LAST_ADMIS', 'NUM_PREV_PROCS', 'NUM_PREV_DIAGS']  # +\
                            # ['Glascow coma scale total avg', 'Glascow coma scale total first',
                            #  'Glascow coma scale total last', 'Capillary refill rate avg',
                            #  'Capillary refill rate first', 'Capillary refill rate last',
